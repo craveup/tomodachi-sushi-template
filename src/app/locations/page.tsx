@@ -106,7 +106,7 @@ export default function LeclercLocationsPage() {
   const handleOrderFromLocation = (locationId: string) => {
     // In a real app, this would set the selected location and redirect to menu
     console.log(`Starting order from location: ${locationId}`);
-    window.location.href = "/examples/leclerc-bakery";
+    window.location.href = "/";
   };
 
   const handleGetDirections = (address: string) => {

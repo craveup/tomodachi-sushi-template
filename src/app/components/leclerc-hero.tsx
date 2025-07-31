@@ -48,12 +48,14 @@ export function LeclercHero() {
             <Button
               size="lg"
               onClick={() => setIsAddressFlowOpen(true)}
-              className={`${getThemeClass("hero-cta")} bg-[hsl(var(--brand-accent))] text-white dark:text-white hover:bg-[hsl(var(--brand-accent))]/90 transition-all duration-200`}
+              className={`${getThemeClass(
+                "hero-cta"
+              )} bg-[hsl(var(--brand-accent))] text-white dark:text-white hover:bg-[hsl(var(--brand-accent))]/90 transition-all duration-200`}
             >
               <MapPin className="mr-2 h-4 w-4" />
               Start Order
             </Button>
-            <Link href="/examples/leclerc-bakery/menu">
+            <Link href="/menu">
               <Button
                 size="lg"
                 variant="outline"

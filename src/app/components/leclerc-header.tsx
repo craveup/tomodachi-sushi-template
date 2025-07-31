@@ -33,17 +33,21 @@ export function LeclercHeader({ onCartClick }: LeclercHeaderProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <a
-            href="/examples/leclerc-bakery"
+            href="/"
             className="flex items-center hover:opacity-80 transition-opacity"
             aria-label="Go to Leclerc Bakery home page"
           >
             <h1
-              className={`font-leclerc-display text-2xl font-semibold tracking-tight ${getThemeClass("header-logo")} text-[hsl(var(--brand-accent))]`}
+              className={`font-leclerc-display text-2xl font-semibold tracking-tight ${getThemeClass(
+                "header-logo"
+              )} text-[hsl(var(--brand-accent))]`}
             >
               LECLERC
             </h1>
             <span
-              className={`font-leclerc-support ml-2 text-sm tracking-wider ${getThemeClass("header-tagline")} text-muted-foreground`}
+              className={`font-leclerc-support ml-2 text-sm tracking-wider ${getThemeClass(
+                "header-tagline"
+              )} text-muted-foreground`}
             >
               BAKERY
             </span>
@@ -56,29 +60,37 @@ export function LeclercHeader({ onCartClick }: LeclercHeaderProps) {
             aria-label="Main navigation"
           >
             <a
-              href="/examples/leclerc-bakery/menu"
-              className={`font-leclerc-support text-sm font-medium tracking-wide ${getThemeClass("header-nav-link")} text-foreground hover:text-primary transition-colors`}
+              href="/menu"
+              className={`font-leclerc-support text-sm font-medium tracking-wide ${getThemeClass(
+                "header-nav-link"
+              )} text-foreground hover:text-primary transition-colors`}
               aria-label="View menu"
             >
               Menu
             </a>
             <a
-              href="/examples/leclerc-bakery/locations"
-              className={`font-leclerc-support text-sm font-medium tracking-wide ${getThemeClass("header-nav-link")} text-foreground hover:text-primary transition-colors`}
+              href="/locations"
+              className={`font-leclerc-support text-sm font-medium tracking-wide ${getThemeClass(
+                "header-nav-link"
+              )} text-foreground hover:text-primary transition-colors`}
               aria-label="View store locations"
             >
               Locations
             </a>
             <a
-              href="/examples/leclerc-bakery#catering"
-              className={`font-leclerc-support text-sm font-medium tracking-wide ${getThemeClass("header-nav-link")} text-foreground hover:text-primary transition-colors`}
+              href="#catering"
+              className={`font-leclerc-support text-sm font-medium tracking-wide ${getThemeClass(
+                "header-nav-link"
+              )} text-foreground hover:text-primary transition-colors`}
               aria-label="View catering options"
             >
               Catering
             </a>
             <a
-              href="/examples/leclerc-bakery#about"
-              className={`font-leclerc-support text-sm font-medium tracking-wide ${getThemeClass("header-nav-link")} text-foreground hover:text-primary transition-colors`}
+              href="#about"
+              className={`font-leclerc-support text-sm font-medium tracking-wide ${getThemeClass(
+                "header-nav-link"
+              )} text-foreground hover:text-primary transition-colors`}
               aria-label="Learn about our story"
             >
               Our Story

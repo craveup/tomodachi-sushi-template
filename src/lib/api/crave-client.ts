@@ -2,6 +2,9 @@ import axios from "axios";
 
 const STORE_FRONT_API_BASE_URL = process.env.NEXT_PUBLIC_STORE_FRONT_API_URL || "http://localhost:8000";
 
+// Local development mode flag
+const isLocalMode = process.env.NEXT_PUBLIC_LOCAL_MODE === 'true';
+
 // SWR fetcher function
 export const fetcherSWR = async (
   endPoint: string,
@@ -56,7 +59,21 @@ export const postData = async (
   data: Record<any, any>,
   baseUrl?: string,
 ) => {
+  // Local mode fallback
+  if (isLocalMode) {
+    console.log('🟡 Local mode enabled - using mock data for POST:', endpoint);
+    return getMockPostResponse(endpoint, data);
+  }
+
   try {
+    console.log('POST request attempt:', {
+      endpoint,
+      fullUrl: `${baseUrl || STORE_FRONT_API_BASE_URL}${endpoint}`,
+      data,
+      apiKey: process.env.NEXT_PUBLIC_CRAVEUP_API_KEY ? 'SET' : 'NOT SET',
+      baseUrl: baseUrl || STORE_FRONT_API_BASE_URL
+    });
+
     const response = await handleRequestClientSide(
       endpoint,
       "POST",
@@ -68,13 +85,76 @@ export const postData = async (
   } catch (error: any) {
     console.error('POST request failed:', {
       endpoint,
+      fullUrl: `${baseUrl || STORE_FRONT_API_BASE_URL}${endpoint}`,
       data,
       error: error.response?.data || error.message,
-      status: error.response?.status
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      headers: error.response?.headers,
+      config: {
+        method: error.config?.method,
+        url: error.config?.url,
+        headers: error.config?.headers
+      }
     });
+
+    // Fallback to local mode on connection error
+    if (error.code === 'ECONNREFUSED' || error.message.includes('Network Error')) {
+      console.log('🟡 API unavailable - falling back to mock data for POST:', endpoint);
+      return getMockPostResponse(endpoint, data);
+    }
+    
     throw error;
   }
 };
+
+// Mock response generator for local development
+function getMockPostResponse(endpoint: string, data: Record<any, any>) {
+  // Mock cart creation
+  if (endpoint.includes('/carts') && !endpoint.includes('/cart-item')) {
+    return {
+      cartId: 'mock-cart-' + Date.now(),
+      items: [],
+      subtotal: 0,
+      tax: 0,
+      total: 0,
+      status: 'active'
+    };
+  }
+
+  // Mock add to cart
+  if (endpoint.includes('/cart-item')) {
+    return {
+      cartId: 'mock-cart-123',
+      items: [{
+        _id: 'mock-item-' + Date.now(),
+        productId: data.id,
+        quantity: data.quantity || 1,
+        price: 5.00,
+        itemTotal: (data.quantity || 1) * 5.00
+      }],
+      subtotal: (data.quantity || 1) * 5.00,
+      tax: (data.quantity || 1) * 5.00 * 0.08,
+      total: (data.quantity || 1) * 5.00 * 1.08
+    };
+  }
+
+  // Mock promo code application
+  if (endpoint.includes('/discounts/apply-discount')) {
+    return {
+      discountApplied: true,
+      discountAmount: 2.00,
+      discountCode: data.discountCode
+    };
+  }
+
+  // Default mock response
+  return {
+    success: true,
+    message: 'Mock response for local development',
+    data: data
+  };
+}
 
 export const putData = async (
   endpoint: string,
