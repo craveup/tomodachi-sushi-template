@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { X, Plus, Minus, Info } from "lucide-react";
+import { X, Info } from "lucide-react";
 import Image from "next/image";
 
 import type { MenuItem } from "@/types/restaurant";
@@ -164,7 +164,7 @@ export default function ItemDetailModal({
               </div>
 
               <div className="flex items-center justify-between">
-                <PriceDisplay price={item.price} size="2xl" />
+                <PriceDisplay price={item.price} size="xxl" />
                 {(item.rating || item.reviewCount) && (
                   <RatingDisplay
                     rating={item.rating}

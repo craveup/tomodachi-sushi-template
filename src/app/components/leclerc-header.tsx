@@ -8,6 +8,7 @@ import { useAddress } from "../providers/address-provider";
 import { useThemeClasses } from "../hooks/use-restaurant-theme";
 import { AddressFlow, DeliveryOption } from "./address-flow";
 import { ClientIcon } from "./client-icon";
+import Link from "next/link";
 
 interface LeclercHeaderProps {
   onCartClick?: () => void;
@@ -32,7 +33,7 @@ export function LeclercHeader({ onCartClick }: LeclercHeaderProps) {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <a
+          <Link
             href="/"
             className="flex items-center hover:opacity-80 transition-opacity"
             aria-label="Go to Leclerc Bakery home page"
@@ -51,7 +52,7 @@ export function LeclercHeader({ onCartClick }: LeclercHeaderProps) {
             >
               BAKERY
             </span>
-          </a>
+          </Link>
 
           {/* Navigation */}
           <nav

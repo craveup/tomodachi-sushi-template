@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -59,7 +59,7 @@ export default function LeclercCheckoutPage() {
   };
 
   // Generate time slots like real delivery apps
-  const generateTimeSlots = () => {
+  const generateTimeSlots = useCallback(() => {
     const slots = [];
     const now = new Date();
 
@@ -138,10 +138,10 @@ export default function LeclercCheckoutPage() {
     }
 
     return slots.slice(0, 20); // Show next 20 available slots
-  };
+  }, [orderType]);
 
   // Regenerate time slots when order type changes
-  const timeSlots = useMemo(() => generateTimeSlots(), [orderType]);
+  const timeSlots = useMemo(() => generateTimeSlots(), [generateTimeSlots]);
 
   // Clear selected time when switching order types
   const handleOrderTypeChange = (newType: string) => {

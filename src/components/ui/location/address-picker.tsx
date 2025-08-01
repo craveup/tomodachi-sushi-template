@@ -49,7 +49,8 @@ export default function AddressPickerModal({
             Enter your delivery address
           </DialogTitle>
           <p className="text-sm text-muted-foreground text-center">
-            This will help us confirm the store's availability and delivery fees
+            This will help us confirm the store&apos;s availability and delivery
+            fees
           </p>
         </DialogHeader>
 

@@ -45,8 +45,8 @@ export function useComponentLoader(name?: string): UseComponentLoaderResult {
         }
 
         // Then try to load from the component registry
-        const { Index } = await import("../../../example/components");
-        const componentInfo: ComponentInfo = Index[name];
+        const { Index } = await import("@/config/components");
+        const componentInfo: ComponentInfo = Index[name as keyof typeof Index];
 
         if (!componentInfo) {
           if (!cancelled) {

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { getLocation, createCart } from "../../../../lib/api/cart";
+import { getLocation, createCart } from "@/lib/api/cart";
 
 export default function TestAPIPage() {
   const [result, setResult] = useState<any>(null);

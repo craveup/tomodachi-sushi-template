@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TimeSlotPicker } from "@/components/ui/time-slot-picker";
+import { TimeSlotPicker, type TimeSlot } from "@/components/ui/time-slot-picker";
 
 export default function TimeSlotPickerDemo() {
-  const [selectedSlot, setSelectedSlot] = useState(null);
-  const [orderType, setOrderType] = useState("delivery");
+  const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
+  const [orderType, setOrderType] = useState<"pickup" | "delivery">("delivery");
 
   const timeSlots = [
     { id: "1", time: "10:00", label: "10:00 AM", available: true },

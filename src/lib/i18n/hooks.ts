@@ -94,7 +94,7 @@ export function useDirection() {
     // Logical properties for custom styles
     insetStart: isRTL ? 'right' : 'left',
     insetEnd: isRTL ? 'left' : 'right',
-  }), [isRTL]);
+  }), [dir, isRTL]);
 }
 
 /**

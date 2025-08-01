@@ -4,6 +4,16 @@ import { useState } from "react";
 import { Minus, Plus } from "lucide-react";
 
 // Mock QuantitySelector component
+interface QuantitySelectorProps {
+  value: number;
+  onChange: (value: number) => void;
+  variant?: "default" | "compact" | "inline";
+  size?: "sm" | "md" | "lg";
+  showInput?: boolean;
+  min?: number;
+  max?: number;
+}
+
 function QuantitySelector({
   value,
   onChange,
@@ -12,8 +22,8 @@ function QuantitySelector({
   showInput = true,
   min = 0,
   max = 99,
-}) {
-  const sizeClasses = {
+}: QuantitySelectorProps) {
+  const sizeClasses: Record<"sm" | "md" | "lg", string> = {
     sm: "h-7 w-7 text-xs",
     md: "h-9 w-9 text-sm",
     lg: "h-11 w-11",

@@ -215,7 +215,7 @@ export const createPaymentIntent = async (
   cartId: string
 ): Promise<PaymentIntent> => {
   const response = await fetch(endpoints.paymentIntent(locationId, cartId), {
-    headers: apiHeaders
+    headers: apiHeaders()
   })
   return handleAPIResponse(response)
 }
@@ -291,7 +291,7 @@ export const updateCartItemQuantity = async (
   const cart = await fetchCart(locationId, cartId)
   
   const updatedItems = cart.items.map(item =>
-    item._id === itemId ? { ...item, quantity, itemTotal: item.price * quantity } : item
+    item.id === itemId ? { ...item, quantity, total: (parseFloat(item.price) * quantity).toString() } : item
   ).filter(item => item.quantity > 0) // Remove items with 0 quantity
   
   return updateCart(locationId, cartId, updatedItems)

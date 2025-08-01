@@ -27,7 +27,9 @@ export default function MenuSearchDemo() {
         <div className="mt-4 p-4 rounded-lg bg-muted/50">
           <p className="text-sm text-muted-foreground">
             Searching for:{" "}
-            <span className="font-medium text-foreground">"{searchQuery}"</span>
+            <span className="font-medium text-foreground">
+              &quot;{searchQuery}&quot;
+            </span>
           </p>
         </div>
       )}

@@ -33,7 +33,7 @@ export function rehypeComponent() {
           if (srcPath) {
             src = srcPath;
           } else {
-            const component = Index[name];
+            const component = Index[name as keyof typeof Index];
             src = fileName
               ? component.files.find((file: string) => {
                   return (
@@ -98,7 +98,7 @@ export function rehypeComponent() {
         }
 
         try {
-          const component = Index[name];
+          const component = Index[name as keyof typeof Index];
           if (!component) {
             console.warn(`Component "${name}" not found in registry`);
             return;

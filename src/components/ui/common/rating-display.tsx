@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { ThumbsUp } from "lucide-react";
 
 interface RatingDisplayProps {
-  rating: string | number;
+  rating?: string | number;
   reviewCount?: string | number;
   className?: string;
   iconClassName?: string;

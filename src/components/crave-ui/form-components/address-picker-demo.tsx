@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import AddressPickerModal from "@/components/location/address-picker";
+import AddressPickerModal from "@/components/ui/location/address-picker";
 
 export default function AddressPickerDemo() {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [selectedAddress, setSelectedAddress] = useState<{ street: string; apartment?: string } | null>(null);
 
-  const handleAddressSubmit = (address) => {
+  const handleAddressSubmit = (address: { street: string; apartment?: string }) => {
     setSelectedAddress(address);
     setIsOpen(false);
     console.log("Address submitted:", address);

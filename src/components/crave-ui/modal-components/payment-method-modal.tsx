@@ -472,7 +472,7 @@ export default function PaymentMethodModal({
                     Connect PayPal
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    You'll be redirected to PayPal to complete your payment
+                    You&apos;ll be redirected to PayPal to complete your payment
                     securely.
                   </p>
                 </div>
@@ -509,7 +509,7 @@ export default function PaymentMethodModal({
                     Connect Venmo
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    You'll be redirected to Venmo to complete your payment
+                    You&apos;ll be redirected to Venmo to complete your payment
                     securely.
                   </p>
                 </div>

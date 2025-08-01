@@ -10,9 +10,9 @@ import rehypeSlug from "rehype-slug";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { okaidia } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { ComponentPreview } from "@/components/docs/component-preview";
-import { Callout } from "@/components/callout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { Callout } from "./callout";
 
 // Simple ComponentCard for documentation
 function ComponentCard({
@@ -58,7 +58,8 @@ const components = {
     children,
     ...props
   }: React.HTMLAttributes<HTMLHeadingElement>) => {
-    const id = typeof children === "string" ? slugify(children) : undefined;
+    const childText = React.Children.toArray(children).join("");
+    const id = childText ? slugify(childText) : undefined;
     return (
       <h1
         id={id}
@@ -77,7 +78,8 @@ const components = {
     children,
     ...props
   }: React.HTMLAttributes<HTMLHeadingElement>) => {
-    const id = typeof children === "string" ? slugify(children) : undefined;
+    const childText = React.Children.toArray(children).join("");
+    const id = childText ? slugify(childText) : undefined;
     return (
       <h2
         id={id}
@@ -96,7 +98,8 @@ const components = {
     children,
     ...props
   }: React.HTMLAttributes<HTMLHeadingElement>) => {
-    const id = typeof children === "string" ? slugify(children) : undefined;
+    const childText = React.Children.toArray(children).join("");
+    const id = childText ? slugify(childText) : undefined;
     return (
       <h3
         id={id}
@@ -115,7 +118,8 @@ const components = {
     children,
     ...props
   }: React.HTMLAttributes<HTMLHeadingElement>) => {
-    const id = typeof children === "string" ? slugify(children) : undefined;
+    const childText = React.Children.toArray(children).join("");
+    const id = childText ? slugify(childText) : undefined;
     return (
       <h4
         id={id}
@@ -134,7 +138,8 @@ const components = {
     children,
     ...props
   }: React.HTMLAttributes<HTMLHeadingElement>) => {
-    const id = typeof children === "string" ? slugify(children) : undefined;
+    const childText = React.Children.toArray(children).join("");
+    const id = childText ? slugify(childText) : undefined;
     return (
       <h5
         id={id}
@@ -153,7 +158,8 @@ const components = {
     children,
     ...props
   }: React.HTMLAttributes<HTMLHeadingElement>) => {
-    const id = typeof children === "string" ? slugify(children) : undefined;
+    const childText = React.Children.toArray(children).join("");
+    const id = childText ? slugify(childText) : undefined;
     return (
       <h6
         id={id}
@@ -245,8 +251,9 @@ const components = {
     let code = "";
     let language = "tsx";
     if (React.isValidElement(children) && children.props) {
-      code = children.props.children || "";
-      const childClass = children.props.className || "";
+      const childProps = children.props as { children?: string; className?: string };
+      code = childProps.children || "";
+      const childClass = childProps.className || "";
       if (childClass.startsWith("language-")) {
         language = childClass.replace("language-", "");
       }
@@ -350,7 +357,16 @@ const components = {
       </pre>
     </div>
   ),
-  PropsTable: ({ data }: { data: any }) => (
+  PropsTable: ({
+    data,
+  }: {
+    data: Array<{
+      name: string;
+      type: string;
+      default?: string;
+      description: string;
+    }>;
+  }) => (
     <div className="my-6 overflow-hidden rounded-lg border">
       <table className="w-full">
         <thead className="border-b bg-muted/50">
@@ -362,7 +378,7 @@ const components = {
           </tr>
         </thead>
         <tbody>
-          {data?.map((prop: any, index: number) => (
+          {data?.map((prop, index: number) => (
             <tr key={index} className="border-b">
               <td className="p-4 font-mono text-sm">{prop.name}</td>
               <td className="p-4 font-mono text-sm">{prop.type}</td>
@@ -397,7 +413,6 @@ export function MDXComponents({ code }: MDXComponentsProps) {
 
         const { default: MDXContent } = await run(compiled, {
           ...runtime,
-          baseUrl: import.meta.url,
           useMDXComponents: () => components,
         });
 

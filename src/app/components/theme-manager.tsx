@@ -359,7 +359,7 @@ export function ThemeManager() {
               {!hasSeasonalSupport && (
                 <div className="text-center py-8 text-muted-foreground">
                   <p className="text-sm">
-                    This theme doesn't include seasonal variations.
+                    This theme doesn&apos;t include seasonal variations.
                   </p>
                   <p className="text-xs mt-1">
                     Contact your theme developer to add seasonal support.

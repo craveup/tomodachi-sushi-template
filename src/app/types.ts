@@ -3,7 +3,7 @@ export interface MenuItem {
   name: string
   description: string
   price: number
-  image: string
+  image: string | null
   category: "signature" | "seasonal" | "limited" | "cookies" | "pastries" | "breads"
   calories: number
   isNew?: boolean

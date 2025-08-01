@@ -196,8 +196,8 @@ export function LeclercCatering() {
           </h2>
           <p className="font-leclerc-primary text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Elevate your next event with our artisanal French pastries and baked
-            goods. From intimate gatherings to corporate meetings, we'll make it
-            deliciously memorable.
+            goods. From intimate gatherings to corporate meetings, we&apos;ll
+            make it deliciously memorable.
           </p>
         </div>
 
@@ -338,8 +338,8 @@ export function LeclercCatering() {
                 Request a Custom Quote
               </CardTitle>
               <p className="text-center text-muted-foreground">
-                Tell us about your event and we'll create a perfect catering
-                solution for you.
+                Tell us about your event and we&apos;ll create a perfect
+                catering solution for you.
               </p>
             </CardHeader>
             <CardContent>

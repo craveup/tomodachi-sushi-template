@@ -87,3 +87,33 @@ Required for full functionality:
 - **React Testing Library**: Available for component testing
 - **Test Utilities**: Custom test helpers in `src/lib/test-utils/`
 - **Mock Data**: Predefined mock data for development and testing
+
+### Critical Architecture Details
+
+#### Advanced State Management Patterns
+- **Hybrid Cart Strategy**: Primary API-driven state with localStorage fallback for offline functionality
+- **Provider Hierarchy**: Error Boundary → Theme → Address → Cart (strict layering order)
+- **State Synchronization**: Real-time cart sync between API and local storage with optimistic updates
+
+#### Theme Engine Implementation
+- **JSON-Driven Themes**: Load from `public/themes/` with runtime validation
+- **CSS Custom Properties**: Dynamic generation with dark mode overrides
+- **Performance**: Theme caching and lazy loading patterns
+
+#### API Architecture
+- **Dual Strategy**: Direct CraveUp API + Next.js API routes for CORS protection
+- **Security**: Server-side API key handling, client calls through `/api/` routes only
+- **Error Handling**: Custom `CraveUpAPIError` class with standardized response handling
+
+#### Component Development Guidelines
+- **Follow Existing Patterns**: Reference `src/components/ui/example/` for new components
+- **Compound Components**: Use for complex UI (cart, menu items)
+- **TypeScript**: Strict mode - always define proper interfaces in `src/types/`
+- **Styling**: Use theme engine variables, not hardcoded colors
+
+#### Key Files for Development
+- `src/lib/theme-engine.ts` - Theme system core
+- `src/lib/api/client.ts` - API client with error handling
+- `src/app/providers/cart-provider.tsx` - Cart state management
+- `src/types/restaurant.ts` - Core type definitions
+- `public/themes/leclerc-theme.json` - Theme configuration

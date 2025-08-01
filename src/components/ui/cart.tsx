@@ -118,9 +118,9 @@ export function Cart({
                         <span className="text-muted-foreground">
                           {mod.name}
                         </span>
-                        {(mod.price || 0) > 0 && (
+                        {Number(mod.price || 0) > 0 && (
                           <span className="font-medium">
-                            +{formatPrice(mod.price || 0)}
+                            +{formatPrice(Number(mod.price || 0))}
                           </span>
                         )}
                       </div>

@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Minus, Plus } from "lucide-react";
 
 export interface QuantitySelectorProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   value: number;
   onChange: (value: number) => void;
   min?: number;

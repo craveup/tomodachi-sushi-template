@@ -61,7 +61,11 @@ export const DEFAULT_BUSINESS_CONFIG: BusinessConfig = {
 }
 
 // Environment-specific overrides
-const ENV_OVERRIDES: Record<string, Partial<BusinessConfig>> = {
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
+
+const ENV_OVERRIDES: Record<string, DeepPartial<BusinessConfig>> = {
   development: {
     ui: {
       enableAnimations: false // Faster development
@@ -100,7 +104,7 @@ export function getBusinessConfig(): BusinessConfig {
       ...DEFAULT_BUSINESS_CONFIG.ui,
       ...overrides.ui
     }
-  }
+  } as BusinessConfig
 }
 
 /**

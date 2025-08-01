@@ -43,11 +43,12 @@ export function CodeBlockWrapper({
   const contentToDisplay = React.Children.map(children, (child) => {
     if (React.isValidElement(child)) {
       if (child.type === "pre") {
+        const childProps = child.props as { className?: string } || {};
         return React.cloneElement(child as React.ReactElement<any>, {
-          ...child.props,
+          ...childProps,
           className: cn(
             "rounded-md font-mono text-sm my-0",
-            child.props.className
+            childProps.className
           ),
         });
       }

@@ -4,9 +4,11 @@ import * as React from "react";
 
 interface IPhoneMockupProps {
   children: React.ReactNode;
+  variant?: string;
+  color?: string;
 }
 
-export function IPhoneMockup({ children }: IPhoneMockupProps) {
+export function IPhoneMockup({ children, variant, color }: IPhoneMockupProps) {
   return (
     <div className="relative mx-auto flex justify-center items-center">
       <div className="relative">

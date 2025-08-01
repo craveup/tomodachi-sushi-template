@@ -5,7 +5,7 @@ import { Truck, MapPin, Clock, DollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface OrderType {
-  id: "delivery" | "pickup" | "dine-in";
+  id: "delivery" | "pickup" | "dine-in" | "scheduled";
   label: string;
   description: string;
   icon: React.ElementType;

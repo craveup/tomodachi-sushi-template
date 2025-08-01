@@ -11,7 +11,7 @@ interface CartItem {
   name: string;
   price: number;
   quantity: number;
-  imageUrl: string;
+  imageUrl: string | null;
   modifiers?: string[];
 }
 
@@ -19,7 +19,7 @@ interface SuggestedItem {
   id: string;
   name: string;
   price: number;
-  imageUrl: string;
+  imageUrl: string | null;
 }
 
 interface CartSidebarProps {

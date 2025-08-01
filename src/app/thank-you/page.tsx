@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { LeclercHeader } from "../components/leclerc-header";
 import { LeclercFooter } from "../components/leclerc-footer";
 import { CheckCircle, Star } from "lucide-react";
 
-const ThankYouPage = () => {
+const ThankYouContent = () => {
   const searchParams = useSearchParams();
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
@@ -56,7 +56,7 @@ const ThankYouPage = () => {
               </p>
 
               <p className="text-muted-foreground">
-                We'll send you updates about your order via email and SMS.
+                We&apos;ll send you updates about your order via email and SMS.
               </p>
             </div>
 
@@ -162,6 +162,14 @@ const ThankYouPage = () => {
 
       <LeclercFooter />
     </div>
+  );
+};
+
+const ThankYouPage = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ThankYouContent />
+    </Suspense>
   );
 };
 

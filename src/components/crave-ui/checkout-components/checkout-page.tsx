@@ -142,8 +142,8 @@ export default function CheckoutPage({
         paymentData.type === "card"
           ? `•••• •••• •••• ${paymentData.cardData?.number.slice(-4)}`
           : paymentData.type === "paypal"
-            ? "PayPal"
-            : "Venmo",
+          ? "PayPal"
+          : "Venmo",
       lastFour: paymentData.cardData?.number.replace(/\s/g, "").slice(-4),
       expiryMonth: paymentData.cardData?.expiryMonth,
       expiryYear: paymentData.cardData?.expiryYear,
@@ -356,8 +356,9 @@ export default function CheckoutPage({
               className="text-sm text-muted-foreground"
               data-testid="auto-detect-disclaimer"
             >
-              To maximize your benefits, we'll check if you have an account with
-              us or our partner DoorDash, and we'll text you a code to sign in.
+              To maximize your benefits, we&apos;ll check if you have an account
+              with us or our partner DoorDash, and we&apos;ll text you a code to
+              sign in.
             </p>
 
             {/* Phone and Country */}
@@ -550,7 +551,7 @@ export default function CheckoutPage({
             </div>
 
             <p className="text-xs text-muted-foreground">
-              We'll text you a verification code after checkout.
+              We&apos;ll text you a verification code after checkout.
             </p>
           </div>
         </section>

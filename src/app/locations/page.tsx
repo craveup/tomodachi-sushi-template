@@ -313,12 +313,12 @@ export default function LeclercLocationsPage() {
           <Card className="max-w-2xl mx-auto">
             <CardContent className="pt-6">
               <h3 className="text-xl font-semibold mb-4">
-                Can't Find What You're Looking For?
+                Can&apos;t Find What You&apos;re Looking For?
               </h3>
               <p className="text-muted-foreground mb-6">
-                We're always looking to expand! Contact us if you'd like to
-                suggest a new location or inquire about catering services in
-                your area.
+                We&apos;re always looking to expand! Contact us if you&apos;d
+                like to suggest a new location or inquire about catering
+                services in your area.
               </p>
               <div className="flex gap-4 justify-center">
                 <Button variant="outline">Contact Us</Button>

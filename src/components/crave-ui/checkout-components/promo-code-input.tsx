@@ -23,7 +23,7 @@ export interface PromoCode {
 }
 
 export interface PromoCodeInputProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onSubmit'> {
   onSubmit: (code: string) => Promise<void>;
   onRemove: () => void;
   appliedCode?: PromoCode | null;
@@ -62,7 +62,7 @@ export function PromoCodeInput({
   const [showSuggestionsDropdown, setShowSuggestionsDropdown] =
     React.useState(false);
 
-  const debounceRef = React.useRef<NodeJS.Timeout>();
+  const debounceRef = React.useRef<NodeJS.Timeout | undefined>(undefined);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const currentError = error || localError;

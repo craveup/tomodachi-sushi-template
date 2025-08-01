@@ -92,12 +92,12 @@ export function DatePicker({
           initialFocus
           weekStartsOn={weekStartsOn}
           modifiersStyles={{
-            today: highlightToday
-              ? {
-                  fontWeight: "bold",
-                  textDecoration: "underline",
-                }
-              : undefined,
+            ...(highlightToday && {
+              today: {
+                fontWeight: "bold",
+                textDecoration: "underline",
+              }
+            })
           }}
         />
         {blackoutDates.length > 0 && (

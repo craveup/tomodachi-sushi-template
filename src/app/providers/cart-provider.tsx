@@ -70,6 +70,33 @@ export function CartProvider({ children }: { children: ReactNode }) {
     throw new Error("NEXT_PUBLIC_LOCATION_ID environment variable is required");
   }
 
+  // Initialize cart function - moved to component scope
+  const initializeCart = useCallback(async () => {
+    try {
+      // Get existing cart ID from localStorage
+      const savedCartId =
+        typeof window !== "undefined"
+          ? localStorage.getItem("leclerc-cart-id")
+          : null;
+
+      // Initializing cart for location
+      const newCartResponse = await createCart(
+        locationId,
+        savedCartId,
+        "takeout"
+      );
+      // Cart created successfully
+      // Setting cartId
+      setCartId(newCartResponse.cartId);
+      // Save cartId to localStorage
+      if (typeof window !== "undefined") {
+        localStorage.setItem("leclerc-cart-id", newCartResponse.cartId);
+      }
+    } catch (error) {
+      console.warn("❌ Failed to create cart, using local storage", error);
+    }
+  }, [locationId]);
+
   // Handle hydration - load data only after component has mounted
   useEffect(() => {
     setIsHydrated(true);
@@ -94,35 +121,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Initialize cart on component mount (only after hydration)
   useEffect(() => {
     if (!isHydrated) return;
-
-    const initializeCart = async () => {
-      try {
-        // Get existing cart ID from localStorage
-        const savedCartId =
-          typeof window !== "undefined"
-            ? localStorage.getItem("leclerc-cart-id")
-            : null;
-
-        // Initializing cart for location
-        const newCartResponse = await createCart(
-          locationId,
-          savedCartId,
-          "takeout"
-        );
-        // Cart created successfully
-        // Setting cartId
-        setCartId(newCartResponse.cartId);
-        // Save cartId to localStorage
-        if (typeof window !== "undefined") {
-          localStorage.setItem("leclerc-cart-id", newCartResponse.cartId);
-        }
-      } catch (error) {
-        console.warn("❌ Failed to create cart, using local storage", error);
-      }
-    };
-
     initializeCart();
-  }, [locationId, isHydrated]);
+  }, [initializeCart, isHydrated]);
 
   const clearError = useCallback(() => {
     setError(null);
@@ -281,7 +281,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setIsLoading(false);
       }
     },
-    [cartId, locationId]
+    [cartId, locationId, initializeCart, items, apiCart]
   );
 
   const removeItem = (cartId: string) => {

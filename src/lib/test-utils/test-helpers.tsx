@@ -23,23 +23,26 @@ export const renderWithProviders = (
 /**
  * Mock functions for common component props
  */
+// Simple mock function for testing
+const mockFn = () => {};
+
 export const mockHandlers = {
-  onClick: jest.fn(),
-  onAddToCart: jest.fn(),
-  onChange: jest.fn(),
-  onSubmit: jest.fn(),
-  onClose: jest.fn(),
-  onUpdateQuantity: jest.fn(),
-  onRemoveItem: jest.fn(),
-  onClearCart: jest.fn(),
-  onCheckout: jest.fn()
+  onClick: mockFn,
+  onAddToCart: mockFn,
+  onChange: mockFn,
+  onSubmit: mockFn,
+  onClose: mockFn,
+  onUpdateQuantity: mockFn,
+  onRemoveItem: mockFn,
+  onClearCart: mockFn,
+  onCheckout: mockFn
 }
 
 /**
  * Reset all mock handlers
  */
 export const resetMockHandlers = () => {
-  Object.values(mockHandlers).forEach(mock => mock.mockClear())
+  // No-op for basic mock functions
 }
 
 /**

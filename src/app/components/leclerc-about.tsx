@@ -17,7 +17,7 @@ export function LeclercAbout() {
             Our Story
           </h2>
           <p className="font-leclerc-primary text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            From a small Parisian family recipe to New York's beloved
+            From a small Parisian family recipe to New York&apos;s beloved
             neighborhood bakery, Leclerc has been crafting authentic French
             pastries with love for over a decade.
           </p>

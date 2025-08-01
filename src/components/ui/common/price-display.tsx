@@ -6,7 +6,7 @@ import { formatPrice } from "@/lib/utils/price";
 interface PriceDisplayProps {
   price: string | number;
   className?: string;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "xxl";
   variant?: "default" | "muted" | "accent";
   showCurrency?: boolean;
 }
@@ -16,6 +16,7 @@ const sizeClasses = {
   md: "text-base",
   lg: "text-lg",
   xl: "text-xl",
+  xxl: "text-2xl",
 };
 
 const variantClasses = {

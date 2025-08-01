@@ -15,7 +15,7 @@ const EmptyCart = () => {
         <h2 className="text-2xl font-bold mb-4">Your cart is empty</h2>
 
         <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-          Looks like you haven't added any items to your cart yet. Start
+          Looks like you haven&apos;t added any items to your cart yet. Start
           browsing our delicious menu to get started!
         </p>
 

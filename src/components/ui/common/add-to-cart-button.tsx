@@ -65,7 +65,7 @@ export function AddToCartButton({
   return (
     <Button
       variant={variant === "outline" ? "outline" : "default"}
-      size={size}
+      size={size === "md" ? "default" : size}
       className={cn("w-full", className)}
       onClick={onAddToCart}
       disabled={disabled || loading}

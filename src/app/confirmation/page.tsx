@@ -136,7 +136,7 @@ export default function LeclercConfirmationPage() {
                 Track Your Order
               </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                We'll send you updates via text message
+                We&apos;ll send you updates via text message
               </p>
               <Button
                 className="text-white dark:text-white hover:opacity-90"

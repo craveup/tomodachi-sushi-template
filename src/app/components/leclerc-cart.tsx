@@ -124,6 +124,7 @@ export function LeclercCart({
                 : fullProduct.price,
             image: fullProduct.images?.[0] || null,
             category: "signature" as const,
+            calories: 0,
             options: {
               warming: "room-temp",
               packaging: "standard",

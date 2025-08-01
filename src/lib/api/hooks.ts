@@ -80,7 +80,7 @@ export const useCart = (locationId: string, cartId: string) => {
   const createCartMutation = useMutation({
     mutationFn: () => api.createCart(locationId),
     onSuccess: (newCart) => {
-      queryClient.setQueryData(['cart', locationId, newCart._id], newCart)
+      queryClient.setQueryData(['cart', locationId, newCart.id], newCart)
     }
   })
 

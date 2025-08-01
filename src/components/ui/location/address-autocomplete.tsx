@@ -3,8 +3,40 @@
 import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { MapPin, Loader2, CheckCircle } from "lucide-react";
+import { MapPin, Loader2, CheckCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+// Extend Window interface to include google
+declare global {
+  interface Window {
+    google?: {
+      maps?: {
+        places?: {
+          AutocompleteService: new () => {
+            getPlacePredictions: (request: any, callback: (predictions: any, status: any) => void) => void;
+          };
+          PlacesService: new (map: any) => {
+            getDetails: (request: any, callback: (result: any, status: any) => void) => void;
+          };
+          PlacesServiceStatus: {
+            OK: string;
+            ZERO_RESULTS: string;
+          };
+          PlaceResult: any;
+        };
+      };
+    };
+  }
+}
+
+// Type alias for Google Places API types
+type GooglePlacesService = {
+  getDetails: (request: any, callback: (result: any, status: any) => void) => void;
+};
+
+type GoogleAutocompleteService = {
+  getPlacePredictions: (request: any, callback: (predictions: any, status: any) => void) => void;
+};
 
 export interface Address {
   street: string;
@@ -18,7 +50,7 @@ export interface Address {
 }
 
 export interface AddressAutocompleteProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onError' | 'defaultValue' | 'required' | 'disabled'> {
   onAddressSelect: (address: Address) => void;
   onError?: (error: string) => void;
   placeholder?: string;
@@ -27,6 +59,7 @@ export interface AddressAutocompleteProps
   disabled?: boolean;
   googleMapsApiKey?: string;
   variant?: "default" | "compact";
+  "data-testid"?: string;
 }
 
 interface PlacePrediction {
@@ -48,7 +81,8 @@ export function AddressAutocomplete({
   googleMapsApiKey,
   variant = "default",
   className,
-  ...props
+  id,
+  "data-testid": dataTestId
 }: AddressAutocompleteProps) {
   const [inputValue, setInputValue] = React.useState(defaultValue);
   const [predictions, setPredictions] = React.useState<PlacePrediction[]>([]);
@@ -60,8 +94,8 @@ export function AddressAutocomplete({
   const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = React.useState(false);
 
   const autocompleteService =
-    React.useRef<google.maps.places.AutocompleteService | null>(null);
-  const placesService = React.useRef<google.maps.places.PlacesService | null>(
+    React.useRef<GoogleAutocompleteService | null>(null);
+  const placesService = React.useRef<GooglePlacesService | null>(
     null
   );
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -93,11 +127,13 @@ export function AddressAutocomplete({
   React.useEffect(() => {
     if (!isGoogleMapsLoaded) return;
 
-    autocompleteService.current = new google.maps.places.AutocompleteService();
+    if (window.google?.maps?.places) {
+      autocompleteService.current = new window.google.maps.places.AutocompleteService();
 
-    // Create a hidden div for PlacesService
-    const div = document.createElement("div");
-    placesService.current = new google.maps.places.PlacesService(div);
+      // Create a hidden div for PlacesService
+      const div = document.createElement("div");
+      placesService.current = new window.google.maps.places.PlacesService(div);
+    }
   }, [isGoogleMapsLoaded]);
 
   // Handle input change and fetch predictions
@@ -126,7 +162,7 @@ export function AddressAutocomplete({
           setIsLoading(false);
 
           if (
-            status === google.maps.places.PlacesServiceStatus.OK &&
+            status === window.google?.maps?.places?.PlacesServiceStatus.OK &&
             predictions
           ) {
             setPredictions(predictions);
@@ -135,7 +171,7 @@ export function AddressAutocomplete({
             setPredictions([]);
             setShowDropdown(false);
             if (
-              status !== google.maps.places.PlacesServiceStatus.ZERO_RESULTS
+              status !== window.google?.maps?.places?.PlacesServiceStatus.ZERO_RESULTS
             ) {
               onError?.("Error fetching address suggestions");
             }
@@ -163,7 +199,7 @@ export function AddressAutocomplete({
       placesService.current.getDetails(request, (place, status) => {
         setIsLoading(false);
 
-        if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+        if (status === window.google?.maps?.places?.PlacesServiceStatus.OK && place) {
           const address = parseGooglePlaceToAddress(place);
           setSelectedAddress(address);
           onAddressSelect(address);
@@ -177,17 +213,17 @@ export function AddressAutocomplete({
 
   // Parse Google Place to our Address interface
   const parseGooglePlaceToAddress = (
-    place: google.maps.places.PlaceResult
+    place: any
   ): Address => {
     const components = place.address_components || [];
 
     const getComponent = (type: string) => {
-      const component = components.find((c) => c.types.includes(type));
+      const component = components.find((c: any) => c.types.includes(type));
       return component?.long_name || "";
     };
 
     const getShortComponent = (type: string) => {
-      const component = components.find((c) => c.types.includes(type));
+      const component = components.find((c: any) => c.types.includes(type));
       return component?.short_name || "";
     };
 
@@ -224,7 +260,7 @@ export function AddressAutocomplete({
   const isCompact = variant === "compact";
 
   return (
-    <div className={cn("relative w-full", className)} {...props}>
+    <div className={cn("relative w-full", className)} id={id} data-testid={dataTestId}>
       <div className="relative">
         <div className="absolute left-3 top-0 bottom-0 flex items-center">
           {isLoading ? (
@@ -312,7 +348,8 @@ export function AddressInput({
   required = false,
   disabled = false,
   className,
-  ...props
+  id,
+  "data-testid": dataTestId
 }: Omit<AddressAutocompleteProps, "googleMapsApiKey">) {
   const [value, setValue] = React.useState(defaultValue);
 
@@ -332,7 +369,7 @@ export function AddressInput({
   };
 
   return (
-    <div className={cn("relative w-full", className)} {...props}>
+    <div className={cn("relative w-full", className)} id={id} data-testid={dataTestId}>
       <div className="flex gap-2">
         <div className="relative flex-1">
           <div className="absolute left-3 top-0 bottom-0 flex items-center">

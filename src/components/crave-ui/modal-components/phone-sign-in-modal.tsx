@@ -61,7 +61,10 @@ export default function PhoneSigninModal({
       } else if (digits.length <= 6) {
         return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
       } else {
-        return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+        return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(
+          6,
+          10
+        )}`;
       }
     }
 
@@ -197,8 +200,8 @@ export default function PhoneSigninModal({
             </div>
 
             <p className="text-sm text-muted-foreground leading-relaxed">
-              We'll text you a security code to sign in, or create a new account
-              with this number.
+              We&apos;ll text you a security code to sign in, or create a new
+              account with this number.
             </p>
           </div>
         </div>
