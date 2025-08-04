@@ -14,6 +14,37 @@ interface LeclercMenuProps {
   isHomePage?: boolean;
 }
 
+// Helper function to get image path based on product name and category
+const getImagePath = (name: string, category: string): string => {
+  // Map of product names to actual image filenames based on public/images structure
+  const imageMap: Record<string, string> = {
+    // Cookies (signature folder)
+    "Classic Chocolate Chip": "/images/leclerc-bakery/signature/choc-chip-walnut.webp",
+    "Double Dark Chocolate": "/images/leclerc-bakery/signature/dark-choc-chip.webp", 
+    "Oatmeal Raisin": "/images/leclerc-bakery/signature/oatmeal-raisin.webp",
+    "Peanut Butter Dream": "/images/leclerc-bakery/signature/pb-choc-chip.webp",
+    
+    // Pastries (menu folder)
+    "Butter Croissant": "/images/leclerc-bakery/menu/butter-croissant.webp",
+    "Pain au Chocolat": "/images/leclerc-bakery/menu/pain-au-chocolat.webp",
+    "Almond Croissant": "/images/leclerc-bakery/menu/almond-croissant.webp",
+    "Fruit Danish": "/images/leclerc-bakery/menu/fruit-danish.webp",
+    "Palmier": "/images/leclerc-bakery/menu/palmier.webp",
+    "Éclair": "/images/leclerc-bakery/menu/eclair.webp",
+    
+    // Breads (menu folder)
+    "Sourdough Loaf": "/images/leclerc-bakery/menu/sourdough-loaf.webp",
+    "French Baguette": "/images/leclerc-bakery/menu/french-baguette.webp",
+    "Whole Wheat Country": "/images/leclerc-bakery/menu/whole-wheat-country.webp",
+    "Olive Rosemary": "/images/leclerc-bakery/menu/olive-rosemary.webp",
+    "Brioche": "/images/leclerc-bakery/menu/brioche.webp",
+    "Multigrain": "/images/leclerc-bakery/menu/multigrain.webp",
+  };
+  
+  // Return mapped image or fallback based on category
+  return imageMap[name] || `/images/leclerc-bakery/signature/choc-chip-walnut.webp`;
+};
+
 export function LeclercMenu({ isHomePage = false }: LeclercMenuProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [apiProducts, setApiProducts] = useState<Product[]>([]);
@@ -116,7 +147,7 @@ export function LeclercMenu({ isHomePage = false }: LeclercMenuProps) {
           name: item.name,
           description: item.description,
           price: item.price,
-          image: null, // Don't use hardcoded fallback images
+          image: item.image || getImagePath(item.name, item.category),
           category: item.category,
           calories: item.calories,
           isPopular: item.isPopular || false,
@@ -135,7 +166,7 @@ export function LeclercMenu({ isHomePage = false }: LeclercMenuProps) {
           typeof product.price === "string"
             ? parseFloat(product.price)
             : product.price,
-        image: product.images?.[0] || product.images || null,
+        image: product.images?.[0] || product.images || getImagePath(product.name, product.category || 'cookies'),
         category: product.category,
         calories: getCaloriesFromName(product.name),
         isPopular:
