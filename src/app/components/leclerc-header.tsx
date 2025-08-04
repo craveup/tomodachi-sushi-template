@@ -79,7 +79,7 @@ export function LeclercHeader({ onCartClick }: LeclercHeaderProps) {
               Locations
             </a>
             <a
-              href="#catering"
+              href="/#catering"
               className={`font-leclerc-support text-sm font-medium tracking-wide ${getThemeClass(
                 "header-nav-link"
               )} text-foreground hover:text-primary transition-colors`}
@@ -88,7 +88,7 @@ export function LeclercHeader({ onCartClick }: LeclercHeaderProps) {
               Catering
             </a>
             <a
-              href="#about"
+              href="/#about"
               className={`font-leclerc-support text-sm font-medium tracking-wide ${getThemeClass(
                 "header-nav-link"
               )} text-foreground hover:text-primary transition-colors`}

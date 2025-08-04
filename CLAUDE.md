@@ -79,8 +79,10 @@ The application uses a sophisticated theming system:
 ### Environment Variables
 
 Required for full functionality:
-- `CRAVEUP_API_KEY` - API key for CraveUp restaurant API
+- `CRAVEUP_API_KEY` - Server-side API key for CraveUp restaurant API
+- `NEXT_PUBLIC_CRAVEUP_API_KEY` - Client-side API key (fallback)
 - `CRAVEUP_API_BASE_URL` - Base URL for API calls (defaults to localhost:8000)
+- `NEXT_PUBLIC_LOCATION_ID` - Required location ID for restaurant operations
 
 ### Testing Approach
 
@@ -94,16 +96,22 @@ Required for full functionality:
 - **Hybrid Cart Strategy**: Primary API-driven state with localStorage fallback for offline functionality
 - **Provider Hierarchy**: Error Boundary → Theme → Address → Cart (strict layering order)
 - **State Synchronization**: Real-time cart sync between API and local storage with optimistic updates
+- **Cart Initialization**: Automatic cart creation via `initializeCart()` with saved cart ID persistence
+- **Hydration Safety**: Client-side state hydration with SSR compatibility
 
 #### Theme Engine Implementation
-- **JSON-Driven Themes**: Load from `public/themes/` with runtime validation
-- **CSS Custom Properties**: Dynamic generation with dark mode overrides
-- **Performance**: Theme caching and lazy loading patterns
+- **JSON-Driven Themes**: Load from `public/themes/` with runtime validation via `ThemeEngine.validateTheme()`
+- **CSS Custom Properties**: Dynamic generation with dark mode overrides and seasonal adjustments
+- **Provider Integration**: `RestaurantThemeProvider` with hooks for component-level theme access
+- **Multi-Hook Architecture**: `useRestaurantTheme`, `useThemeClasses`, `useThemeAnimations`, `useSeasonalTheme`
+- **Performance**: Theme caching, localStorage persistence, and automatic system preference detection
 
 #### API Architecture
 - **Dual Strategy**: Direct CraveUp API + Next.js API routes for CORS protection
-- **Security**: Server-side API key handling, client calls through `/api/` routes only
+- **Security**: Server-side API key handling via `getServerApiKey()`, client calls through `/api/` routes
 - **Error Handling**: Custom `CraveUpAPIError` class with standardized response handling
+- **Endpoint Management**: Centralized in `src/lib/api/config.ts` with environment-based URL building
+- **Hybrid API Approach**: Some endpoints use direct API calls, others use Next.js API routes
 
 #### Component Development Guidelines
 - **Follow Existing Patterns**: Reference `src/components/ui/example/` for new components
@@ -112,8 +120,11 @@ Required for full functionality:
 - **Styling**: Use theme engine variables, not hardcoded colors
 
 #### Key Files for Development
-- `src/lib/theme-engine.ts` - Theme system core
-- `src/lib/api/client.ts` - API client with error handling
-- `src/app/providers/cart-provider.tsx` - Cart state management
-- `src/types/restaurant.ts` - Core type definitions
-- `public/themes/leclerc-theme.json` - Theme configuration
+- `src/lib/theme-engine.ts` - Theme system core with CSS custom properties generation
+- `src/lib/api/client.ts` - CraveUp API client with error handling
+- `src/lib/api/config.ts` - API configuration, endpoints, and security handling
+- `src/app/providers/cart-provider.tsx` - Cart state management with API/localStorage hybrid
+- `src/app/hooks/use-restaurant-theme.tsx` - Theme management hooks and providers
+- `src/app/types.ts` - Core application type definitions
+- `public/themes/leclerc-theme.json` - Theme configuration with bakery-specific styling
+- `components.json` - Shadcn/ui configuration (New York style, CSS variables enabled)
