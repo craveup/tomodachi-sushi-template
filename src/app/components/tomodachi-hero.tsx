@@ -10,7 +10,7 @@ const socialIcons = [
   { icon: Twitter, label: "Twitter" },
 ];
 
-export default function QitchenHero() {
+export default function TomodachiHero() {
   return (
     <div className="relative w-full max-w-[1436px] h-[1032px] bg-black rounded-2xl overflow-hidden mx-auto">
       <div className="relative h-[1032px] bg-[url(/images/sushi/hero-background.png)] bg-cover bg-center">

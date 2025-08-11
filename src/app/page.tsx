@@ -7,7 +7,7 @@ import { Navbar } from "./components/navbar";
 import SideCard from "./components/side-card";
 import RoundedEdge from "./components/rounded-edge";
 
-const QitchenFrontpage = () => {
+const TomodachiFrontpage = () => {
   const socialIcons = [
     { icon: Instagram, label: "Instagram" },
     { icon: Facebook, label: "Facebook" },
@@ -83,4 +83,4 @@ const QitchenFrontpage = () => {
   );
 };
 
-export default QitchenFrontpage;
+export default TomodachiFrontpage;
