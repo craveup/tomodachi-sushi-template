@@ -65,37 +65,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [apiCart, setApiCart] = useState<CartResponse | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  const locationId = process.env.NEXT_PUBLIC_LOCATION_ID;
-  if (!locationId) {
-    throw new Error("NEXT_PUBLIC_LOCATION_ID environment variable is required");
-  }
+  // Demo mode - disable API calls for local development
+  const locationId = process.env.NEXT_PUBLIC_LOCATION_ID || "demo-location";
 
-  // Initialize cart function - moved to component scope
+  // Demo mode - skip cart initialization (no API calls)
   const initializeCart = useCallback(async () => {
-    try {
-      // Get existing cart ID from localStorage
-      const savedCartId =
-        typeof window !== "undefined"
-          ? localStorage.getItem("leclerc-cart-id")
-          : null;
-
-      // Initializing cart for location
-      const newCartResponse = await createCart(
-        locationId,
-        savedCartId,
-        "takeout"
-      );
-      // Cart created successfully
-      // Setting cartId
-      setCartId(newCartResponse.cartId);
-      // Save cartId to localStorage
-      if (typeof window !== "undefined") {
-        localStorage.setItem("leclerc-cart-id", newCartResponse.cartId);
-      }
-    } catch (error) {
-      console.warn("❌ Failed to create cart, using local storage", error);
-    }
-  }, [locationId]);
+    console.log("Demo mode: Cart running locally without API");
+  }, []);
 
   // Handle hydration - load data only after component has mounted
   useEffect(() => {
@@ -147,119 +123,29 @@ export function CartProvider({ children }: { children: ReactNode }) {
         // Validate the item
         validateMenuItem(item);
 
-        // Ensure we have a cart
-        let currentCartId = cartId;
-        if (!currentCartId) {
-          console.log("No cart ID found, creating new cart...");
-          await initializeCart();
-          currentCartId = cartId; // Get the updated cartId
-        } else if (!apiCart) {
-          console.log("Cart not initialized, creating new cart...");
-          await initializeCart();
-          currentCartId = cartId; // Get the updated cartId
+        // Demo mode - no cart initialization needed
+
+        // Demo mode - use local storage only (skip API calls)
+        let finalPrice = item.price;
+        if (item.options.giftBox) {
+          finalPrice += 5.0;
         }
 
-        // Now we should have a valid cartId
-        if (currentCartId) {
-          // Try to use API
-          const addItemData = {
-            productId: item.id,
-            quantity: 1,
-            specialInstructions: item.options.giftBox ? "Add gift box" : "",
-            itemUnavailableAction: "remove_item",
-            selectedModifiers: [], // Empty for now since we're not using complex modifiers
-          };
+        const cartItem: LocalCartItem = {
+          ...item,
+          price: finalPrice,
+          cartId: `${item.id}-${Date.now()}-${Math.random()
+            .toString(36)
+            .substr(2, 9)}`,
+          quantity: 1,
+        };
 
-          // Calling addItemToCart API
-          console.log("Adding item to cart:", {
-            locationId,
-            currentCartId,
-            addItemData,
-          });
-          console.log("Current cart state:", apiCart);
-          // Making API call to add item to cart
-          const addResult = await addItemToCart(
-            locationId,
-            currentCartId,
-            addItemData
-          );
-          console.log("API call successful:", addResult);
-          // API call successful
+        const newItems = [...items, cartItem];
+        setItems(newItems);
 
-          // Fetch the updated cart to get the full cart data
-          const updatedCart = await getCart(locationId, currentCartId);
-          // Fetched updated cart
-          setApiCart(updatedCart);
-
-          // Convert API cart items to local format
-          const localItems: LocalCartItem[] = (updatedCart.items || []).map(
-            (apiItem) => {
-              // Find matching menu item to get full details
-              const menuItem = menuItems.find(
-                (mi) => mi.id === apiItem.productId
-              );
-
-              return {
-                id: apiItem.productId,
-                name: apiItem.name,
-                description: apiItem.description || menuItem?.description || "",
-                price:
-                  typeof apiItem.price === "string"
-                    ? parseFloat(apiItem.price)
-                    : apiItem.price,
-                image:
-                  apiItem.imageUrl ||
-                  menuItem?.image ||
-                  "/images/leclerc-bakery/signature/choc-chip-walnut.webp",
-                category: menuItem?.category || "cookies",
-                cartId: apiItem.id,
-                quantity: apiItem.quantity,
-                options: {
-                  giftBox:
-                    apiItem.specialInstructions?.includes("gift box") || false,
-                  warming: "room-temp",
-                  packaging: "standard",
-                },
-                calories: menuItem?.calories || 0,
-                isNew: menuItem?.isNew || false,
-                isPopular: menuItem?.isPopular || false,
-                isGlutenFree: menuItem?.isGlutenFree || false,
-              };
-            }
-          );
-
-          setItems(localItems);
-          // Save to localStorage
-          if (typeof window !== "undefined") {
-            localStorage.setItem(
-              "leclerc-cart-items",
-              JSON.stringify(localItems)
-            );
-          }
-        } else {
-          // Fallback to local storage
-          let finalPrice = item.price;
-          if (item.options.giftBox) {
-            finalPrice += 5.0;
-          }
-
-          const cartItem: LocalCartItem = {
-            ...item,
-            price: finalPrice,
-            cartId: `${item.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            quantity: 1,
-          };
-
-          const newItems = [...items, cartItem];
-          setItems(newItems);
-
-          // Save to localStorage
-          if (typeof window !== "undefined") {
-            localStorage.setItem(
-              "leclerc-cart-items",
-              JSON.stringify(newItems)
-            );
-          }
+        // Save to localStorage
+        if (typeof window !== "undefined") {
+          localStorage.setItem("leclerc-cart-items", JSON.stringify(newItems));
         }
 
         // Automatically open the cart when an item is added
