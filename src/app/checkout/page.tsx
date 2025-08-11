@@ -215,28 +215,121 @@ export default function TomodachiCheckoutPage() {
                 <RadioGroup
                   value={orderType}
                   onValueChange={handleOrderTypeChange}
+                  className="space-y-4"
                 >
-                  <div className="flex items-center space-x-4 p-6 border border-borderdefault rounded-2xl hover:bg-backgroundmuted/30 transition-colors">
-                    <RadioGroupItem value="delivery" id="delivery" />
-                    <Label htmlFor="delivery" className="flex-1 cursor-pointer">
-                      <div className="font-heading-h6 text-textdefault text-lg tracking-wider">
-                        Delivery
+                  <div
+                    className={`group relative flex items-center space-x-4 p-6 border-2 rounded-2xl cursor-pointer transition-all duration-200 ${
+                      orderType === "delivery"
+                        ? "border-backgroundprimary bg-backgroundprimary/10 shadow-lg"
+                        : "border-borderdefault hover:border-backgroundprimary/50 hover:bg-backgroundmuted/50 hover:shadow-md"
+                    }`}
+                  >
+                    <RadioGroupItem
+                      value="delivery"
+                      id="delivery"
+                      className="border-2 data-[state=checked]:border-backgroundprimary data-[state=checked]:bg-backgroundprimary"
+                    />
+                    <div className="flex items-center space-x-4 flex-1">
+                      <div
+                        className={`p-3 rounded-xl transition-colors ${
+                          orderType === "delivery"
+                            ? "bg-backgroundprimary/20 text-backgroundprimary"
+                            : "bg-backgroundmuted text-textmuted group-hover:bg-backgroundprimary/10 group-hover:text-backgroundprimary"
+                        }`}
+                      >
+                        <svg
+                          className="w-6 h-6"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                          />
+                        </svg>
                       </div>
-                      <div className="font-text-meta text-sm text-textmuted tracking-wider">
-                        25-40 min • Free over $50
+                      <Label
+                        htmlFor="delivery"
+                        className="flex-1 cursor-pointer"
+                      >
+                        <div
+                          className={`font-heading-h6 text-lg tracking-wider transition-colors ${
+                            orderType === "delivery"
+                              ? "text-backgroundprimary"
+                              : "text-textdefault group-hover:text-backgroundprimary"
+                          }`}
+                        >
+                          Delivery
+                        </div>
+                        <div className="font-text-meta text-sm text-textmuted tracking-wider">
+                          25-40 min • Free over $50
+                        </div>
+                      </Label>
+                    </div>
+                    {orderType === "delivery" && (
+                      <div className="absolute top-4 right-4">
+                        <div className="w-2 h-2 bg-backgroundprimary rounded-full"></div>
                       </div>
-                    </Label>
+                    )}
                   </div>
-                  <div className="flex items-center space-x-4 p-6 border border-borderdefault rounded-2xl hover:bg-backgroundmuted/30 transition-colors mt-4">
-                    <RadioGroupItem value="pickup" id="pickup" />
-                    <Label htmlFor="pickup" className="flex-1 cursor-pointer">
-                      <div className="font-heading-h6 text-textdefault text-lg tracking-wider">
-                        Pickup
+
+                  <div
+                    className={`group relative flex items-center space-x-4 p-6 border-2 rounded-2xl cursor-pointer transition-all duration-200 ${
+                      orderType === "pickup"
+                        ? "border-backgroundprimary bg-backgroundprimary/10 shadow-lg"
+                        : "border-borderdefault hover:border-backgroundprimary/50 hover:bg-backgroundmuted/50 hover:shadow-md"
+                    }`}
+                  >
+                    <RadioGroupItem
+                      value="pickup"
+                      id="pickup"
+                      className="border-2 data-[state=checked]:border-backgroundprimary data-[state=checked]:bg-backgroundprimary"
+                    />
+                    <div className="flex items-center space-x-4 flex-1">
+                      <div
+                        className={`p-3 rounded-xl transition-colors ${
+                          orderType === "pickup"
+                            ? "bg-backgroundprimary/20 text-backgroundprimary"
+                            : "bg-backgroundmuted text-textmuted group-hover:bg-backgroundprimary/10 group-hover:text-backgroundprimary"
+                        }`}
+                      >
+                        <svg
+                          className="w-6 h-6"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                          />
+                        </svg>
                       </div>
-                      <div className="font-text-meta text-sm text-textmuted tracking-wider">
-                        Ready in 15-20 min
+                      <Label htmlFor="pickup" className="flex-1 cursor-pointer">
+                        <div
+                          className={`font-heading-h6 text-lg tracking-wider transition-colors ${
+                            orderType === "pickup"
+                              ? "text-backgroundprimary"
+                              : "text-textdefault group-hover:text-backgroundprimary"
+                          }`}
+                        >
+                          Pickup
+                        </div>
+                        <div className="font-text-meta text-sm text-textmuted tracking-wider">
+                          Ready in 15-20 min
+                        </div>
+                      </Label>
+                    </div>
+                    {orderType === "pickup" && (
+                      <div className="absolute top-4 right-4">
+                        <div className="w-2 h-2 bg-backgroundprimary rounded-full"></div>
                       </div>
-                    </Label>
+                    )}
                   </div>
                 </RadioGroup>
               </CardContent>
