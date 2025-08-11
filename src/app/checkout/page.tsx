@@ -466,7 +466,7 @@ export default function TomodachiCheckoutPage() {
                     </div>
                     <Button
                       variant="outline"
-                      className="w-full bg-backgroundmuted border-borderdefault rounded-xl py-3 font-text-meta tracking-wider hover:bg-backgroundmuted/80"
+                      className="w-full bg-transparent border-2 border-borderdefault text-textdefault rounded-xl py-3 font-text-meta tracking-wider hover:bg-backgroundprimary/10 hover:border-backgroundprimary/30 hover:text-textdefault transition-all duration-200"
                       onClick={() => setIsAddressFlowOpen(true)}
                     >
                       Choose Different Location
