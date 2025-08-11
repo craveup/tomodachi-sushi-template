@@ -8,6 +8,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-forum: "Forum", serif;
   --color-backgrounddefault: var(--backgrounddefault);
   --color-backgroundmuted: var(--backgroundmuted);
   --color-backgroundprimary: var(--backgroundprimary);
@@ -58,7 +59,7 @@
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   
-  /* Qitchen Sushi Theme Variables */
+  /* Tomodachi Sushi Theme Variables */
   --backgrounddefault: #0a0b0a;
   --backgroundmuted: rgba(24, 24, 24, 0.5);
   --backgroundprimary: #efe7d2;
@@ -70,7 +71,14 @@
   --textmuted: rgba(245, 242, 234, 0.7);
   
   /* Typography Variables */
-  --heading-h4-font-family: "Forum", Helvetica;
+  --heading-h1-font-family: var(--font-forum), "Forum", Helvetica;
+  --heading-h2-font-family: var(--font-forum), "Forum", Helvetica;
+  --heading-h3-font-family: var(--font-forum), "Forum", Helvetica;
+  --heading-h4-font-family: var(--font-forum), "Forum", Helvetica;
+  --heading-h5-font-family: var(--font-forum), "Forum", Helvetica;
+  --heading-h6-font-family: var(--font-forum), "Forum", Helvetica;
+  --heading-xlarge-font-family: var(--font-forum), "Forum", Helvetica;
+  --heading-large-font-family: var(--font-forum), "Forum", Helvetica;
   --text-meta-font-family: "Satoshi", Helvetica;
   --text-meta-font-weight: 400;
   --text-meta-font-size: 12px;
@@ -158,5 +166,50 @@
 
   .scrollbar-hide::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
+  }
+
+  /* Tomodachi Brand Font Utilities */
+  .font-heading-xlarge {
+    font-family: var(--heading-xlarge-font-family);
+    font-weight: 400;
+    font-size: 140px;
+    letter-spacing: 3px;
+    line-height: 100%;
+  }
+
+  .font-heading-large {
+    font-family: var(--heading-large-font-family);
+    font-weight: 400;
+    font-size: 112px;
+    letter-spacing: 2px;
+    line-height: 100%;
+  }
+
+  .font-heading-h1 {
+    font-family: var(--heading-h1-font-family);
+  }
+
+  .font-heading-h2 {
+    font-family: var(--heading-h2-font-family);
+  }
+
+  .font-heading-h3 {
+    font-family: var(--heading-h3-font-family);
+  }
+
+  .font-heading-h4 {
+    font-family: var(--heading-h4-font-family);
+  }
+
+  .font-heading-h5 {
+    font-family: var(--heading-h5-font-family);
+  }
+
+  .font-heading-h6 {
+    font-family: var(--heading-h6-font-family);
+  }
+
+  .font-text-meta {
+    font-family: var(--text-meta-font-family);
   }
 }

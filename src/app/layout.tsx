@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Forum } from "next/font/google";
 import "./globals.css";
 import "./styles/leclerc-fonts.css";
 
@@ -21,11 +21,17 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const forum = Forum({
+  variable: "--font-forum",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 // App Metadata
 export const metadata: Metadata = {
-  title: "Leclerc Bakery - Fresh Artisanal Pastries & Baked Goods",
+  title: "Tomodachi Sushi - Authentic Japanese Cuisine",
   description:
-    "Artisanal French bakery specializing in fresh pastries, signature cookies, and traditional baked goods. Order online for pickup and delivery.",
+    "Experience authentic Japanese sushi and rolls at Tomodachi Sushi. Fresh ingredients, traditional flavors, and a modern dining experience.",
 };
 
 export default function RootLayout({
@@ -36,7 +42,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${forum.variable} antialiased`}
       >
         <ErrorBoundary>
           <RestaurantThemeProvider defaultThemePath="/themes/leclerc-theme.json">
