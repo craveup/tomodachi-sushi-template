@@ -17,7 +17,7 @@ import { useAddress } from "../providers/address-provider";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export default function LeclercCheckoutPage() {
+export default function TomodachiCheckoutPage() {
   const router = useRouter();
   const { items, subtotal, tax, total, clearCart } = useCart();
   const { getThemeClass } = useThemeClasses();
@@ -25,6 +25,36 @@ export default function LeclercCheckoutPage() {
   const [orderType, setOrderType] = useState("delivery");
   const [selectedTime, setSelectedTime] = useState("");
   const [isAddressFlowOpen, setIsAddressFlowOpen] = useState(false);
+
+  // Redirect to menu if cart is empty
+  if (items.length === 0) {
+    return (
+      <div className="min-h-screen bg-backgrounddefault flex items-center justify-center">
+        <div className="text-center space-y-6">
+          <div className="w-16 h-16 mx-auto rounded-full bg-backgroundmuted flex items-center justify-center">
+            <ClientIcon
+              name="ShoppingCart"
+              className="w-8 h-8 text-textmuted"
+            />
+          </div>
+          <div>
+            <h2 className="font-heading-h4 text-textdefault text-2xl tracking-wider mb-2">
+              YOUR CART IS EMPTY
+            </h2>
+            <p className="font-text-meta text-textmuted tracking-wider">
+              Add some delicious sushi to your cart before checking out
+            </p>
+          </div>
+          <Button
+            onClick={() => router.push("/menu")}
+            className="bg-backgroundprimary text-textinverse hover:bg-backgroundprimary/90 font-text-meta tracking-wider rounded-xl px-8 py-3"
+          >
+            Browse Menu
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const deliveryFee = orderType === "delivery" && subtotal < 50 ? 5.99 : 0;
   const finalTotal = total + deliveryFee;
@@ -44,13 +74,11 @@ export default function LeclercCheckoutPage() {
       // Payment successful: ${paymentIntentId}
 
       clearCart();
-      router.push(
-        `/examples/leclerc-bakery/confirmation?paymentIntentId=${paymentIntentId}`
-      );
+      router.push(`/confirmation?paymentIntentId=${paymentIntentId}`);
     } catch (error) {
       // Still clear cart and redirect, but show error
       clearCart();
-      router.push("/examples/leclerc-bakery/confirmation");
+      router.push("/confirmation");
     }
   };
 
@@ -150,59 +178,62 @@ export default function LeclercCheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-backgrounddefault">
       {/* Header */}
-      <header className="bg-background border-b sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
+      <header className="bg-backgrounddefault border-b border-borderdefault sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-backgrounddefault/60">
+        <div className="container mx-auto px-6">
+          <div className="flex items-center justify-between h-20">
             <Link
-              href="/examples/leclerc-bakery"
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+              href="/"
+              className="flex items-center gap-3 text-textmuted hover:text-textdefault transition-colors"
             >
               <ClientIcon name="ArrowLeft" className="h-5 w-5" />
-              <span>Back to Menu</span>
+              <span className="font-text-meta text-sm tracking-wider">
+                Back to Menu
+              </span>
             </Link>
-            <h1
-              className="text-xl font-semibold"
-              style={{ color: "hsl(var(--brand-accent))" }}
-            >
-              Checkout
+            <h1 className="font-heading-h3 text-textdefault text-2xl tracking-wider">
+              CHECKOUT
             </h1>
-            <div className="w-24" /> {/* Spacer for centering */}
+            <div className="w-32" /> {/* Spacer for centering */}
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
+      <div className="container mx-auto px-6 py-12">
+        <div className="grid lg:grid-cols-3 gap-12">
           {/* Main checkout form */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-8">
             {/* Order Type */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Order Type</CardTitle>
+            <Card className="bg-backgrounddefault border-borderdefault rounded-2xl">
+              <CardHeader className="pb-6">
+                <CardTitle className="font-heading-h4 text-textdefault text-xl tracking-wider">
+                  ORDER TYPE
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <RadioGroup
                   value={orderType}
                   onValueChange={handleOrderTypeChange}
                 >
-                  <div className="flex items-center space-x-4 p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center space-x-4 p-6 border border-borderdefault rounded-2xl hover:bg-backgroundmuted/30 transition-colors">
                     <RadioGroupItem value="delivery" id="delivery" />
                     <Label htmlFor="delivery" className="flex-1 cursor-pointer">
-                      <div className="font-medium text-foreground">
+                      <div className="font-heading-h6 text-textdefault text-lg tracking-wider">
                         Delivery
                       </div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="font-text-meta text-sm text-textmuted tracking-wider">
                         25-40 min • Free over $50
                       </div>
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-4 p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors mt-3">
+                  <div className="flex items-center space-x-4 p-6 border border-borderdefault rounded-2xl hover:bg-backgroundmuted/30 transition-colors mt-4">
                     <RadioGroupItem value="pickup" id="pickup" />
                     <Label htmlFor="pickup" className="flex-1 cursor-pointer">
-                      <div className="font-medium text-foreground">Pickup</div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="font-heading-h6 text-textdefault text-lg tracking-wider">
+                        Pickup
+                      </div>
+                      <div className="font-text-meta text-sm text-textmuted tracking-wider">
                         Ready in 15-20 min
                       </div>
                     </Label>
@@ -212,82 +243,137 @@ export default function LeclercCheckoutPage() {
             </Card>
 
             {/* Delivery/Pickup Details */}
-            <Card>
-              <CardHeader>
-                <CardTitle>
+            <Card className="bg-backgrounddefault border-borderdefault rounded-2xl">
+              <CardHeader className="pb-6">
+                <CardTitle className="font-heading-h4 text-textdefault text-xl tracking-wider">
                   {orderType === "delivery"
-                    ? "Delivery Details"
-                    : "Pickup Location"}
+                    ? "DELIVERY DETAILS"
+                    : "PICKUP LOCATION"}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 {orderType === "delivery" ? (
                   <>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="firstName">First Name</Label>
-                        <Input id="firstName" placeholder="John" />
+                        <Label
+                          htmlFor="firstName"
+                          className="font-text-meta text-textdefault text-sm tracking-wider font-medium"
+                        >
+                          First Name
+                        </Label>
+                        <Input
+                          id="firstName"
+                          placeholder="John"
+                          className="mt-2 bg-backgroundmuted border-borderdefault rounded-xl px-4 py-3 text-textdefault placeholder:text-textmuted"
+                        />
                       </div>
                       <div>
-                        <Label htmlFor="lastName">Last Name</Label>
-                        <Input id="lastName" placeholder="Doe" />
+                        <Label
+                          htmlFor="lastName"
+                          className="font-text-meta text-textdefault text-sm tracking-wider font-medium"
+                        >
+                          Last Name
+                        </Label>
+                        <Input
+                          id="lastName"
+                          placeholder="Doe"
+                          className="mt-2 bg-backgroundmuted border-borderdefault rounded-xl px-4 py-3 text-textdefault placeholder:text-textmuted"
+                        />
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="phone">Phone Number</Label>
+                      <Label
+                        htmlFor="phone"
+                        className="font-text-meta text-textdefault text-sm tracking-wider font-medium"
+                      >
+                        Phone Number
+                      </Label>
                       <Input
                         id="phone"
                         type="tel"
                         placeholder="(555) 123-4567"
+                        className="mt-2 bg-backgroundmuted border-borderdefault rounded-xl px-4 py-3 text-textdefault placeholder:text-textmuted"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="address">Delivery Address</Label>
-                      <Input id="address" placeholder="123 Main St" />
+                      <Label
+                        htmlFor="address"
+                        className="font-text-meta text-textdefault text-sm tracking-wider font-medium"
+                      >
+                        Delivery Address
+                      </Label>
+                      <Input
+                        id="address"
+                        placeholder="123 Main St"
+                        className="mt-2 bg-backgroundmuted border-borderdefault rounded-xl px-4 py-3 text-textdefault placeholder:text-textmuted"
+                      />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="apt">Apt/Suite</Label>
-                        <Input id="apt" placeholder="Apt 4B" />
+                        <Label
+                          htmlFor="apt"
+                          className="font-text-meta text-textdefault text-sm tracking-wider font-medium"
+                        >
+                          Apt/Suite
+                        </Label>
+                        <Input
+                          id="apt"
+                          placeholder="Apt 4B"
+                          className="mt-2 bg-backgroundmuted border-borderdefault rounded-xl px-4 py-3 text-textdefault placeholder:text-textmuted"
+                        />
                       </div>
                       <div>
-                        <Label htmlFor="zip">ZIP Code</Label>
-                        <Input id="zip" placeholder="10001" />
+                        <Label
+                          htmlFor="zip"
+                          className="font-text-meta text-textdefault text-sm tracking-wider font-medium"
+                        >
+                          ZIP Code
+                        </Label>
+                        <Input
+                          id="zip"
+                          placeholder="10001"
+                          className="mt-2 bg-backgroundmuted border-borderdefault rounded-xl px-4 py-3 text-textdefault placeholder:text-textmuted"
+                        />
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="instructions">
+                      <Label
+                        htmlFor="instructions"
+                        className="font-text-meta text-textdefault text-sm tracking-wider font-medium"
+                      >
                         Delivery Instructions
                       </Label>
                       <Textarea
                         id="instructions"
                         placeholder="Leave at door, ring bell, etc."
                         rows={3}
+                        className="mt-2 bg-backgroundmuted border-borderdefault rounded-xl px-4 py-3 text-textdefault placeholder:text-textmuted"
                       />
                     </div>
                   </>
                 ) : (
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-3 p-4 border border-border rounded-lg bg-muted/30">
+                  <div className="space-y-6">
+                    <div className="flex items-start gap-4 p-6 border border-borderdefault rounded-2xl bg-backgroundmuted/30">
                       <ClientIcon
                         name="MapPin"
-                        className="h-5 w-5 mt-0.5 text-muted-foreground"
+                        className="h-6 w-6 mt-1 text-textmuted"
                       />
                       <div>
-                        <div className="font-medium text-foreground">
-                          Upper West Side
+                        <div className="font-heading-h6 text-textdefault text-lg tracking-wider">
+                          Tomodachi Sushi
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                          167 W 74th St, New York, NY 10023
+                        <div className="font-text-meta text-sm text-textmuted tracking-wider">
+                          123 Nihonbashi Street, New York, NY 10001
                         </div>
-                        <div className="text-sm text-muted-foreground mt-1">
+                        <div className="font-text-meta text-sm text-textmuted tracking-wider mt-1">
                           Open until 10:00 PM
                         </div>
                       </div>
                     </div>
                     <Button
                       variant="outline"
-                      className="w-full"
+                      className="w-full bg-backgroundmuted border-borderdefault rounded-xl py-3 font-text-meta tracking-wider hover:bg-backgroundmuted/80"
                       onClick={() => setIsAddressFlowOpen(true)}
                     >
                       Choose Different Location
@@ -298,13 +384,13 @@ export default function LeclercCheckoutPage() {
             </Card>
 
             {/* Time Selection */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ClientIcon name="Clock" className="h-5 w-5" />
-                  {orderType === "delivery" ? "Delivery Time" : "Pickup Time"}
+            <Card className="bg-backgrounddefault border-borderdefault rounded-2xl">
+              <CardHeader className="pb-6">
+                <CardTitle className="flex items-center gap-3 font-heading-h4 text-textdefault text-xl tracking-wider">
+                  <ClientIcon name="Clock" className="h-6 w-6" />
+                  {orderType === "delivery" ? "DELIVERY TIME" : "PICKUP TIME"}
                 </CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="font-text-meta text-sm text-textmuted tracking-wider mt-2">
                   Select your preferred {orderType} time from available slots
                 </p>
               </CardHeader>
@@ -352,13 +438,13 @@ export default function LeclercCheckoutPage() {
                                       {isToday
                                         ? "Today"
                                         : isTomorrow
-                                          ? "Tomorrow"
-                                          : new Date(date).toLocaleDateString(
-                                              "en-US",
-                                              {
-                                                weekday: "long",
-                                              }
-                                            )}
+                                        ? "Tomorrow"
+                                        : new Date(date).toLocaleDateString(
+                                            "en-US",
+                                            {
+                                              weekday: "long",
+                                            }
+                                          )}
                                     </h4>
                                     <p className="text-sm text-muted-foreground">
                                       {new Date(date).toLocaleDateString(
@@ -443,7 +529,11 @@ export default function LeclercCheckoutPage() {
                                           }}
                                         >
                                           <div
-                                            className={`font-medium text-sm ${isSelected ? "text-white dark:text-white" : "text-foreground"}`}
+                                            className={`font-medium text-sm ${
+                                              isSelected
+                                                ? "text-white dark:text-white"
+                                                : "text-foreground"
+                                            }`}
                                           >
                                             {slot.time}
                                           </div>
@@ -496,20 +586,20 @@ export default function LeclercCheckoutPage() {
                 onPaymentError={handlePaymentError}
               />
             ) : (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <ClientIcon name="CreditCard" className="h-5 w-5" />
-                    Payment
+              <Card className="bg-backgrounddefault border-borderdefault rounded-2xl">
+                <CardHeader className="pb-6">
+                  <CardTitle className="flex items-center gap-3 font-heading-h4 text-textdefault text-xl tracking-wider">
+                    <ClientIcon name="CreditCard" className="h-6 w-6" />
+                    PAYMENT
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-8">
+                  <div className="text-center py-12">
                     <ClientIcon
                       name="Clock"
-                      className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-50"
+                      className="h-16 w-16 mx-auto mb-4 text-textmuted opacity-50"
                     />
-                    <p className="text-muted-foreground">
+                    <p className="font-text-meta text-textmuted tracking-wider">
                       Please select a {orderType} time to continue with payment
                     </p>
                   </div>
@@ -520,58 +610,68 @@ export default function LeclercCheckoutPage() {
 
           {/* Order Summary Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-24">
-              <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
+            <Card className="sticky top-24 bg-backgrounddefault border-borderdefault rounded-2xl">
+              <CardHeader className="pb-6">
+                <CardTitle className="font-heading-h4 text-textdefault text-xl tracking-wider">
+                  YOUR ORDER
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 {/* Items */}
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {items.map((item) => (
                     <div
                       key={item.cartId}
-                      className="flex justify-between text-sm"
+                      className="flex justify-between items-start"
                     >
-                      <div>
-                        <div className="font-medium text-foreground">
+                      <div className="flex-1">
+                        <div className="font-heading-h6 text-textdefault text-base tracking-wider">
                           {item.quantity}x {item.name}
                         </div>
                         {item.options.warming === "warmed" && (
-                          <div className="text-muted-foreground">Warmed</div>
+                          <div className="font-text-meta text-sm text-textmuted tracking-wider">
+                            Warmed
+                          </div>
                         )}
                         {item.options.giftBox && (
-                          <div className="text-muted-foreground">Gift Box</div>
+                          <div className="font-text-meta text-sm text-textmuted tracking-wider">
+                            Gift Box
+                          </div>
                         )}
                       </div>
-                      <div className="font-medium">
+                      <div className="font-heading-h6 text-textdefault text-base tracking-wider">
                         ${(item.price * item.quantity).toFixed(2)}
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <Separator />
+                <Separator className="bg-borderdefault" />
 
                 {/* Totals */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                <div className="space-y-3">
+                  <div className="flex justify-between font-text-meta text-sm tracking-wider">
+                    <span className="text-textdefault">Subtotal</span>
+                    <span className="text-textdefault">
+                      ${subtotal.toFixed(2)}
+                    </span>
                   </div>
                   {deliveryFee > 0 && (
-                    <div className="flex justify-between text-sm">
-                      <span>Delivery Fee</span>
-                      <span>${deliveryFee.toFixed(2)}</span>
+                    <div className="flex justify-between font-text-meta text-sm tracking-wider">
+                      <span className="text-textdefault">Delivery Fee</span>
+                      <span className="text-textdefault">
+                        ${deliveryFee.toFixed(2)}
+                      </span>
                     </div>
                   )}
-                  <div className="flex justify-between text-sm">
-                    <span>Tax</span>
-                    <span>${tax.toFixed(2)}</span>
+                  <div className="flex justify-between font-text-meta text-sm tracking-wider">
+                    <span className="text-textdefault">Tax</span>
+                    <span className="text-textdefault">${tax.toFixed(2)}</span>
                   </div>
-                  <Separator />
-                  <div className="flex justify-between font-semibold text-lg">
-                    <span>Total</span>
-                    <span style={{ color: "hsl(var(--brand-accent))" }}>
+                  <Separator className="bg-borderdefault" />
+                  <div className="flex justify-between font-heading-h5 text-lg tracking-wider">
+                    <span className="text-textdefault">Total</span>
+                    <span className="text-textdefault">
                       ${finalTotal.toFixed(2)}
                     </span>
                   </div>
@@ -579,22 +679,22 @@ export default function LeclercCheckoutPage() {
 
                 {/* Payment Instructions */}
                 {!selectedTime ? (
-                  <div className="text-center p-4 rounded-lg bg-muted/50">
+                  <div className="text-center p-6 rounded-2xl bg-backgroundmuted/50">
                     <ClientIcon
                       name="Clock"
-                      className="h-5 w-5 mx-auto mb-2 text-muted-foreground"
+                      className="h-6 w-6 mx-auto mb-3 text-textmuted"
                     />
-                    <p className="text-sm text-muted-foreground">
+                    <p className="font-text-meta text-sm text-textmuted tracking-wider">
                       Please select a {orderType} time to continue with payment
                     </p>
                   </div>
                 ) : (
-                  <div className="text-center p-4 rounded-lg bg-green-50 dark:bg-green-950/20">
+                  <div className="text-center p-6 rounded-2xl bg-backgroundmuted/30">
                     <ClientIcon
                       name="Shield"
-                      className="h-5 w-5 mx-auto mb-2 text-green-600"
+                      className="h-6 w-6 mx-auto mb-3 text-textdefault"
                     />
-                    <p className="text-sm text-green-800 dark:text-green-400">
+                    <p className="font-text-meta text-sm text-textdefault tracking-wider">
                       Complete your payment securely below
                     </p>
                   </div>

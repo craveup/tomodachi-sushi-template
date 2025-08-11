@@ -1,10 +1,12 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { useCart } from "../providers/cart-provider";
 import CartSidebar from "@/components/crave-ui/cart-component/cart-sidebar";
 
 export function CartWrapper() {
+  const router = useRouter();
   const { items, isCartOpen, closeCart, updateQuantity, removeItem } =
     useCart();
 
@@ -19,9 +21,8 @@ export function CartWrapper() {
   }));
 
   const handleCheckout = () => {
-    console.log("Proceeding to checkout...");
     closeCart();
-    // Add checkout navigation logic here later
+    router.push("/checkout");
   };
 
   return (
