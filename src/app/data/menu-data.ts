@@ -167,7 +167,7 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Salmon Nigiri",
       description: "Fresh Atlantic salmon over seasoned sushi rice",
       price: 8.0,
-      image: "/images/sushi/salmon-nigiri.jpg",
+      image: "/images/sushi/menu-items/salmon-maki.jpg",
       category: "signature",
       calories: 120,
       isPopular: true,

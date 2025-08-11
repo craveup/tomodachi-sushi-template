@@ -62,7 +62,7 @@ const defaultSuggestedItems: SuggestedItem[] = [
     id: "s2",
     name: "Salmon Nigiri",
     price: 8.0,
-    imageUrl: "/images/sushi/menu-items/salmon-nigiri.jpg",
+    imageUrl: "/images/sushi/menu-items/salmon-maki.jpg",
   },
   {
     id: "s3",
