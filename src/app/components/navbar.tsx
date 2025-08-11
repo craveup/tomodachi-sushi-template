@@ -18,18 +18,18 @@ export const Navbar = () => {
       <Button
         variant="outline"
         size="icon"
-        className="flex flex-col w-[41px] h-[41px] items-center justify-center gap-[5px] relative z-[2] bg-backgroundmuted rounded-lg overflow-hidden border border-solid border-borderdefault hover:bg-backgroundmuted"
+        className="flex items-center justify-center w-[41px] h-[41px] relative z-[2] bg-backgroundmuted rounded-lg overflow-hidden border border-solid border-borderdefault hover:bg-backgroundmuted"
       >
         <Menu className="w-5 h-5 text-icondefault" />
       </Button>
 
-      <div className="inline-flex flex-col items-start gap-2.5 pt-1 pb-0 px-0 relative flex-[0_0_auto] z-[1]">
+      <div className="inline-flex items-center justify-center relative flex-[0_0_auto] z-[1]">
         <Link
           href="/"
-          className="relative w-[118.31px] h-[26.82px] flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer"
+          className="flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer"
         >
           <span className="font-heading-h4 text-textdefault tracking-wider text-xl font-bold">
-            QITCHEN
+            TOMODACHI
           </span>
         </Link>
       </div>
@@ -45,7 +45,7 @@ export const Navbar = () => {
                   : "hover:bg-backgroundmuted/50"
               }`}
             >
-              <span className="relative w-fit mt-[-1.00px] font-text-meta text-textdefault text-xs tracking-wider leading-tight whitespace-nowrap font-normal">
+              <span className="relative w-fit font-text-meta text-textdefault text-xs tracking-wider leading-tight whitespace-nowrap font-normal">
                 {item.label}
               </span>
             </Button>
