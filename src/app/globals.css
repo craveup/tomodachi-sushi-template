@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=WDXL+Lubrifont+JP+N:wght@400&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -9,6 +10,7 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-forum: "Forum", serif;
+  --font-wdxl-jp: "WDXL Lubrifont JP N", "WD-XL 滑油字", sans-serif;
   --color-backgrounddefault: var(--backgrounddefault);
   --color-backgroundmuted: var(--backgroundmuted);
   --color-backgroundprimary: var(--backgroundprimary);
@@ -211,5 +213,12 @@
 
   .font-text-meta {
     font-family: var(--text-meta-font-family);
+  }
+
+  /* Japanese WDXL Lubrifont for hero text */
+  .font-wdxl-jp {
+    font-family: var(--font-wdxl-jp);
+    font-weight: 400;
+    letter-spacing: 0.02em;
   }
 }
