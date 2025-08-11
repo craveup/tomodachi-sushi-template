@@ -216,9 +216,17 @@
   }
 
   /* Japanese WDXL Lubrifont for hero text */
-  .font-wdxl-jp {
-    font-family: var(--font-wdxl-jp);
-    font-weight: 400;
-    letter-spacing: 0.02em;
-  }
+.font-wdxl-jp {
+  font-family: var(--font-wdxl-jp);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+/* Line clamp utilities for text truncation */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 }

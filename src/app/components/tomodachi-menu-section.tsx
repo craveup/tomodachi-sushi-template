@@ -48,7 +48,7 @@ export const TomodachiMenuSection = ({ title, items }: MenuSectionProps) => {
         {items.map((item) => (
           <div
             key={item.id}
-            className="flex items-start gap-6 relative self-stretch w-full"
+            className="flex items-start gap-6 relative self-stretch w-full min-h-[120px]"
           >
             <div className="relative w-[120px] h-[120px] flex-shrink-0">
               <img
@@ -57,13 +57,13 @@ export const TomodachiMenuSection = ({ title, items }: MenuSectionProps) => {
                 src={item.image || "/images/sushi/menu-items/sushi-plate.jpg"}
               />
             </div>
-            <div className="flex flex-col items-start gap-3 relative flex-1 grow">
-              <div className="flex items-center justify-between relative self-stretch w-full">
-                <h3 className="relative flex-1 font-heading-h5 text-textdefault text-[22px] tracking-[1px] leading-tight">
+            <div className="flex flex-col items-start gap-3 relative flex-1 min-w-0">
+              <div className="flex items-start justify-between relative self-stretch w-full">
+                <h3 className="relative flex-1 min-w-0 font-heading-h5 text-textdefault text-[22px] tracking-[1px] leading-tight pr-4">
                   {item.name}
                 </h3>
-                <div className="flex items-center gap-3">
-                  <span className="relative font-heading-h5 text-textdefault text-[22px] tracking-[1px] leading-tight">
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <span className="relative font-heading-h5 text-textdefault text-[22px] tracking-[1px] leading-tight whitespace-nowrap">
                     ${item.price.toFixed(2)}
                   </span>
                   <button
@@ -75,7 +75,7 @@ export const TomodachiMenuSection = ({ title, items }: MenuSectionProps) => {
                   </button>
                 </div>
               </div>
-              <p className="relative self-stretch font-text-small text-textmuted text-[14px] leading-relaxed">
+              <p className="relative self-stretch font-text-small text-textmuted text-[14px] leading-relaxed line-clamp-3">
                 {item.description}
               </p>
             </div>
