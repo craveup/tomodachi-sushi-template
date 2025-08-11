@@ -59,7 +59,7 @@ const TomodachiFrontpage = () => {
                 </div>
               </div>
 
-              <h1 className="absolute w-[1091px] bottom-[77px] left-[77px] font-wdxl-jp text-textdefault text-[96px] tracking-[2px] leading-none">
+              <h1 className="absolute w-[1091px] bottom-[77px] left-12 font-wdxl-jp text-textdefault text-[96px] tracking-[2px] leading-none">
                 日本橋蛎殻町友達寿司
               </h1>
             </div>
