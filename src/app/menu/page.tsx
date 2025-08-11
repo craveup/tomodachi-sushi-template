@@ -290,12 +290,12 @@ const MenuSection = ({
 
 const Menu = () => {
   return (
-    <div className="flex flex-col items-start p-6 relative bg-backgrounddefault min-h-screen">
-      <div className="flex items-start gap-4 relative self-stretch w-full flex-1 rounded-[0px_48px_48px_0px]">
-        <div className="relative flex-1 grow h-[1032px] bg-black rounded-2xl overflow-hidden">
-          <div className="relative w-full h-[1032px] bg-[url(/images/sushi/hero-background.png)] bg-cover bg-center">
-            <div className="absolute w-full h-[381px] top-[651px] left-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,1)_100%)]">
-              <div className="absolute w-[667px] top-[212px] left-[66px] font-heading-large text-textdefault text-[112px] tracking-[2px] leading-none">
+    <div className="flex flex-col items-start p-6 relative bg-backgrounddefault h-screen overflow-hidden">
+      <div className="flex items-start gap-4 relative self-stretch w-full flex-1 min-h-0">
+        <div className="relative flex-1 grow h-full bg-black rounded-2xl overflow-hidden">
+          <div className="relative w-full h-full bg-[url(/images/sushi/hero-background.png)] bg-cover bg-center">
+            <div className="absolute w-full h-[381px] bottom-0 left-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,1)_100%)]">
+              <div className="absolute bottom-8 left-16 font-heading-large text-textdefault text-[112px] tracking-[2px] leading-none">
                 MENU
               </div>
             </div>
@@ -306,8 +306,8 @@ const Menu = () => {
           </div>
         </div>
 
-        <div className="flex flex-col items-start gap-4 relative flex-1 grow">
-          <Card className="flex flex-col items-start gap-16 pt-8 pb-20 px-24 relative self-stretch w-full rounded-2xl border border-solid border-borderdefault bg-backgrounddefault">
+        <div className="flex flex-col items-start relative flex-1 grow h-full min-h-0">
+          <Card className="flex flex-col items-start gap-6 pt-8 pb-8 px-24 relative self-stretch w-full h-full rounded-2xl border border-solid border-borderdefault bg-backgrounddefault overflow-hidden">
             <CardContent className="flex flex-col items-start gap-8 relative self-stretch w-full p-0">
               <div className="flex gap-2 relative self-stretch w-full items-center justify-center p-2 rounded-xl">
                 <div className="flex items-center justify-center gap-1 relative flex-1 grow">
@@ -326,32 +326,12 @@ const Menu = () => {
               </div>
             </CardContent>
 
-            <div className="flex flex-col items-start gap-24 relative self-stretch w-full">
+            <div className="flex flex-col items-start gap-12 relative self-stretch w-full flex-1 overflow-y-auto pr-4 pb-8 min-h-0">
               <MenuSection title="MAKI" items={makiItems} />
               <MenuSection title="URAMAKI" items={uramakiItems} />
               <MenuSection title="SPECIAL ROLLS" items={specialRollsItems} />
             </div>
           </Card>
-
-          <footer className="flex items-center justify-around gap-20 pl-6 pr-5 py-5 relative self-stretch w-full bg-transparent rounded-2xl border border-solid border-borderdefault">
-            <div className="inline-flex items-center gap-4 relative">
-              <span className="relative w-fit font-text-small text-textdefault text-[14px] leading-relaxed whitespace-nowrap">
-                By Pawel Gola
-              </span>
-
-              <div className="relative w-2 h-2 border border-solid border-borderdefault -rotate-45" />
-
-              <span className="relative w-fit font-text-small text-textdefault text-[14px] leading-relaxed whitespace-nowrap">
-                Licensing
-              </span>
-
-              <div className="relative w-2 h-2 border border-solid border-borderdefault -rotate-45" />
-
-              <span className="relative w-fit font-text-small text-textdefault text-[14px] leading-relaxed whitespace-nowrap">
-                Styleguide
-              </span>
-            </div>
-          </footer>
         </div>
       </div>
     </div>
