@@ -54,45 +54,39 @@ const defaultCartItems: CartItem[] = [
 const defaultSuggestedItems: SuggestedItem[] = [
   {
     id: "s1",
-    name: "Two Chip Chocolate Chip Cookie",
-    price: 6.33,
-    imageUrl:
-      "https://img.cdn4dd.com/cdn-cgi/image/fit=contain,width=1200,height=672,format=auto/https://doordash-static.s3.amazonaws.com/media/photosV2/d1edfa6f-0b34-4919-9833-237faa20feae-retina-large.jpg",
+    name: "Spicy Tuna Maki",
+    price: 12.0,
+    imageUrl: "/images/sushi/menu-items/spicy-tuna-maki.jpg",
   },
   {
     id: "s2",
-    name: "Organic Valley Milk",
-    price: 3.3,
-    imageUrl:
-      "https://img.cdn4dd.com/cdn-cgi/image/fit=contain,width=1200,height=672,format=auto/https://doordash-static.s3.amazonaws.com/media/photosV2/b6c4aa04-a4b1-47e4-b0ab-d8590fcdaace-retina-large.jpg",
+    name: "Salmon Nigiri",
+    price: 8.0,
+    imageUrl: "/images/sushi/menu-items/salmon-nigiri.jpg",
   },
   {
     id: "s3",
-    name: "Chocolate Chip Walnut Cookie",
-    price: 6.33,
-    imageUrl:
-      "https://img.cdn4dd.com/cdn-cgi/image/fit=contain,width=1200,height=672,format=auto/https://doordash-static.s3.amazonaws.com/media/photosV2/471c0dfb-6d30-41e7-b75d-1c9d0e17cf8c-retina-large.jpg",
+    name: "Dragon Elegance",
+    price: 18.0,
+    imageUrl: "/images/sushi/menu-items/dragon-elegance.jpg",
   },
   {
     id: "s4",
-    name: "Latte",
-    price: 4.95,
-    imageUrl:
-      "https://img.cdn4dd.com/cdn-cgi/image/fit=contain,width=1200,height=672,format=auto/https://doordash-static.s3.amazonaws.com/media/photosV2/e261fb7e-1126-4e01-b305-e058374ca571-retina-large.jpg",
+    name: "Rainbow Fusion",
+    price: 16.0,
+    imageUrl: "/images/sushi/menu-items/rainbow-fusion.jpg",
   },
   {
     id: "s5",
-    name: "Dark Chocolate Peanut Butter Chip Cookie",
-    price: 6.33,
-    imageUrl:
-      "https://img.cdn4dd.com/cdn-cgi/image/fit=contain,width=1200,height=672,format=auto/https://doordash-static.s3.amazonaws.com/media/photosV2/f59c45f6-3de4-4802-af94-1541cb3fab1e-retina-large.jpg",
+    name: "Mango Maki",
+    price: 10.0,
+    imageUrl: "/images/sushi/menu-items/mango-maki.jpg",
   },
   {
     id: "s6",
-    name: "Oatly Milk",
-    price: 3.3,
-    imageUrl:
-      "https://img.cdn4dd.com/cdn-cgi/image/fit=contain,width=1200,height=672,format=auto/https://doordash-static.s3.amazonaws.com/media/photosV2/6f57853f-7933-45f7-a69d-1ddcbbe3df6b-retina-large.png",
+    name: "Tokyo Blossom",
+    price: 20.0,
+    imageUrl: "/images/sushi/menu-items/tokyo-blossom.jpg",
   },
 ];
 
