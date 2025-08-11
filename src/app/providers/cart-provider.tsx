@@ -17,7 +17,6 @@ import {
   getCart,
 } from "@/lib/api/cart";
 import type { CartResponse } from "@/lib/api";
-import { menuItems } from "../data/menu-items";
 
 interface CartContextType {
   items: LocalCartItem[];
@@ -131,16 +130,34 @@ export function CartProvider({ children }: { children: ReactNode }) {
           finalPrice += 5.0;
         }
 
-        const cartItem: LocalCartItem = {
-          ...item,
-          price: finalPrice,
-          cartId: `${item.id}-${Date.now()}-${Math.random()
-            .toString(36)
-            .substr(2, 9)}`,
-          quantity: 1,
-        };
+        // Check if item with same id and options already exists
+        const existingItemIndex = items.findIndex(
+          (cartItem) =>
+            cartItem.id === item.id &&
+            JSON.stringify(cartItem.options) === JSON.stringify(item.options)
+        );
 
-        const newItems = [...items, cartItem];
+        let newItems: LocalCartItem[];
+
+        if (existingItemIndex >= 0) {
+          // Item exists, increment quantity
+          newItems = items.map((cartItem, index) =>
+            index === existingItemIndex
+              ? { ...cartItem, quantity: cartItem.quantity + 1 }
+              : cartItem
+          );
+        } else {
+          // New item, add to cart
+          const cartItem: LocalCartItem = {
+            ...item,
+            price: finalPrice,
+            cartId: `${item.id}-${Date.now()}-${Math.random()
+              .toString(36)
+              .substr(2, 9)}`,
+            quantity: 1,
+          };
+          newItems = [...items, cartItem];
+        }
         setItems(newItems);
 
         // Save to localStorage
