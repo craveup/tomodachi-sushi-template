@@ -37,18 +37,18 @@ export default function SideCard({
                   <Button
                     variant="outline"
                     size="icon"
-                    className="w-8 h-8 bg-backgroundmuted rounded-[500px] border-borderdefault hover:bg-backgroundprimary hover:text-textinverse transition-colors"
+                    className="w-8 h-8 bg-backgroundmuted rounded-[500px] border-borderdefault hover:bg-white transition-colors group"
                   >
-                    <ArrowRight className="w-4 h-4 text-icondefault" />
+                    <ArrowRight className="w-4 h-4 text-icondefault group-hover:text-gray-600 transition-colors" />
                   </Button>
                 </Link>
               ) : (
                 <Button
                   variant="outline"
                   size="icon"
-                  className="w-8 h-8 bg-backgroundmuted rounded-[500px] border-borderdefault hover:bg-backgroundprimary hover:text-textinverse transition-colors"
+                  className="w-8 h-8 bg-backgroundmuted rounded-[500px] border-borderdefault hover:bg-white transition-colors group"
                 >
-                  <ArrowRight className="w-4 h-4 text-icondefault" />
+                  <ArrowRight className="w-4 h-4 text-icondefault group-hover:text-gray-600 transition-colors" />
                 </Button>
               )}
             </div>
