@@ -2,7 +2,14 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { X, Plus, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  X,
+  Plus,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  ShoppingCart,
+} from "lucide-react";
 import Image from "next/image";
 import { useFormatters } from "@/lib/i18n/hooks";
 
@@ -243,7 +250,7 @@ export default function CartSidebar({
 
       {/* Sidebar */}
       <div
-        className="fixed right-0 top-0 h-full w-[430px] max-w-[430px] bg-background shadow-xl z-[1000] flex flex-col"
+        className="fixed right-0 top-0 h-full w-[430px] max-w-[430px] bg-backgrounddefault shadow-xl z-[1000] flex flex-col"
         style={{
           width: "430px",
           maxWidth: "430px",
@@ -254,33 +261,44 @@ export default function CartSidebar({
         data-testid="OrderCart"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <div className="w-6" /> {/* Spacer */}
+        <div className="flex items-center justify-between p-6 border-b border-borderdefault">
+          <div className="flex items-center gap-3">
+            <h2 className="font-heading-h4 text-textdefault text-lg tracking-wider">
+              YOUR ORDER
+            </h2>
+          </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
             aria-label="Close"
-            className="h-8 w-8"
+            className="h-8 w-8 hover:bg-backgroundmuted"
           >
-            <X className="h-5 w-5" />
+            <X className="h-5 w-5 text-textdefault" />
           </Button>
         </div>
 
         {/* Cart Content */}
         <div className="flex-1 overflow-y-auto">
           {/* Cart Items */}
-          <div className="p-4">
+          <div className="p-6">
             {internalCartItems.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                Your cart is empty
+              <div className="text-center py-12">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-16 h-16 rounded-full bg-backgroundmuted flex items-center justify-center">
+                    <ShoppingCart className="w-8 h-8 text-icondefault" />
+                  </div>
+                  <p className="font-text-meta text-textmuted text-sm tracking-wider">
+                    YOUR CART IS EMPTY
+                  </p>
+                </div>
               </div>
             ) : (
               <div className="space-y-4">
                 {internalCartItems.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-4 p-3 border border-border rounded-lg hover:bg-muted/50"
+                    className="flex items-center gap-4 p-4 border border-borderdefault rounded-2xl hover:bg-backgroundmuted/30 transition-colors"
                     role="listitem"
                     aria-label={`click to open modal and edit item: ${item.name}`}
                     data-testid="OrderCartItem"
@@ -298,10 +316,10 @@ export default function CartSidebar({
 
                     {/* Item Details */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-foreground truncate">
+                      <h3 className="font-heading-h6 text-textdefault text-base tracking-wider truncate">
                         {item.name}
                       </h3>
-                      <p className="text-lg font-semibold text-foreground mt-1">
+                      <p className="text-lg font-semibold text-textdefault mt-1">
                         {currency(item.price)}
                       </p>
                     </div>
@@ -317,13 +335,13 @@ export default function CartSidebar({
                         onClick={() => handleRemoveItem(item.id)}
                         aria-label="remove item from cart"
                         data-testid="stepper-decrement-button"
-                        className="h-8 w-8 text-muted-foreground hover:text-red-600"
+                        className="h-8 w-8 text-textmuted hover:text-red-600 hover:bg-backgroundmuted rounded-full"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
 
                       <span
-                        className="text-sm font-medium min-w-[2rem] text-center"
+                        className="text-sm font-medium min-w-[2rem] text-center text-textdefault"
                         data-testid="stepper-expanded-quantity"
                       >
                         {item.quantity} ×
@@ -335,7 +353,7 @@ export default function CartSidebar({
                         onClick={() => handleQuantityChange(item.id, 1)}
                         aria-label="add one to cart"
                         data-testid="stepper-increment-button"
-                        className="h-8 w-8 text-muted-foreground hover:text-green-600"
+                        className="h-8 w-8 text-textmuted hover:text-green-600 hover:bg-backgroundmuted rounded-full"
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
@@ -347,13 +365,13 @@ export default function CartSidebar({
           </div>
 
           {/* Suggested Items Section */}
-          <div className="border-t border-border p-4">
-            <div className="flex items-center justify-between mb-4">
+          <div className="border-t border-borderdefault p-6">
+            <div className="flex items-center justify-between mb-6">
               <h3
-                className="text-lg font-semibold text-foreground"
+                className="font-heading-h5 text-textdefault text-lg tracking-wider"
                 data-testid="order-cart-recommendation-title"
               >
-                In case you missed it
+                YOU MIGHT ALSO LIKE
               </h3>
               <div className="flex gap-2">
                 <Button
@@ -361,7 +379,7 @@ export default function CartSidebar({
                   size="icon"
                   onClick={() => scrollSuggested("left")}
                   aria-label="Previous button of carousel"
-                  className="h-8 w-8"
+                  className="h-8 w-8 hover:bg-backgroundmuted text-textdefault"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -370,7 +388,7 @@ export default function CartSidebar({
                   size="icon"
                   onClick={() => scrollSuggested("right")}
                   aria-label="Next button of carousel"
-                  className="h-8 w-8"
+                  className="h-8 w-8 hover:bg-backgroundmuted text-textdefault"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -392,7 +410,7 @@ export default function CartSidebar({
                     data-testid="CarouselSuggestedItem"
                     tabIndex={0}
                   >
-                    <div className="bg-card rounded-lg border border-border overflow-hidden hover:shadow-md transition-shadow h-full flex flex-col">
+                    <div className="bg-backgrounddefault rounded-2xl border border-borderdefault overflow-hidden hover:shadow-md transition-all h-full flex flex-col">
                       <div className="relative">
                         <div className="aspect-square">
                           <Image
@@ -410,17 +428,17 @@ export default function CartSidebar({
                             variant="secondary"
                             onClick={() => handleAddSuggestedItem(item)}
                             aria-label="Add to cart"
-                            className="h-8 w-8 bg-white hover:bg-green-50 hover:border-green-300 rounded-full shadow-md border border-gray-200 transition-all duration-200 hover:scale-105"
+                            className="h-8 w-8 bg-backgroundprimary hover:bg-backgroundprimary/90 rounded-full shadow-md border border-borderdefault transition-all duration-200 hover:scale-105"
                           >
-                            <Plus className="h-4 w-4 text-green-600" />
+                            <Plus className="h-4 w-4 text-textinverse" />
                           </Button>
                         </div>
                       </div>
-                      <div className="p-2 flex-1 flex flex-col justify-between">
-                        <h4 className="text-xs font-medium text-foreground line-clamp-2 mb-1">
+                      <div className="p-3 flex-1 flex flex-col justify-between">
+                        <h4 className="text-xs font-heading-h6 text-textdefault line-clamp-2 mb-1 tracking-wider">
                           {item.name}
                         </h4>
-                        <p className="text-sm font-semibold text-foreground">
+                        <p className="text-sm font-semibold text-textdefault">
                           {currency(item.price)}
                         </p>
                       </div>
@@ -433,16 +451,16 @@ export default function CartSidebar({
         </div>
 
         {/* Checkout Footer */}
-        <div className="border-t border-border p-4">
+        <div className="border-t border-borderdefault p-6 bg-backgrounddefault">
           <Button
             onClick={onCheckout}
-            className="w-full h-12 text-base font-semibold"
+            className="w-full h-14 text-base font-heading-h6 tracking-wider bg-backgroundprimary hover:bg-backgroundprimary/90 text-textinverse rounded-2xl"
             size="lg"
             data-anchor-id="CheckoutButton"
             data-testid="CheckoutButton"
           >
             <div className="flex items-center justify-between w-full">
-              <span>Checkout</span>
+              <span>CHECKOUT</span>
               <span>{currency(subtotal)}</span>
             </div>
           </Button>
