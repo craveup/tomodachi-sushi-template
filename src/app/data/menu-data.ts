@@ -144,7 +144,8 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Lobster Tempura with Yuzu Aioli",
       description: "Maine lobster tail in a crisp tempura batter.",
       price: 38.0,
-      image: "/images/sushi/menu-items/20250811_2347_Maine Lobster Tempura Delight_simple_compose_01k2egfh4beq688sr88598d7wt.png",
+      image:
+        "/images/sushi/menu-items/20250811_2347_Maine Lobster Tempura Delight_simple_compose_01k2egfh4beq688sr88598d7wt.png",
       category: "chefs-creations-warm-dishes",
       calories: 340,
     },
@@ -154,7 +155,7 @@ export const menuData: Record<string, MenuItem[]> = {
       description:
         "Steamed egg custard topped with Santa Barbara uni and snow crab.",
       price: 24.0,
-      image: "/images/sushi/menu-items/chawanmushi-uni-crab.jpg",
+      image: "/images/sushi/menu-items/20250811_2349_Gourmet Uni Custard_simple_compose_01k2eghjq5er8asd806qtcq7fw.png",
       category: "chefs-creations-warm-dishes",
       calories: 180,
     },
