@@ -26,66 +26,6 @@ export default function TomodachiCheckoutPage() {
   const [selectedTime, setSelectedTime] = useState("");
   const [isAddressFlowOpen, setIsAddressFlowOpen] = useState(false);
 
-  // Redirect to menu if cart is empty
-  if (items.length === 0) {
-    return (
-      <div className="min-h-screen bg-backgrounddefault flex items-center justify-center">
-        <div className="text-center space-y-6">
-          <div className="w-16 h-16 mx-auto rounded-full bg-backgroundmuted flex items-center justify-center">
-            <ClientIcon
-              name="ShoppingCart"
-              className="w-8 h-8 text-textmuted"
-            />
-          </div>
-          <div>
-            <h2 className="font-heading-h4 text-textdefault text-2xl tracking-wider mb-2">
-              YOUR CART IS EMPTY
-            </h2>
-            <p className="font-text-meta text-textmuted tracking-wider">
-              Add some delicious sushi to your cart before checking out
-            </p>
-          </div>
-          <Button
-            onClick={() => router.push("/menu")}
-            className="bg-backgroundprimary text-textinverse hover:bg-backgroundprimary/90 font-text-meta tracking-wider rounded-xl px-8 py-3"
-          >
-            Browse Menu
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  const deliveryFee = orderType === "delivery" && subtotal < 50 ? 5.99 : 0;
-  const finalTotal = total + deliveryFee;
-
-  const handleAddressFlowComplete = (data: {
-    deliveryOption: DeliveryOption;
-    address?: { street: string; apartment?: string };
-  }) => {
-    setDeliveryData(data);
-    setIsAddressFlowOpen(false);
-  };
-
-  const handlePaymentSuccess = async (paymentIntentId?: string) => {
-    try {
-      // With the cart-based API, orders are automatically created via Stripe webhook
-      // We just need to clear the cart and redirect to confirmation
-      // Payment successful: ${paymentIntentId}
-
-      clearCart();
-      router.push(`/confirmation?paymentIntentId=${paymentIntentId}`);
-    } catch (error) {
-      // Still clear cart and redirect, but show error
-      clearCart();
-      router.push("/confirmation");
-    }
-  };
-
-  const handlePaymentError = (error: string) => {
-    // You could show a toast notification here
-  };
-
   // Generate time slots like real delivery apps
   const generateTimeSlots = useCallback(() => {
     const slots = [];
@@ -175,6 +115,66 @@ export default function TomodachiCheckoutPage() {
   const handleOrderTypeChange = (newType: string) => {
     setOrderType(newType);
     setSelectedTime(""); // Clear selection since times are different
+  };
+
+  // Redirect to menu if cart is empty
+  if (items.length === 0) {
+    return (
+      <div className="min-h-screen bg-backgrounddefault flex items-center justify-center">
+        <div className="text-center space-y-6">
+          <div className="w-16 h-16 mx-auto rounded-full bg-backgroundmuted flex items-center justify-center">
+            <ClientIcon
+              name="ShoppingCart"
+              className="w-8 h-8 text-textmuted"
+            />
+          </div>
+          <div>
+            <h2 className="font-heading-h4 text-textdefault text-2xl tracking-wider mb-2">
+              YOUR CART IS EMPTY
+            </h2>
+            <p className="font-text-meta text-textmuted tracking-wider">
+              Add some delicious sushi to your cart before checking out
+            </p>
+          </div>
+          <Button
+            onClick={() => router.push("/menu")}
+            className="bg-backgroundprimary text-textinverse hover:bg-backgroundprimary/90 font-text-meta tracking-wider rounded-xl px-8 py-3"
+          >
+            Browse Menu
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const deliveryFee = orderType === "delivery" && subtotal < 50 ? 5.99 : 0;
+  const finalTotal = total + deliveryFee;
+
+  const handleAddressFlowComplete = (data: {
+    deliveryOption: DeliveryOption;
+    address?: { street: string; apartment?: string };
+  }) => {
+    setDeliveryData(data);
+    setIsAddressFlowOpen(false);
+  };
+
+  const handlePaymentSuccess = async (paymentIntentId?: string) => {
+    try {
+      // With the cart-based API, orders are automatically created via Stripe webhook
+      // We just need to clear the cart and redirect to confirmation
+      // Payment successful: ${paymentIntentId}
+
+      clearCart();
+      router.push(`/confirmation?paymentIntentId=${paymentIntentId}`);
+    } catch (error) {
+      // Still clear cart and redirect, but show error
+      clearCart();
+      router.push("/confirmation");
+    }
+  };
+
+  const handlePaymentError = (error: string) => {
+    // You could show a toast notification here
   };
 
   return (

@@ -106,9 +106,9 @@ const About = () => {
                 COMMUNITY
               </h3>
               <p className="font-text-meta text-textmuted leading-relaxed">
-                Tomodachi means "friend" in Japanese. We create a welcoming
-                space where food brings people together in friendship and
-                celebration.
+                Tomodachi means &ldquo;friend&rdquo; in Japanese. We create a
+                welcoming space where food brings people together in friendship
+                and celebration.
               </p>
             </Card>
           </div>
@@ -189,8 +189,9 @@ const About = () => {
 
               <blockquote className="border-l-4 border-backgroundprimary pl-6 py-4">
                 <p className="font-text-meta text-textdefault italic text-lg leading-relaxed">
-                  "Sushi is not just food, it's a meditation on perfection. Each
-                  grain of rice, each slice of fish tells a story."
+                  &ldquo;Sushi is not just food, it&apos;s a meditation on
+                  perfection. Each grain of rice, each slice of fish tells a
+                  story.&rdquo;
                 </p>
                 <cite className="font-heading-h6 text-textmuted tracking-wider mt-2 block">
                   - Chef Tanaka

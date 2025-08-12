@@ -77,8 +77,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setIsHydrated(true);
 
     // Load from localStorage after hydration
-    const savedItems = localStorage.getItem("leclerc-cart-items");
-    const savedCartId = localStorage.getItem("leclerc-cart-id");
+    const savedItems = localStorage.getItem("tomodachi-cart-items");
+    const savedCartId = localStorage.getItem("tomodachi-cart-id");
 
     if (savedItems) {
       try {
@@ -162,7 +162,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
         // Save to localStorage
         if (typeof window !== "undefined") {
-          localStorage.setItem("leclerc-cart-items", JSON.stringify(newItems));
+          localStorage.setItem(
+            "tomodachi-cart-items",
+            JSON.stringify(newItems)
+          );
         }
 
         // Automatically open the cart when an item is added
@@ -192,7 +195,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems(newItems);
     // Save to localStorage
     if (typeof window !== "undefined") {
-      localStorage.setItem("leclerc-cart-items", JSON.stringify(newItems));
+      localStorage.setItem("tomodachi-cart-items", JSON.stringify(newItems));
     }
   };
 
@@ -206,7 +209,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setItems(newItems);
       // Save to localStorage
       if (typeof window !== "undefined") {
-        localStorage.setItem("leclerc-cart-items", JSON.stringify(newItems));
+        localStorage.setItem("tomodachi-cart-items", JSON.stringify(newItems));
       }
     }
   };
@@ -215,8 +218,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems([]);
     // Clear localStorage
     if (typeof window !== "undefined") {
-      localStorage.removeItem("leclerc-cart-items");
-      localStorage.removeItem("leclerc-cart-id");
+      localStorage.removeItem("tomodachi-cart-items");
+      localStorage.removeItem("tomodachi-cart-id");
     }
   };
 

@@ -4,8 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { LeclercHeader } from "../components/leclerc-header";
-import { LeclercFooter } from "../components/leclerc-footer";
+import { Navbar } from "../components/navbar";
 import { CheckCircle, Star } from "lucide-react";
 
 const ThankYouContent = () => {
@@ -13,32 +12,34 @@ const ThankYouContent = () => {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
 
-  const displayName = searchParams.get("displayName") || "Restaurant";
+  const displayName = searchParams.get("displayName") || "Tomodachi Sushi";
   const locationId = searchParams.get("locationId");
   const cartId = searchParams.get("cartId");
 
   useEffect(() => {
     // Clear cart from localStorage since order is complete
-    // Using the same keys as the cart provider
     if (typeof window !== "undefined") {
-      localStorage.removeItem("leclerc-cart-items");
-      localStorage.removeItem("leclerc-cart-id");
-      localStorage.removeItem("crave_cart_data"); // Also clear the API cart data
+      localStorage.removeItem("tomodachi-cart-items");
+      localStorage.removeItem("tomodachi-cart-id");
+      localStorage.removeItem("crave_cart_data");
     }
   }, []);
 
   const handleRatingClick = (value: number) => {
     setRating(value);
     // Here you would send the rating to your API
-    // Rating submitted: ${value} stars
+    console.log(`Rating submitted: ${value} stars`);
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <LeclercHeader />
+    <div className="min-h-screen bg-backgrounddefault">
+      {/* Header */}
+      <header className="absolute top-6 left-6 lg:top-12 lg:left-12 z-20">
+        <Navbar />
+      </header>
 
-      <main className="pt-20 pb-12">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 text-center">
+      <main className="pt-32 pb-12">
+        <div className="max-w-2xl mx-auto px-6 text-center">
           <div className="space-y-8">
             {/* Success Icon */}
             <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
@@ -47,55 +48,63 @@ const ThankYouContent = () => {
 
             {/* Thank You Message */}
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-4">
-                Thank you for your order!
+              <h1 className="font-heading-h1 text-textdefault text-3xl lg:text-4xl tracking-wider mb-4">
+                ありがとうございます
               </h1>
 
-              <p className="text-lg text-muted-foreground mb-2">
+              <h2 className="font-heading-h3 text-textdefault text-2xl tracking-wider mb-4">
+                THANK YOU FOR YOUR ORDER!
+              </h2>
+
+              <p className="font-text-meta text-textmuted text-lg tracking-wider mb-2">
                 Your order from {displayName} has been confirmed.
               </p>
 
-              <p className="text-muted-foreground">
+              <p className="font-text-meta text-textmuted tracking-wider">
                 We&apos;ll send you updates about your order via email and SMS.
               </p>
             </div>
 
             {/* Order Details */}
-            <div className="bg-muted/30 rounded-lg p-6">
-              <h2 className="text-xl font-semibold mb-4">Order Details</h2>
+            <div className="bg-backgroundmuted rounded-2xl p-6 border border-borderdefault">
+              <h2 className="font-heading-h4 text-textdefault text-xl tracking-wider mb-4">
+                ORDER DETAILS
+              </h2>
 
-              <div className="space-y-2 text-sm">
+              <div className="space-y-3 font-text-meta text-sm tracking-wider">
                 <div className="flex justify-between">
-                  <span>Order ID:</span>
-                  <span className="font-mono">
-                    {cartId?.slice(-8).toUpperCase()}
+                  <span className="text-textmuted">Order ID:</span>
+                  <span className="font-mono text-textdefault">
+                    {cartId?.slice(-8).toUpperCase() ||
+                      "TD-" +
+                        Math.random().toString(36).substr(2, 6).toUpperCase()}
                   </span>
                 </div>
 
                 <div className="flex justify-between">
-                  <span>Restaurant:</span>
-                  <span>{displayName}</span>
+                  <span className="text-textmuted">Restaurant:</span>
+                  <span className="text-textdefault">{displayName}</span>
                 </div>
 
                 <div className="flex justify-between">
-                  <span>Estimated Time:</span>
-                  <span>15-20 minutes</span>
+                  <span className="text-textmuted">Estimated Time:</span>
+                  <span className="text-textdefault">25-30 minutes</span>
                 </div>
 
                 <div className="flex justify-between">
-                  <span>Order Type:</span>
-                  <span>Pickup</span>
+                  <span className="text-textmuted">Order Type:</span>
+                  <span className="text-textdefault">Pickup</span>
                 </div>
               </div>
             </div>
 
             {/* Rating Section */}
-            <div className="border rounded-lg p-6">
-              <h2 className="text-xl font-semibold mb-4">
-                Rate Your Experience
+            <div className="bg-backgrounddefault border border-borderdefault rounded-2xl p-6">
+              <h2 className="font-heading-h4 text-textdefault text-xl tracking-wider mb-4">
+                RATE YOUR EXPERIENCE
               </h2>
 
-              <p className="text-muted-foreground mb-4">
+              <p className="font-text-meta text-textmuted tracking-wider mb-4">
                 How was your ordering experience?
               </p>
 
@@ -112,7 +121,7 @@ const ThankYouContent = () => {
                       className={`h-8 w-8 ${
                         star <= (hoveredRating || rating)
                           ? "fill-yellow-400 text-yellow-400"
-                          : "text-gray-300"
+                          : "text-textmuted"
                       }`}
                     />
                   </button>
@@ -120,7 +129,7 @@ const ThankYouContent = () => {
               </div>
 
               {rating > 0 && (
-                <p className="text-sm text-green-600">
+                <p className="font-text-meta text-sm text-green-600 tracking-wider">
                   Thank you for your {rating}-star rating!
                 </p>
               )}
@@ -128,39 +137,41 @@ const ThankYouContent = () => {
 
             {/* Action Buttons */}
             <div className="flex flex-col gap-4">
-              <Link href="/examples/leclerc-bakery" className="w-full">
+              <Link href="/" className="w-full">
                 <Button
                   size="lg"
-                  className="w-full bg-[hsl(var(--brand-accent))] hover:bg-[hsl(var(--brand-accent))]/90 text-white"
+                  className="w-full h-14 font-heading-h6 tracking-wider bg-backgroundprimary hover:bg-backgroundprimary/90 text-textinverse rounded-2xl"
                 >
-                  Place Another Order
+                  PLACE ANOTHER ORDER
                 </Button>
               </Link>
 
-              <Link href="/examples/leclerc-bakery/menu" className="w-full">
-                <Button variant="outline" size="lg" className="w-full">
-                  Browse Menu
+              <Link href="/menu" className="w-full">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full h-14 font-heading-h6 tracking-wider border-borderdefault text-textdefault hover:bg-backgroundmuted rounded-2xl"
+                >
+                  BROWSE MENU
                 </Button>
               </Link>
             </div>
 
             {/* Footer Message */}
-            <div className="text-center pt-8 border-t">
-              <p className="text-sm text-muted-foreground">
+            <div className="text-center pt-8 border-t border-borderdefault">
+              <p className="font-text-meta text-sm text-textmuted tracking-wider">
                 Questions about your order? Contact us at{" "}
                 <a
-                  href="mailto:support@leclercbakery.com"
-                  className="text-[hsl(var(--brand-accent))] hover:underline"
+                  href="mailto:support@tomodachi.com"
+                  className="text-backgroundprimary hover:underline"
                 >
-                  support@leclercbakery.com
+                  support@tomodachi.com
                 </a>
               </p>
             </div>
           </div>
         </div>
       </main>
-
-      <LeclercFooter />
     </div>
   );
 };
