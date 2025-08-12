@@ -2,7 +2,8 @@
 
 import { Separator } from "@/components/ui/separator";
 import { Plus } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
+import Image from "next/image";
 import { useCart } from "../providers/cart-provider";
 import { MenuItem, ItemOptions } from "../types";
 
@@ -20,6 +21,9 @@ export const TomodachiMenuSection = ({
   onSectionMount,
 }: MenuSectionProps) => {
   const { addToCart, isLoading } = useCart();
+  const [imageErrors, setImageErrors] = useState<{ [key: string]: boolean }>(
+    {}
+  );
 
   const handleAddToCart = async (item: MenuItem) => {
     const defaultOptions: ItemOptions = {
@@ -33,6 +37,10 @@ export const TomodachiMenuSection = ({
     } catch (error) {
       console.error("Failed to add item to cart:", error);
     }
+  };
+
+  const handleImageError = (itemId: string) => {
+    setImageErrors((prev) => ({ ...prev, [itemId]: true }));
   };
 
   return (
@@ -64,12 +72,38 @@ export const TomodachiMenuSection = ({
             key={item.id}
             className="flex items-start gap-6 relative w-full min-h-[120px]"
           >
-            <div className="relative w-[120px] h-[120px] flex-shrink-0">
-              <img
-                className="absolute w-[120px] h-[120px] top-0 left-0 object-cover rounded-2xl"
-                alt={item.name}
-                src={item.image || "/images/sushi/menu-items/sushi-plate.jpg"}
-              />
+            <div className="relative w-[120px] h-[120px] flex-shrink-0 overflow-hidden rounded-2xl bg-backgroundmuted">
+              {imageErrors[item.id] ? (
+                // Fallback placeholder when image fails
+                <div className="w-full h-full bg-backgroundmuted flex items-center justify-center">
+                  <svg
+                    className="w-8 h-8 text-textmuted"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+              ) : (
+                <Image
+                  src={item.image || "/images/sushi/menu-items/sushi-plate.jpg"}
+                  alt={item.name}
+                  fill
+                  className="object-cover transition-opacity duration-300"
+                  sizes="120px"
+                  loading="lazy"
+                  placeholder="blur"
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+                  onError={() => handleImageError(item.id)}
+                  priority={false}
+                />
+              )}
             </div>
             <div className="flex flex-col items-start gap-3 relative flex-1 min-w-0">
               <div className="flex items-start justify-between relative self-stretch w-full">
