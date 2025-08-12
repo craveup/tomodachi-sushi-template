@@ -33,7 +33,7 @@ const About = () => {
         <div className="relative z-10 h-full flex items-center justify-center">
           <div className="text-center space-y-8 px-6">
             {/* Japanese Characters */}
-            <div className="font-wdxl-jp text-white text-4xl lg:text-6xl opacity-60">
+            <div className="font-yuji-mai text-white text-4xl lg:text-6xl opacity-60">
               友達の物語
             </div>
 
@@ -350,7 +350,7 @@ const About = () => {
               the bonds of friendship that bring us together.
             </p>
 
-            <div className="font-wdxl-jp text-textmuted text-2xl opacity-60 mt-8">
+            <div className="font-yuji-mai text-textmuted text-2xl opacity-60 mt-8">
               ありがとうございます
             </div>
             <p className="font-text-meta text-textmuted text-sm tracking-wider">

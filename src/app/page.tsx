@@ -44,24 +44,23 @@ const TomodachiFrontpage = () => {
               <Navbar />
             </header>
 
-            {/* Japanese Title - Mobile: Center overlay, Desktop: Bottom positioned */}
+            {/* Mobile: Japanese Title Overlay */}
             <h1
-              className="absolute 
+              className="lg:hidden absolute 
                          top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center
-                         lg:top-auto lg:left-12 lg:bottom-[77px] lg:transform-none lg:text-left
-                         font-wdxl-jp text-white lg:text-textdefault 
-                         text-3xl sm:text-4xl md:text-6xl lg:text-[96px] 
-                         tracking-wide lg:tracking-[2px] 
-                         leading-tight lg:leading-none
-                         max-w-[90vw] lg:max-w-[1091px]
+                         font-yuji-mai text-white
+                         text-3xl sm:text-4xl md:text-6xl
+                         tracking-wide
+                         leading-tight
+                         max-w-[90vw]
                          break-words
-                         drop-shadow-2xl lg:drop-shadow-none
+                         drop-shadow-2xl
                          z-20"
             >
               日本橋蛎殻町友達寿司
             </h1>
 
-            {/* Gradient overlay for text readability - Desktop only */}
+            {/* Desktop: Gradient overlay with Japanese text */}
             <div className="hidden lg:block absolute w-full h-[534px] top-[498px] left-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,1)_100%)]">
               {/* Social Icons - Desktop only */}
               <div className="absolute top-auto right-0 bottom-[77px] transform -translate-y-full">
@@ -84,6 +83,11 @@ const TomodachiFrontpage = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Desktop Japanese Title */}
+              <h1 className="absolute w-[1091px] bottom-[77px] left-12 font-yuji-mai text-textdefault text-[96px] tracking-[2px] leading-none">
+                日本橋蛎殻町友達寿司
+              </h1>
             </div>
 
             {/* Mobile: Subtle gradient for text readability */}

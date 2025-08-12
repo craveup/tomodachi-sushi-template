@@ -10,6 +10,7 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-forum: "Forum", serif;
+  --font-yuji-mai: var(--font-yuji-mai);
   --font-wdxl-jp: "WDXL Lubrifont JP N", "WD-XL 滑油字", sans-serif;
   --color-backgrounddefault: var(--backgrounddefault);
   --color-backgroundmuted: var(--backgroundmuted);
@@ -214,6 +215,13 @@
   .font-text-meta {
     font-family: var(--text-meta-font-family);
   }
+
+  /* Japanese Yuji Mai for hero text */
+.font-yuji-mai {
+  font-family: var(--font-yuji-mai);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
 
   /* Japanese WDXL Lubrifont for hero text */
 .font-wdxl-jp {
