@@ -6,6 +6,9 @@ export interface MenuItem {
   image: string | null;
   category:
     | "maki"
+    | "nigiri"
+    | "rolls"
+    | "warmDishes"
     | "uramaki"
     | "specialRolls"
     | "signature"
@@ -13,7 +16,10 @@ export interface MenuItem {
     | "limited"
     | "cookies"
     | "pastries"
-    | "breads";
+    | "breads"
+    | "nigiri-sashimi"
+    | "seasonal-rolls-handrolls"
+    | "chefs-creations-warm-dishes";
   calories: number;
   isNew?: boolean;
   isPopular?: boolean;

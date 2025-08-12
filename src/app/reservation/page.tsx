@@ -127,7 +127,7 @@ export default function ReservationPage() {
         <div className="relative z-10 h-full flex items-center justify-center">
           <div className="text-center space-y-6 px-6">
             {/* Japanese Characters */}
-            <div className="font-wdxl-jp text-white text-3xl lg:text-5xl opacity-60">
+            <div className="font-yuji-mai text-white text-3xl lg:text-5xl opacity-60">
               予約
             </div>
 

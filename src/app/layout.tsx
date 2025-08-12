@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Forum } from "next/font/google";
+import { Geist, Geist_Mono, Forum, Yuji_Mai } from "next/font/google";
 
 import "./globals.css";
 import "./styles/leclerc-fonts.css";
@@ -28,6 +28,13 @@ const forum = Forum({
   weight: "400",
 });
 
+// Yuji Mai for Japanese text
+const yujiMai = Yuji_Mai({
+  variable: "--font-yuji-mai",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 // WDXL Lubrifont JP N for Japanese text (using Google Fonts)
 // Import via CSS since it's available on Google Fonts
 const wdxlLubrifont = {
@@ -49,7 +56,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${forum.variable} ${wdxlLubrifont.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${forum.variable} ${yujiMai.variable} ${wdxlLubrifont.variable} antialiased`}
       >
         <ErrorBoundary>
           <RestaurantThemeProvider defaultThemePath="/themes/leclerc-theme.json">

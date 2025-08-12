@@ -19,7 +19,8 @@ import { Button } from "@/components/ui/button";
 
 export default function TomodachiCheckoutPage() {
   const router = useRouter();
-  const { items, subtotal, tax, total, clearCart } = useCart();
+  const { items, subtotal, tax, total, clearCart, updateQuantity, removeItem } =
+    useCart();
   const { getThemeClass } = useThemeClasses();
   const { setDeliveryData } = useAddress();
   const [orderType, setOrderType] = useState("delivery");
@@ -357,7 +358,6 @@ export default function TomodachiCheckoutPage() {
                         </Label>
                         <Input
                           id="firstName"
-                          placeholder="John"
                           className="mt-2 bg-backgroundmuted border-borderdefault rounded-xl px-4 py-3 text-textdefault placeholder:text-textmuted"
                         />
                       </div>
@@ -370,7 +370,6 @@ export default function TomodachiCheckoutPage() {
                         </Label>
                         <Input
                           id="lastName"
-                          placeholder="Doe"
                           className="mt-2 bg-backgroundmuted border-borderdefault rounded-xl px-4 py-3 text-textdefault placeholder:text-textmuted"
                         />
                       </div>
@@ -576,7 +575,7 @@ export default function TomodachiCheckoutPage() {
                                         key={slot.value}
                                         htmlFor={slot.value}
                                         className={`
-                                        relative cursor-pointer group transition-all duration-200 ease-in-out
+                                        relative cursor-pointer group transition-all duration-200 ease-in-out rounded-xl
                                         ${
                                           isSelected
                                             ? "ring-2 ring-offset-2 scale-105"
@@ -605,7 +604,7 @@ export default function TomodachiCheckoutPage() {
                                         />
                                         <div
                                           className={`
-                                          p-3 rounded-lg border-2 text-center transition-all duration-200
+                                          p-3 rounded-2xl border-2 text-center transition-all duration-200
                                           ${
                                             isSelected
                                               ? "text-white dark:text-white shadow-md transform"
@@ -631,7 +630,7 @@ export default function TomodachiCheckoutPage() {
                                             {slot.time}
                                           </div>
                                           {isSelected && (
-                                            <div className="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-sm">
+                                            <div className="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-sm border border-borderdefault">
                                               <ClientIcon
                                                 name="Check"
                                                 className="h-3 w-3 text-green-600"
@@ -715,11 +714,11 @@ export default function TomodachiCheckoutPage() {
                   {items.map((item) => (
                     <div
                       key={item.cartId}
-                      className="flex justify-between items-start"
+                      className="flex items-center justify-between"
                     >
                       <div className="flex-1">
                         <div className="font-heading-h6 text-textdefault text-base tracking-wider">
-                          {item.quantity}x {item.name}
+                          {item.name}
                         </div>
                         {item.options.warming === "warmed" && (
                           <div className="font-text-meta text-sm text-textmuted tracking-wider">
@@ -732,7 +731,44 @@ export default function TomodachiCheckoutPage() {
                           </div>
                         )}
                       </div>
-                      <div className="font-heading-h6 text-textdefault text-base tracking-wider">
+
+                      <div className="flex items-center gap-2">
+                        {item.quantity > 1 ? (
+                          <button
+                            onClick={() =>
+                              updateQuantity(item.cartId, item.quantity - 1)
+                            }
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-borderdefault text-textmuted hover:bg-backgroundmuted"
+                            aria-label="decrease quantity"
+                          >
+                            <ClientIcon name="Minus" className="h-4 w-4" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => removeItem(item.cartId)}
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-borderdefault text-textmuted hover:bg-backgroundmuted"
+                            aria-label="remove item"
+                          >
+                            <ClientIcon name="Trash2" className="h-4 w-4" />
+                          </button>
+                        )}
+
+                        <span className="min-w-[2rem] text-center font-text-meta text-textdefault">
+                          {item.quantity} ×
+                        </span>
+
+                        <button
+                          onClick={() =>
+                            updateQuantity(item.cartId, item.quantity + 1)
+                          }
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-borderdefault text-textmuted hover:bg-backgroundmuted"
+                          aria-label="increase quantity"
+                        >
+                          <ClientIcon name="Plus" className="h-4 w-4" />
+                        </button>
+                      </div>
+
+                      <div className="font-heading-h6 text-textdefault text-base tracking-wider min-w-[4.5rem] text-right">
                         ${(item.price * item.quantity).toFixed(2)}
                       </div>
                     </div>
