@@ -9,9 +9,16 @@ import { MenuItem, ItemOptions } from "../types";
 interface MenuSectionProps {
   title: string;
   items: MenuItem[];
+  sectionId?: string;
+  onSectionMount?: (id: string, element: HTMLElement | null) => void;
 }
 
-export const TomodachiMenuSection = ({ title, items }: MenuSectionProps) => {
+export const TomodachiMenuSection = ({
+  title,
+  items,
+  sectionId,
+  onSectionMount,
+}: MenuSectionProps) => {
   const { addToCart, isLoading } = useCart();
 
   const handleAddToCart = async (item: MenuItem) => {
@@ -29,7 +36,14 @@ export const TomodachiMenuSection = ({ title, items }: MenuSectionProps) => {
   };
 
   return (
-    <section className="flex flex-col items-start gap-12 relative self-stretch w-full">
+    <section
+      ref={(el) => {
+        if (sectionId && onSectionMount) {
+          onSectionMount(sectionId, el);
+        }
+      }}
+      className="flex flex-col items-start gap-8 relative w-full"
+    >
       <div className="flex items-center justify-center gap-4 relative self-stretch w-full">
         <div className="inline-flex items-center justify-center px-0 py-[7px] relative">
           <div className="relative w-2 h-2 border border-solid border-borderdefault -rotate-45" />
@@ -44,11 +58,11 @@ export const TomodachiMenuSection = ({ title, items }: MenuSectionProps) => {
         </div>
       </div>
 
-      <div className="flex flex-col items-start gap-8 relative self-stretch w-full">
+      <div className="flex flex-col items-start gap-6 relative w-full">
         {items.map((item) => (
           <div
             key={item.id}
-            className="flex items-start gap-6 relative self-stretch w-full min-h-[120px]"
+            className="flex items-start gap-6 relative w-full min-h-[120px]"
           >
             <div className="relative w-[120px] h-[120px] flex-shrink-0">
               <img
