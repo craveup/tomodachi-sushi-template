@@ -4,6 +4,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "../providers/cart-provider";
 import CartSidebar from "@/components/crave-ui/cart-component/cart-sidebar";
+import { menuData } from "../data/menu-data";
 
 export function CartWrapper() {
   const router = useRouter();
@@ -55,11 +56,27 @@ export function CartWrapper() {
     }
   };
 
+  // Build suggested items from our new menu data
+  const suggestedFromMenu = React.useMemo(() => {
+    const pools = [
+      ...(menuData["nigiri-sashimi"] || []),
+      ...(menuData["seasonal-rolls-handrolls"] || []),
+      ...(menuData["chefs-creations-warm-dishes"] || []),
+    ];
+    return pools.slice(0, 12).map((i) => ({
+      id: i.id,
+      name: i.name,
+      price: i.price,
+      imageUrl: i.image,
+    }));
+  }, []);
+
   return (
     <CartSidebar
       isOpen={isCartOpen}
       onClose={closeCart}
       cartItems={cartItems}
+      suggestedItems={suggestedFromMenu}
       onUpdateQuantity={updateQuantity}
       onRemoveItem={removeItem}
       onCheckout={handleCheckout}
