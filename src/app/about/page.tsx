@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -121,11 +122,16 @@ const About = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="order-2 lg:order-1">
               <div className="relative">
-                <img
-                  src="/images/sushi/reservation-card.jpg"
-                  alt="Master Chef Tanaka"
-                  className="w-full aspect-[4/3] object-cover rounded-2xl"
-                />
+                <div className="relative w-full aspect-[4/3] overflow-hidden rounded-2xl">
+                  <Image
+                    src="/images/sushi/reservation-card.jpg"
+                    alt="Master Chef Tanaka"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority
+                  />
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-2xl"></div>
                 <div className="absolute bottom-6 left-6 text-white">
                   <h4 className="font-heading-h4 text-xl tracking-wider">
@@ -218,10 +224,13 @@ const About = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="group relative overflow-hidden rounded-2xl aspect-square">
-              <img
+              <Image
                 src="/images/sushi/menu-items/spicy-tuna-maki.jpg"
                 alt="Fresh preparation"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                fill
+                className="object-cover group-hover:scale-110 transition-transform duration-500"
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="absolute bottom-4 left-4 text-white">
@@ -233,10 +242,13 @@ const About = () => {
             </div>
 
             <div className="group relative overflow-hidden rounded-2xl aspect-square">
-              <img
+              <Image
                 src="/images/sushi/menu-items/mystic-garden.jpg"
                 alt="Artful presentation"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                fill
+                className="object-cover group-hover:scale-110 transition-transform duration-500"
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="absolute bottom-4 left-4 text-white">
@@ -248,10 +260,13 @@ const About = () => {
             </div>
 
             <div className="group relative overflow-hidden rounded-2xl aspect-square">
-              <img
+              <Image
                 src="/images/sushi/restaurant-card.jpg"
                 alt="Elegant atmosphere"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                fill
+                className="object-cover group-hover:scale-110 transition-transform duration-500"
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="absolute bottom-4 left-4 text-white">
@@ -263,10 +278,13 @@ const About = () => {
             </div>
 
             <div className="group relative overflow-hidden rounded-2xl aspect-square">
-              <img
+              <Image
                 src="/images/sushi/menu-card.jpg"
                 alt="Premium service"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                fill
+                className="object-cover group-hover:scale-110 transition-transform duration-500"
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="absolute bottom-4 left-4 text-white">
