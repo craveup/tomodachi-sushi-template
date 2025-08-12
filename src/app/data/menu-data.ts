@@ -134,7 +134,8 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Pacific Abalone Sashimi & Liver Sauce",
       description: "Served fresh with ponzu.",
       price: 34.0,
-      image: "/images/sushi/menu-items/20250811_2344_Abalone Sashimi Elegance_simple_compose_01k2eg8k9vfnyv6g7jbgjykeae.png",
+      image:
+        "/images/sushi/menu-items/20250811_2344_Abalone Sashimi Elegance_simple_compose_01k2eg8k9vfnyv6g7jbgjykeae.png",
       category: "chefs-creations-warm-dishes",
       calories: 160,
     },
@@ -143,7 +144,7 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Lobster Tempura with Yuzu Aioli",
       description: "Maine lobster tail in a crisp tempura batter.",
       price: 38.0,
-      image: "/images/sushi/menu-items/lobster-tempura-yuzu-aioli.jpg",
+      image: "/images/sushi/menu-items/20250811_2347_Maine Lobster Tempura Delight_simple_compose_01k2egfh4beq688sr88598d7wt.png",
       category: "chefs-creations-warm-dishes",
       calories: 340,
     },
