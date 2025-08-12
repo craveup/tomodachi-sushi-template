@@ -90,7 +90,8 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Santa Monica Veggie Handroll",
       description: "Farmer's market vegetables, miso sesame sauce.",
       price: 15.0,
-      image: "/images/sushi/menu-items/20250811_2332_Vegetable Temaki Delight_simple_compose_01k2efk8jvenns9h1ma6ywn5av.png",
+      image:
+        "/images/sushi/menu-items/20250811_2332_Vegetable Temaki Delight_simple_compose_01k2efk8jvenns9h1ma6ywn5av.png",
       category: "seasonal-rolls-handrolls",
       calories: 160,
       isGlutenFree: true,
@@ -100,7 +101,7 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Spicy Tuna Crispy Roll",
       description: "Tuna tartare with jalapeño, on tempura rice base.",
       price: 22.0,
-      image: "/images/sushi/menu-items/spicy-tuna-crispy-roll.jpg",
+      image: "/images/sushi/menu-items/20250811_2337_Spicy Tuna Delight_simple_compose_01k2efvzyef7s91brvh0cky75p.png",
       category: "seasonal-rolls-handrolls",
       calories: 280,
     },
