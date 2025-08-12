@@ -113,7 +113,8 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Wagyu Tataki with Truffle Ponzu",
       description: "Lightly seared A5 Wagyu, served chilled.",
       price: 42.0,
-      image: "/images/sushi/menu-items/20250811_2338_Wagyu Tataki Delicacy_simple_compose_01k2efybzner7rvs0r8atwwxg3.png",
+      image:
+        "/images/sushi/menu-items/20250811_2338_Wagyu Tataki Delicacy_simple_compose_01k2efybzner7rvs0r8atwwxg3.png",
       category: "chefs-creations-warm-dishes",
       calories: 320,
       isPopular: true,
@@ -123,7 +124,7 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Grilled Black Cod with Miso",
       description: "Classic Saikyo miso marinade, 48 hours.",
       price: 26.0,
-      image: "/images/sushi/menu-items/grilled-black-cod-miso.jpg",
+      image: "/images/sushi/menu-items/20250811_2343_Miso Black Cod Elegance_simple_compose_01k2eg7azgezw8hat23jtkes06.png",
       category: "chefs-creations-warm-dishes",
       calories: 280,
     },
