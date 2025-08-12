@@ -165,7 +165,8 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Seasonal Ankimo (Monkfish Liver)",
       description: "Served chilled with ponzu jelly.",
       price: 18.0,
-      image: "/images/sushi/menu-items/20250811_2349_Elegant Monkfish Appetizer_simple_compose_01k2egk9z2f6jsgyzne396t619.png",
+      image:
+        "/images/sushi/menu-items/20250811_2349_Elegant Monkfish Appetizer_simple_compose_01k2egk9z2f6jsgyzne396t619.png",
       category: "chefs-creations-warm-dishes",
       calories: 200,
       isNew: true,
