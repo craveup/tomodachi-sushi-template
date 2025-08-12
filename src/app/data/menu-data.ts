@@ -60,7 +60,8 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Pacific Rock Crab Handroll",
       description: "Local Dungeness crab, cucumber, touch of yuzu mayo.",
       price: 14.0,
-      image: "/images/sushi/menu-items/20250811_2328_Temaki Delight_simple_compose_01k2efcy6ges3v6hka3fhnmgz3.png",
+      image:
+        "/images/sushi/menu-items/20250811_2328_Temaki Delight_simple_compose_01k2efcy6ges3v6hka3fhnmgz3.png",
       category: "seasonal-rolls-handrolls",
       calories: 180,
     },
@@ -78,7 +79,7 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Grilled Eel & Avocado Roll",
       description: "Sweet unagi glaze, sesame seeds.",
       price: 21.0,
-      image: "/images/sushi/menu-items/grilled-eel-avocado-roll.jpg",
+      image: "/images/sushi/menu-items/20250811_2332_Grilled Eel Uramaki_simple_compose_01k2efk0xgf4as419t8qr0fc46.png",
       category: "seasonal-rolls-handrolls",
       calories: 260,
     },
