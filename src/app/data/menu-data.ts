@@ -50,7 +50,7 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Malibu Sunset Roll",
       description: "Salmon, avocado, mango, chili-lime ponzu.",
       price: 19.0,
-      image: "/images/sushi/menu-items/malibu-sunset-roll.jpg",
+      image: "/images/sushi/menu-items/20250811_2324_Sushi Perfection Delight_simple_compose_01k2ef54b0e04te4ych7f0tknh.png",
       category: "seasonal-rolls-handrolls",
       calories: 240,
     },
