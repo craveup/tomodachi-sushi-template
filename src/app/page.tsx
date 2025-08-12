@@ -96,7 +96,7 @@ const TomodachiFrontpage = () => {
         </div>
 
         {/* Side Cards - Mobile: Stack below hero, Desktop: Side panel */}
-        <aside className="flex flex-col lg:w-[420px] lg:h-full lg:max-h-full lg:overflow-y-hidden lg:pr-1 gap-3 lg:gap-[15px] overscroll-contain">
+        <aside className="flex flex-col lg:w-[420px] lg:h-full lg:max-h-full lg:overflow-y-auto lg:pr-1 gap-3 lg:gap-[15px] overscroll-contain">
           {/* Mobile: Show as horizontal scroll on very small screens */}
           <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3 lg:gap-[15px] overflow-x-auto lg:overflow-x-visible pb-1">
             {sideCards.map((card, index) => (
