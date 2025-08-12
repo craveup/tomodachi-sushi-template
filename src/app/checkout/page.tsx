@@ -358,7 +358,6 @@ export default function TomodachiCheckoutPage() {
                         </Label>
                         <Input
                           id="firstName"
-                          placeholder="John"
                           className="mt-2 bg-backgroundmuted border-borderdefault rounded-xl px-4 py-3 text-textdefault placeholder:text-textmuted"
                         />
                       </div>
@@ -371,7 +370,6 @@ export default function TomodachiCheckoutPage() {
                         </Label>
                         <Input
                           id="lastName"
-                          placeholder="Doe"
                           className="mt-2 bg-backgroundmuted border-borderdefault rounded-xl px-4 py-3 text-textdefault placeholder:text-textmuted"
                         />
                       </div>
