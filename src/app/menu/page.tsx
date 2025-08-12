@@ -12,23 +12,23 @@ import { menuData } from "../data/menu-data";
 import { TomodachiMenuSection } from "../components/tomodachi-menu-section";
 
 const menuCategories = [
-  { id: "maki", label: "MAKI" },
-  { id: "uramaki", label: "URAMAKI" },
-  { id: "special", label: "SPECIAL ROLLS" },
+  { id: "nigiri", label: "NIGIRI" },
+  { id: "uramaki", label: "ROLLS" },
+  { id: "special", label: "CHEF'S CREATIONS" },
 ];
 
 // Import menu items from centralized data
-const makiItems = menuData.maki;
-const uramakiItems = menuData.uramaki;
-const specialRollsItems = menuData.specialRolls;
+const nigiriItems = menuData["nigiri-sashimi"] || [];
+const uramakiItems = menuData["seasonal-rolls-handrolls"] || [];
+const specialRollsItems = menuData["chefs-creations-warm-dishes"] || [];
 
 // MenuSection component moved to ../components/tomodachi-menu-section.tsx
 
 const Menu = () => {
-  const [activeSection, setActiveSection] = useState("maki");
+  const [activeSection, setActiveSection] = useState("nigiri");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({
-    maki: null,
+    nigiri: null,
     uramaki: null,
     special: null,
   });
@@ -54,7 +54,7 @@ const Menu = () => {
       const container = scrollContainerRef.current;
       const scrollTop = container.scrollTop;
 
-      let currentSection = "maki";
+      let currentSection = "nigiri";
       let closestDistance = Infinity;
 
       Object.entries(sectionRefs.current).forEach(
@@ -107,7 +107,7 @@ const Menu = () => {
 
       {/* Menu Content - Mobile: Full width, Desktop: Right side */}
       <div className="flex flex-col items-start relative w-full lg:flex-1 lg:grow h-auto lg:h-full lg:min-h-0">
-        <Card className="flex flex-col items-start gap-4 lg:gap-6 pt-4 sm:pt-6 lg:pt-8 pb-0 px-4 sm:px-8 lg:px-24 relative self-stretch w-full h-auto lg:h-full rounded-2xl border border-solid border-borderdefault bg-backgrounddefault overflow-hidden">
+        <Card className="flex flex-col items-start gap-4 lg:gap-6 pt-4 sm:pt-6 lg:pt-8 pb-0 px-4 sm:px-6 lg:px-12 relative self-stretch w-full h-auto lg:h-full rounded-2xl border border-solid border-borderdefault bg-backgrounddefault overflow-hidden">
           <CardContent className="flex flex-col items-start gap-4 lg:gap-8 relative self-stretch w-full p-0">
             {/* Category Tabs - Touch-friendly on mobile */}
             <div className="flex gap-1 sm:gap-2 relative self-stretch w-full items-center justify-center p-1 sm:p-2 rounded-xl">
@@ -138,15 +138,15 @@ const Menu = () => {
             style={{ scrollbarGutter: "stable" }}
           >
             <TomodachiMenuSection
-              title="MAKI"
-              items={makiItems}
-              sectionId="maki"
+              title="NIGIRI & SASHIMI"
+              items={nigiriItems}
+              sectionId="nigiri"
               onSectionMount={(id, element) => {
                 sectionRefs.current[id] = element;
               }}
             />
             <TomodachiMenuSection
-              title="URAMAKI"
+              title="SEASONAL ROLLS & HANDROLLS"
               items={uramakiItems}
               sectionId="uramaki"
               onSectionMount={(id, element) => {
@@ -154,7 +154,7 @@ const Menu = () => {
               }}
             />
             <TomodachiMenuSection
-              title="SPECIAL ROLLS"
+              title="CHEF'S CREATIONS & WARM DISHES"
               items={specialRollsItems}
               sectionId="special"
               onSectionMount={(id, element) => {
