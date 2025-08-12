@@ -40,47 +40,54 @@ const TomodachiFrontpage = () => {
         <div className="bg-black rounded-xl lg:rounded-2xl relative flex-1 overflow-hidden">
           <div className="relative w-full h-[60vh] sm:h-[70vh] lg:h-[1032px] bg-[url(/images/sushi/hero-background.png)] bg-cover bg-center">
             {/* Header - Responsive positioning */}
-            <header className="absolute top-4 left-4 sm:top-6 sm:left-6 lg:top-12 lg:left-12 z-10">
+            <header className="absolute top-4 left-4 right-4 sm:top-6 sm:left-6 sm:right-6 lg:top-12 lg:left-12 lg:right-auto z-10">
               <Navbar />
             </header>
 
-            {/* Gradient overlay for text readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent lg:bg-[linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,1)_100%)]">
-              {/* Social Icons - Mobile optimized */}
-              <div className="absolute top-4 right-4 sm:top-6 sm:right-6 lg:top-auto lg:right-0 lg:bottom-[77px] lg:transform lg:-translate-y-full">
-                <div className="flex lg:flex-col items-center gap-2 lg:gap-4 p-3 lg:pl-6 lg:pr-4 lg:pt-6 lg:pb-4 bg-backgrounddefault/90 backdrop-blur-sm lg:bg-backgrounddefault rounded-xl lg:rounded-[24px_0px_0px_0px]">
-                  <div className="hidden lg:block">
+            {/* Japanese Title - Mobile: Center overlay, Desktop: Bottom positioned */}
+            <h1
+              className="absolute 
+                         top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center
+                         lg:top-auto lg:left-12 lg:bottom-[77px] lg:transform-none lg:text-left
+                         font-wdxl-jp text-white lg:text-textdefault 
+                         text-3xl sm:text-4xl md:text-6xl lg:text-[96px] 
+                         tracking-wide lg:tracking-[2px] 
+                         leading-tight lg:leading-none
+                         max-w-[90vw] lg:max-w-[1091px]
+                         break-words
+                         drop-shadow-2xl lg:drop-shadow-none
+                         z-20"
+            >
+              日本橋蛎殻町友達寿司
+            </h1>
+
+            {/* Gradient overlay for text readability - Desktop only */}
+            <div className="hidden lg:block absolute w-full h-[534px] top-[498px] left-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,1)_100%)]">
+              {/* Social Icons - Desktop only */}
+              <div className="absolute top-auto right-0 bottom-[77px] transform -translate-y-full">
+                <div className="flex flex-col items-center gap-4 pl-6 pr-4 pt-6 pb-4 bg-backgrounddefault rounded-[24px_0px_0px_0px]">
+                  <div>
                     <RoundedEdge className="!top-[52px] !-left-6 !absolute" />
                     <RoundedEdge className="!-top-6 !left-[140px] !absolute" />
                   </div>
-                  <div className="flex lg:inline-flex items-center gap-2 lg:gap-2">
+                  <div className="inline-flex items-center gap-2">
                     {socialIcons.map((social, index) => (
                       <Button
                         key={index}
                         variant="outline"
                         size="icon"
-                        className="w-8 h-8 lg:w-9 lg:h-9 bg-backgroundmuted rounded-full border-borderdefault hover:bg-backgroundprimary hover:text-textinverse transition-colors"
+                        className="w-9 h-9 bg-backgroundmuted rounded-full border-borderdefault hover:bg-backgroundprimary hover:text-textinverse transition-colors"
                       >
-                        <social.icon className="w-4 h-4 lg:w-[18px] lg:h-[18px] text-icondefault" />
+                        <social.icon className="w-[18px] h-[18px] text-icondefault" />
                       </Button>
                     ))}
                   </div>
                 </div>
               </div>
-
-              {/* Japanese Title - Responsive sizing and positioning */}
-              <h1
-                className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 lg:bottom-[77px] lg:left-12 
-                           font-wdxl-jp text-textdefault 
-                           text-2xl sm:text-4xl md:text-5xl lg:text-[96px] 
-                           tracking-wide lg:tracking-[2px] 
-                           leading-tight lg:leading-none
-                           max-w-[calc(100%-2rem)] lg:max-w-[1091px]
-                           break-words"
-              >
-                日本橋蛎殻町友達寿司
-              </h1>
             </div>
+
+            {/* Mobile: Subtle gradient for text readability */}
+            <div className="lg:hidden absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/30 pointer-events-none"></div>
           </div>
         </div>
 
