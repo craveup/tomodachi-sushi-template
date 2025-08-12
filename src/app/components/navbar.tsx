@@ -59,22 +59,29 @@ export const Navbar = () => {
 
           {/* Desktop Navigation (hidden on mobile) */}
           <div className="hidden md:flex items-center gap-1">
-            {navigationItems.map((item, index) => (
-              <Link key={index} href={item.href}>
-                <Button
-                  variant="ghost"
-                  className={`inline-flex items-center justify-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
-                    item.isActive
-                      ? "bg-backgroundmuted border border-borderdefault"
-                      : "hover:bg-backgroundmuted/50"
-                  }`}
-                >
-                  <span className="font-text-meta text-textdefault text-xs tracking-wider leading-tight whitespace-nowrap font-normal">
-                    {item.label}
-                  </span>
-                </Button>
-              </Link>
-            ))}
+            {navigationItems.map((item, index) => {
+              const isBook = item.label === "BOOK A TABLE";
+              return (
+                <Link key={index} href={item.href}>
+                  <Button
+                    variant="ghost"
+                    className={`inline-flex items-center justify-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
+                      isBook
+                        ? "group bg-backgroundmuted border border-borderdefault hover:bg-backgroundprimary hover:text-textinverse"
+                        : item.isActive
+                          ? "bg-backgroundmuted border border-borderdefault"
+                          : "hover:bg-backgroundmuted/50"
+                    }`}
+                  >
+                    <span className={`font-text-meta text-xs tracking-wider leading-tight whitespace-nowrap font-normal ${
+                      isBook ? "text-textdefault group-hover:text-textinverse" : "text-textdefault"
+                    }`}>
+                      {item.label}
+                    </span>
+                  </Button>
+                </Link>
+              );
+            })}
           </div>
 
           {/* Cart Button */}
@@ -99,26 +106,33 @@ export const Navbar = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden absolute top-full left-0 right-0 mt-2 bg-backgrounddefault rounded-xl border border-borderdefault shadow-xl z-50 overflow-hidden">
             <div className="flex flex-col p-2 gap-1">
-              {navigationItems.map((item, index) => (
-                <Link
-                  key={index}
-                  href={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <Button
-                    variant="ghost"
-                    className={`w-full justify-start px-4 py-3 rounded-lg transition-colors ${
-                      item.isActive
-                        ? "bg-backgroundmuted border border-borderdefault"
-                        : "hover:bg-backgroundmuted/50"
-                    }`}
+              {navigationItems.map((item, index) => {
+                const isBook = item.label === "BOOK A TABLE";
+                return (
+                  <Link
+                    key={index}
+                    href={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <span className="font-text-meta text-textdefault text-sm tracking-wider font-normal">
-                      {item.label}
-                    </span>
-                  </Button>
-                </Link>
-              ))}
+                    <Button
+                      variant="ghost"
+                      className={`w-full justify-start px-4 py-3 rounded-lg transition-colors ${
+                        isBook
+                          ? "group bg-backgroundmuted border border-borderdefault hover:bg-backgroundprimary hover:text-textinverse"
+                          : item.isActive
+                            ? "bg-backgroundmuted border border-borderdefault"
+                            : "hover:bg-backgroundmuted/50"
+                      }`}
+                    >
+                      <span className={`font-text-meta text-sm tracking-wider font-normal ${
+                        isBook ? "text-textdefault group-hover:text-textinverse" : "text-textdefault"
+                      }`}>
+                        {item.label}
+                      </span>
+                    </Button>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         )}
