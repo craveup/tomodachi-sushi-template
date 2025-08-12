@@ -28,7 +28,8 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Santa Barbara Uni",
       description: "Local sea urchin over warm shari, wrapped in crisp nori.",
       price: 16.0,
-      image: "/images/sushi/menu-items/20250811_2320_Cinematic Uni Nigiri_simple_compose_01k2eextaqeqwsz2n3wyk11hxx.png",
+      image:
+        "/images/sushi/menu-items/20250811_2320_Cinematic Uni Nigiri_simple_compose_01k2eextaqeqwsz2n3wyk11hxx.png",
       category: "nigiri-sashimi",
       calories: 110,
     },
@@ -38,7 +39,7 @@ export const menuData: Record<string, MenuItem[]> = {
       description:
         "Marinated in rice vinegar, topped with ginger and scallion.",
       price: 10.0,
-      image: "/images/sushi/menu-items/chutoro-otoro.png",
+      image: "/images/sushi/menu-items/image.png",
       category: "nigiri-sashimi",
       calories: 130,
     },
