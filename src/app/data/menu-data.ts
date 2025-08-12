@@ -101,7 +101,8 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Spicy Tuna Crispy Roll",
       description: "Tuna tartare with jalapeño, on tempura rice base.",
       price: 22.0,
-      image: "/images/sushi/menu-items/20250811_2337_Spicy Tuna Delight_simple_compose_01k2efvzyef7s91brvh0cky75p.png",
+      image:
+        "/images/sushi/menu-items/20250811_2337_Spicy Tuna Delight_simple_compose_01k2efvzyef7s91brvh0cky75p.png",
       category: "seasonal-rolls-handrolls",
       calories: 280,
     },
@@ -112,7 +113,7 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Wagyu Tataki with Truffle Ponzu",
       description: "Lightly seared A5 Wagyu, served chilled.",
       price: 42.0,
-      image: "/images/sushi/menu-items/wagyu-tataki-truffle-ponzu.jpg",
+      image: "/images/sushi/menu-items/20250811_2338_Wagyu Tataki Delicacy_simple_compose_01k2efybzner7rvs0r8atwwxg3.png",
       category: "chefs-creations-warm-dishes",
       calories: 320,
       isPopular: true,
