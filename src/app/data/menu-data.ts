@@ -70,7 +70,8 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Summer Shiso Roll",
       description: "Yellowtail, shiso leaf, cucumber, umeboshi paste.",
       price: 17.0,
-      image: "/images/sushi/menu-items/20250811_2330_Sushi Roll Close-Up_simple_compose_01k2efgrn6e8daarkjvt4rmw34.png",
+      image:
+        "/images/sushi/menu-items/20250811_2330_Sushi Roll Close-Up_simple_compose_01k2efgrn6e8daarkjvt4rmw34.png",
       category: "seasonal-rolls-handrolls",
       calories: 200,
     },
@@ -89,7 +90,7 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Santa Monica Veggie Handroll",
       description: "Farmer's market vegetables, miso sesame sauce.",
       price: 15.0,
-      image: "/images/sushi/menu-items/santa-monica-veggie-handroll.jpg",
+      image: "/images/sushi/menu-items/20250811_2332_Vegetable Temaki Delight_simple_compose_01k2efk8jvenns9h1ma6ywn5av.png",
       category: "seasonal-rolls-handrolls",
       calories: 160,
       isGlutenFree: true,
