@@ -27,7 +27,7 @@ const specialRollsItems = menuData.specialRolls;
 const Menu = () => {
   const [activeSection, setActiveSection] = useState("maki");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({
+  const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({
     maki: null,
     uramaki: null,
     special: null,
@@ -128,7 +128,7 @@ const Menu = () => {
 
             <div
               ref={scrollContainerRef}
-              className="flex flex-col items-start gap-8 relative self-stretch w-full flex-1 overflow-y-scroll px-0 pb-8 min-h-0"
+              className="flex flex-col items-start gap-8 relative self-stretch w-full flex-1 overflow-y-scroll px-0 pb-8 min-h-0 scrollbar-hide"
               style={{ scrollbarGutter: "stable" }}
             >
               <TomodachiMenuSection
