@@ -124,7 +124,8 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Grilled Black Cod with Miso",
       description: "Classic Saikyo miso marinade, 48 hours.",
       price: 26.0,
-      image: "/images/sushi/menu-items/20250811_2343_Miso Black Cod Elegance_simple_compose_01k2eg7azgezw8hat23jtkes06.png",
+      image:
+        "/images/sushi/menu-items/20250811_2343_Miso Black Cod Elegance_simple_compose_01k2eg7azgezw8hat23jtkes06.png",
       category: "chefs-creations-warm-dishes",
       calories: 280,
     },
@@ -133,7 +134,7 @@ export const menuData: Record<string, MenuItem[]> = {
       name: "Pacific Abalone Sashimi & Liver Sauce",
       description: "Served fresh with ponzu.",
       price: 34.0,
-      image: "/images/sushi/menu-items/pacific-abalone-sashimi.jpg",
+      image: "/images/sushi/menu-items/20250811_2344_Abalone Sashimi Elegance_simple_compose_01k2eg8k9vfnyv6g7jbgjykeae.png",
       category: "chefs-creations-warm-dishes",
       calories: 160,
     },
