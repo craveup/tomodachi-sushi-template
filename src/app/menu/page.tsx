@@ -1,13 +1,8 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Plus } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
 import { Navbar } from "../components/navbar";
-import { useCart } from "../providers/cart-provider";
-import { MenuItem } from "../types";
 import { menuData } from "../data/menu-data";
 import { TomodachiMenuSection } from "../components/tomodachi-menu-section";
 

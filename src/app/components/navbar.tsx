@@ -17,7 +17,7 @@ const navigationItems = [
   },
 ];
 
-export const Navbar = () => {
+export const Navbar = (locationData: any) => {
   const { itemCount, openCart } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -51,8 +51,8 @@ export const Navbar = () => {
               href="/"
               className="flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer"
             >
-              <span className="font-heading-h4 text-textdefault tracking-wider text-xl md:text-xl font-bold">
-                TOMODACHI
+              <span className="font-heading-h4 uppercase text-textdefault tracking-wider text-lg md:text-xl font-bold">
+                {locationData.locationData.restaurantDisplayName}
               </span>
             </Link>
           </div>
@@ -69,13 +69,17 @@ export const Navbar = () => {
                       isBook
                         ? "group bg-backgroundmuted border border-borderdefault hover:bg-backgroundprimary hover:text-textinverse"
                         : item.isActive
-                          ? "bg-backgroundmuted border border-borderdefault"
-                          : "hover:bg-backgroundmuted/50"
+                        ? "bg-backgroundmuted border border-borderdefault"
+                        : "hover:bg-backgroundmuted/50"
                     }`}
                   >
-                    <span className={`font-text-meta text-xs tracking-wider leading-tight whitespace-nowrap font-normal ${
-                      isBook ? "text-textdefault group-hover:text-textinverse" : "text-textdefault"
-                    }`}>
+                    <span
+                      className={`font-text-meta text-xs tracking-wider leading-tight whitespace-nowrap font-normal ${
+                        isBook
+                          ? "text-textdefault group-hover:text-textinverse"
+                          : "text-textdefault"
+                      }`}
+                    >
                       {item.label}
                     </span>
                   </Button>
@@ -120,13 +124,17 @@ export const Navbar = () => {
                         isBook
                           ? "group bg-backgroundmuted border border-borderdefault hover:bg-backgroundprimary hover:text-textinverse"
                           : item.isActive
-                            ? "bg-backgroundmuted border border-borderdefault"
-                            : "hover:bg-backgroundmuted/50"
+                          ? "bg-backgroundmuted border border-borderdefault"
+                          : "hover:bg-backgroundmuted/50"
                       }`}
                     >
-                      <span className={`font-text-meta text-sm tracking-wider font-normal ${
-                        isBook ? "text-textdefault group-hover:text-textinverse" : "text-textdefault"
-                      }`}>
+                      <span
+                        className={`font-text-meta text-sm tracking-wider font-normal ${
+                          isBook
+                            ? "text-textdefault group-hover:text-textinverse"
+                            : "text-textdefault"
+                        }`}
+                      >
                         {item.label}
                       </span>
                     </Button>
