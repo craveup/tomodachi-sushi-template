@@ -51,7 +51,7 @@ export default async function TomodachiFrontpage() {
             <div className="relative w-full h-[60vh] sm:h-[70vh] lg:h-full bg-[url(/images/sushi/hero-background.png)] bg-cover bg-center">
               {/* Header - Responsive positioning */}
               <header className="absolute top-4 left-4 right-4 sm:top-6 sm:left-6 sm:right-6 lg:top-12 lg:left-12 lg:right-auto z-10">
-                <Navbar locationData={locationData} />
+                <Navbar location={locationData.restaurantDisplayName} />
               </header>
 
               {/* Mobile: Japanese Title Overlay */}

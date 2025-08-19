@@ -17,7 +17,9 @@ const navigationItems = [
   },
 ];
 
-export const Navbar = (locationData: any) => {
+type NavbarProps = { location?: string };
+
+export const Navbar = ({ location = "Tomodachi Sushii" }: NavbarProps) => {
   const { itemCount, openCart } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -52,7 +54,7 @@ export const Navbar = (locationData: any) => {
               className="flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer"
             >
               <span className="font-heading-h4 uppercase text-textdefault tracking-wider text-lg md:text-xl font-bold">
-                {locationData.locationData.restaurantDisplayName}
+                {location}
               </span>
             </Link>
           </div>
