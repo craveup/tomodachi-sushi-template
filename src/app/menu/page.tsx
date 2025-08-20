@@ -1,13 +1,20 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Navbar } from "../components/navbar";
 import { TomodachiMenuSection } from "../components/tomodachi-menu-section";
 import { useSushiMenuData } from "./useSushiMenuData";
 import { getLocationById } from "@/lib/api/location";
+import ProductDescriptionDialog from "../components/product-description/ProductDescriptionDialog";
+import { useCart } from "../providers/cart-provider";
 
 const Menu = () => {
+  const [selectedProductId, setSelectedProductId] = useState<string>("");
+  const openProduct = useCallback((id: string) => setSelectedProductId(id), []);
+  const closeProduct = useCallback(() => setSelectedProductId(""), []);
+  const { cartId, locationId: ctxLocationId } = useCart();
+
   const [title, setTitle] = useState("Tomodachi Sushii");
 
   const locationId = process.env.NEXT_PUBLIC_LOCATION_ID!;
@@ -76,7 +83,7 @@ const Menu = () => {
             </div>
           </div>
           <header className="absolute top-3 sm:top-6 lg:top-12 left-3 sm:left-6 lg:left-12 right-3 sm:right-6 lg:right-auto">
-            <Navbar location={title} />
+            <Navbar title={title} />
           </header>
         </div>
       </div>
@@ -132,11 +139,21 @@ const Menu = () => {
                   onSectionMount={(id, el) => {
                     sectionRefs.current[id] = el;
                   }}
+                  onItemClick={(id: string) => openProduct(id)}
                 />
               ))}
           </div>
         </Card>
       </div>
+      {selectedProductId && (
+        <ProductDescriptionDialog
+          productId={selectedProductId}
+          locationId={ctxLocationId ?? locationId}
+          cartId={cartId ?? ""}
+          isAddToCartBlocked={!cartId}
+          onClose={closeProduct}
+        />
+      )}
     </div>
   );
 };

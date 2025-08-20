@@ -17,9 +17,9 @@ const navigationItems = [
   },
 ];
 
-type NavbarProps = { location?: string };
+type NavbarProps = { title?: string };
 
-export const Navbar = ({ location = "Tomodachi Sushii" }: NavbarProps) => {
+export const Navbar = ({ title = "Tomodachi Sushii" }: NavbarProps) => {
   const { itemCount, openCart } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -54,7 +54,7 @@ export const Navbar = ({ location = "Tomodachi Sushii" }: NavbarProps) => {
               className="flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer"
             >
               <span className="font-heading-h4 uppercase text-textdefault tracking-wider text-lg md:text-xl font-bold">
-                {location}
+                {title}
               </span>
             </Link>
           </div>

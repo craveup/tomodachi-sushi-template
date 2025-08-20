@@ -12,6 +12,7 @@ interface MenuSectionProps {
   items: MenuItem[];
   sectionId?: string;
   onSectionMount?: (id: string, element: HTMLElement | null) => void;
+  onItemClick?: (id: string) => void;
 }
 
 export const TomodachiMenuSection = ({
@@ -19,13 +20,15 @@ export const TomodachiMenuSection = ({
   items,
   sectionId,
   onSectionMount,
+  onItemClick,
 }: MenuSectionProps) => {
   const { addToCart, isLoading } = useCart();
   const [imageErrors, setImageErrors] = useState<{ [key: string]: boolean }>(
     {}
   );
 
-  const handleAddToCart = async (item: MenuItem) => {
+  const handleAddToCart = async (e: React.MouseEvent, item: MenuItem) => {
+    e.stopPropagation();
     const defaultOptions: ItemOptions = {
       warming: "room-temp",
       packaging: "standard",
@@ -72,6 +75,7 @@ export const TomodachiMenuSection = ({
         {items.map((item) => (
           <div
             key={item.id}
+            onClick={() => onItemClick?.(item.id)}
             className="flex items-start gap-3 sm:gap-4 lg:gap-6 relative w-full min-h-[100px] sm:min-h-[110px] lg:min-h-[120px]"
           >
             {/* Item Image - Responsive sizing */}
@@ -124,7 +128,7 @@ export const TomodachiMenuSection = ({
                   </span>
                   {/* Touch-friendly add button */}
                   <button
-                    onClick={() => handleAddToCart(item)}
+                    onClick={(e) => handleAddToCart(e, item)}
                     disabled={isLoading}
                     className="w-8 h-8 sm:w-9 sm:h-9 lg:w-8 lg:h-8 bg-backgroundprimary hover:bg-backgroundprimary/90 active:bg-backgroundprimary/80 rounded-full flex items-center justify-center transition-colors disabled:opacity-50 touch-manipulation"
                   >
