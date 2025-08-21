@@ -59,7 +59,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<LocalCartItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(true);
   const [cartId, setCartId] = useState<string | null>(null);
   const [apiCart, setApiCart] = useState<CartResponse | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);

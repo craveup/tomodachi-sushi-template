@@ -1,10 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { cartId } from "@/constants";
+import { useCart } from "@/hooks/useCart";
 import { Menu, ShoppingCart, X } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
-import { useCart } from "../providers/cart-provider";
 
 const navigationItems = [
   { label: "MENU", shortLabel: "MENU", isActive: false, href: "/menu" },
@@ -20,8 +21,10 @@ const navigationItems = [
 type NavbarProps = { title?: string };
 
 export const Navbar = ({ title = "Tomodachi Sushii" }: NavbarProps) => {
-  const { itemCount, openCart } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const locationId = process.env.NEXT_PUBLIC_LOCATION_ID!;
+
+  const { cart } = useCart({ locationId, cartId });
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -91,19 +94,24 @@ export const Navbar = ({ title = "Tomodachi Sushii" }: NavbarProps) => {
           </div>
 
           {/* Cart Button */}
+
           <Button
+            type="button"
             variant="outline"
             size="icon"
-            onClick={openCart}
+            onClick={() => {}}
+            aria-haspopup="dialog"
+            // aria-expanded={isCartOpen}
+            aria-controls="cart-sidebar"
             className="flex items-center justify-center w-[44px] h-[44px] bg-backgroundmuted rounded-lg border border-borderdefault hover:bg-backgroundmuted flex-shrink-0"
           >
             <div className="relative">
               <ShoppingCart className="w-5 h-5 text-icondefault" />
-              {itemCount > 0 && (
+              {/* {itemCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-backgroundprimary text-textinverse text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                   {itemCount}
                 </span>
-              )}
+              )} */}
             </div>
           </Button>
         </div>

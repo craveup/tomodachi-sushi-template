@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   X,
@@ -12,6 +12,14 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useFormatters } from "@/lib/i18n/hooks";
+import { useCart } from "@/hooks/useCart";
+import { cartId } from "@/constants";
+import {
+  addItemToCart,
+  updateCartItemQuantity,
+  removeCartItem,
+} from "@/lib/api/cart";
+import { useRouter } from "next/navigation";
 
 interface CartItem {
   id: string;
@@ -90,6 +98,21 @@ const defaultSuggestedItems: SuggestedItem[] = [
   },
 ];
 
+function mapCartResponseToItems(apiCart: any): CartItem[] {
+  const items = Array.isArray(apiCart?.items) ? apiCart.items : [];
+
+  return items.map((line: any) => ({
+    id: String(line?.id ?? line?.productId ?? Math.random()),
+    name: line?.product?.name ?? line?.name ?? "Item",
+    price: Number(line?.product?.price ?? line?.price ?? 0),
+    quantity: Number(line?.quantity ?? 1),
+    imageUrl: line?.product?.imageUrl ?? line?.imageUrl ?? null,
+    modifiers: Array.isArray(line?.modifiers)
+      ? line.modifiers.map((m: any) => m?.name ?? "").filter(Boolean)
+      : undefined,
+  }));
+}
+
 export default function CartSidebar({
   isOpen,
   onClose,
@@ -100,127 +123,110 @@ export default function CartSidebar({
   onAddSuggestedItem,
   onCheckout,
 }: CartSidebarProps) {
-  const [suggestedScrollPosition, setSuggestedScrollPosition] = useState(0);
+  const router = useRouter();
+  const locationId = process.env.NEXT_PUBLIC_LOCATION_ID as string;
+  const { cart, isLoading, error, mutate } = useCart({ locationId, cartId });
+
+  const apiItems = useMemo<CartItem[]>(() => {
+    if (cartItems && cartItems.length) return cartItems;
+    if (cart) return mapCartResponseToItems(cart);
+    return defaultCartItems; // graceful fallback pre-fetch
+  }, [cart, cartItems]);
+
   const [internalCartItems, setInternalCartItems] =
-    useState<CartItem[]>(cartItems);
+    useState<CartItem[]>(apiItems);
   const { currency } = useFormatters();
+
+  const hasItems = internalCartItems.length > 0;
+  const handleCheckout = async () => {
+    if (!hasItems) return;
+
+    await mutate();
+
+    router.push(`/locations/${locationId}/carts/${cartId}/checkout`);
+  };
 
   // Update internal state when props change
   React.useEffect(() => {
-    setInternalCartItems(cartItems);
-  }, [cartItems]);
+    setInternalCartItems(apiItems);
+  }, [apiItems]);
 
   // Lock body scroll when cart is open - minimal approach
+
   React.useEffect(() => {
-    if (isOpen) {
-      // Add scroll lock class to body
-      document.body.classList.add("cart-scroll-lock");
-
-      // Add styles via CSS-in-JS
-      const style = document.createElement("style");
-      style.id = "cart-scroll-lock-styles";
-      style.textContent = `
-        .cart-scroll-lock {
-          overflow: hidden !important;
-        }
-      `;
-      document.head.appendChild(style);
-
-      // Cleanup function
-      return () => {
-        document.body.classList.remove("cart-scroll-lock");
-        const styleElement = document.getElementById("cart-scroll-lock-styles");
-        if (styleElement) {
-          styleElement.remove();
-        }
-      };
-    }
+    if (!isOpen) return;
+    document.body.classList.add("cart-scroll-lock");
+    const style = document.createElement("style");
+    style.id = "cart-scroll-lock-styles";
+    style.textContent = `.cart-scroll-lock{overflow:hidden!important;}`;
+    document.head.appendChild(style);
+    return () => {
+      document.body.classList.remove("cart-scroll-lock");
+      document.getElementById("cart-scroll-lock-styles")?.remove();
+    };
   }, [isOpen]);
 
-  const handleQuantityChange = (itemId: string, change: number) => {
-    const item = internalCartItems.find((item) => item.id === itemId);
-    if (item) {
-      const newQuantity = Math.max(0, item.quantity + change);
-
-      if (newQuantity === 0) {
-        // Remove item from cart
-        const updatedItems = internalCartItems.filter(
-          (item) => item.id !== itemId
-        );
-        setInternalCartItems(updatedItems);
-        onRemoveItem?.(itemId);
-      } else {
-        // Update quantity
-        const updatedItems = internalCartItems.map((cartItem) =>
-          cartItem.id === itemId
-            ? { ...cartItem, quantity: newQuantity }
-            : cartItem
-        );
-        setInternalCartItems(updatedItems);
-        onUpdateQuantity?.(itemId, newQuantity);
-      }
-    }
-  };
-
-  const handleRemoveItem = (itemId: string) => {
-    const updatedItems = internalCartItems.filter((item) => item.id !== itemId);
-    setInternalCartItems(updatedItems);
-    onRemoveItem?.(itemId);
-  };
-
-  const handleAddSuggestedItem = (suggestedItem: SuggestedItem) => {
-    // Check if item already exists in cart
-    const existingItemIndex = internalCartItems.findIndex(
-      (item) => item.id === suggestedItem.id || item.name === suggestedItem.name
-    );
-
-    if (existingItemIndex >= 0) {
-      // If item exists, increase quantity
-      const updatedItems = internalCartItems.map((item) =>
-        item.id === internalCartItems[existingItemIndex].id
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      );
-      setInternalCartItems(updatedItems);
-      onUpdateQuantity?.(
-        internalCartItems[existingItemIndex].id,
-        internalCartItems[existingItemIndex].quantity + 1
-      );
-    } else {
-      // Add new item to cart
-      const newCartItem: CartItem = {
-        id: suggestedItem.id,
-        name: suggestedItem.name,
-        price: suggestedItem.price,
-        quantity: 1,
-        imageUrl: suggestedItem.imageUrl,
-      };
-
-      const updatedItems = [...internalCartItems, newCartItem];
-      setInternalCartItems(updatedItems);
-      onAddSuggestedItem?.(suggestedItem);
-    }
-  };
-
+  const [suggestedScrollPosition, setSuggestedScrollPosition] = useState(0);
   const scrollSuggested = (direction: "left" | "right") => {
     const container = document.getElementById("suggested-carousel");
     if (!container) return;
-
     const scrollAmount = 200;
-    const newPosition =
+    const newPos =
       direction === "left"
         ? Math.max(0, suggestedScrollPosition - scrollAmount)
         : suggestedScrollPosition + scrollAmount;
-
-    container.scrollTo({
-      left: newPosition,
-      behavior: "smooth",
-    });
-    setSuggestedScrollPosition(newPosition);
+    container.scrollTo({ left: newPos, behavior: "smooth" });
+    setSuggestedScrollPosition(newPos);
   };
 
+  const optimisticMutate = async (next: CartItem[]) => {
+    setInternalCartItems(next);
+    try {
+      // If you have a dedicated endpoint, call it here,
+      // e.g. await updateCartLines(locationId, cartId, next)
+    } finally {
+      // Re-fetch server state to prevent drift
+      await mutate();
+    }
+  };
+
+  const handleQuantityChange = async (itemId: string, change: number) => {
+    const item = internalCartItems.find((i) => i.id === itemId);
+    if (!item) return;
+
+    const newQty = Math.max(0, item.quantity + change);
+    if (newQty === 0) {
+      await removeCartItem(locationId, cartId, itemId);
+      await mutate(); // refresh server truth
+      return;
+    }
+
+    await updateCartItemQuantity(locationId, cartId, itemId, newQty);
+    await mutate();
+
+    const next = internalCartItems.map((i) =>
+      i.id === itemId ? { ...i, quantity: newQty } : i
+    );
+    onUpdateQuantity?.(itemId, newQty);
+    await optimisticMutate(next);
+  };
+
+  const handleRemoveItem = async (itemId: string) => {
+    await removeCartItem(locationId, cartId, itemId);
+    await mutate();
+  };
+  const handleAddSuggestedItem = async (s: SuggestedItem) => {
+    // ⚠️ Your add endpoint likely requires a productId, not a line item id.
+    // If your SuggestedItem.id is *productId*, you're good. If not, map it.
+    await addItemToCart(locationId, cartId, {
+      productId: s.id, // or map to real productId
+      quantity: 1,
+      // modifiers: [...]
+    });
+    await mutate();
+  };
   const subtotal = internalCartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, i) => sum + i.price * i.quantity,
     0
   );
 
@@ -447,7 +453,7 @@ export default function CartSidebar({
         {/* Checkout Footer */}
         <div className="border-t border-borderdefault p-6 bg-backgrounddefault">
           <Button
-            onClick={onCheckout}
+            onClick={handleCheckout ?? onCheckout}
             className="w-full h-14 text-base font-heading-h6 tracking-wider bg-backgroundprimary hover:bg-backgroundprimary/90 text-textinverse rounded-2xl"
             size="lg"
             data-anchor-id="CheckoutButton"

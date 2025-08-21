@@ -30,7 +30,7 @@ interface SimpleDialogProps {
   actionButtonText?: any;
   actionButtonFormId?: string;
   actionButtonType?: string;
-  onClick?: () => void;
+  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
   onGoBack?: () => void;
   isLoading?: boolean;
   className?: string;
@@ -54,12 +54,13 @@ function SimpleDialog({
   const isTextHeader = Boolean(title || text);
 
   const actionButton = actionButtonText ? (
-    <div className='w-full'>
+    <div className="w-full">
       <LoadingButton
         loading={isLoading}
         type={onClick ? "button" : "submit"}
         form={actionButtonFormId}
-        className='w-full'
+        className="w-full"
+        onClick={onClick}
       >
         {actionButtonText}
       </LoadingButton>
@@ -76,10 +77,10 @@ function SimpleDialog({
             <DialogHeader>
               {onGoBack && (
                 <Button
-                  className='mb-4'
+                  className="mb-4"
                   onClick={onGoBack}
-                  size='icon'
-                  variant='ghost'
+                  size="icon"
+                  variant="ghost"
                 >
                   <ArrowLeft />
                 </Button>
@@ -89,7 +90,7 @@ function SimpleDialog({
               {text && <DialogDescription>{text}</DialogDescription>}
             </DialogHeader>
           )}
-          <div className='flex-1 overflow-auto'>{children}</div>
+          <div className="flex-1 overflow-auto">{children}</div>
           <DialogFooter>{actionButton}</DialogFooter>
         </DialogContent>
       </Dialog>
@@ -102,14 +103,14 @@ function SimpleDialog({
         className={cn("h-[90vh] overflow-hidden border-none p-0", className)}
       >
         {isTextHeader && (
-          <DrawerHeader className='text-left'>
+          <DrawerHeader className="text-left">
             {title && <DrawerTitle>{title}</DrawerTitle>}
             {text && <DrawerDescription>{text}</DrawerDescription>}
           </DrawerHeader>
         )}
-        <div className='flex-1 overflow-auto px-4'>{children}</div>
+        <div className="flex-1 overflow-auto px-4">{children}</div>
 
-        <DrawerFooter className='pt-2'>{actionButton}</DrawerFooter>
+        <DrawerFooter className="pt-2">{actionButton}</DrawerFooter>
       </DrawerContent>
     </Drawer>
   );

@@ -41,7 +41,7 @@ const ProductDescriptionActionButton = ({
       selectedModifiers: selectedModifiers,
     };
     const cart = await postData(
-      `/api/v1/locations/${locationId}/carts/${cartId}/cart-item`,
+      `/api/v1/locations/${locationId}/carts/68a476738692632db3626f0e/cart-item`,
       addItemData
     );
     closeBottomSheet();

@@ -32,8 +32,8 @@ const SpecialInstructions = ({
 
   const canSave = !disabled && !overLimit && !unchanged;
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = (e?: React.FormEvent | React.MouseEvent) => {
+    e?.preventDefault?.();
     if (!canSave) return;
     setSpecialInstructions(specialIns.trim());
     onClose();
@@ -66,6 +66,7 @@ const SpecialInstructions = ({
         actionButtonText="Save"
         actionButtonFormId="special-instructions-form"
         isOpen={isOpen}
+        onClick={handleSave}
         className="h-auto"
         onClose={() => {
           setSpecialIns(specialInstructions);
