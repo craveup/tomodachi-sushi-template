@@ -217,7 +217,7 @@ const ProductDescription = ({
         />
       </div>
       <div className="px-4 py-6">
-        {!isAddToCartBlocked ? (
+        {isAddToCartBlocked ? (
           <div className="rounded-md bg-red-50 p-4">
             <div className="flex">
               <div className="flex-shrink-0">

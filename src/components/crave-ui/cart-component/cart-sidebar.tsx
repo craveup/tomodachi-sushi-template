@@ -1,25 +1,27 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  X,
-  Plus,
-  Trash2,
-  ChevronLeft,
-  ChevronRight,
-  ShoppingCart,
-} from "lucide-react";
+import { X, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { useFormatters } from "@/lib/i18n/hooks";
 import { useCart } from "@/hooks/useCart";
-import { cartId } from "@/constants";
+import { cartId as CART_ID_FALLBACK } from "@/constants";
+import { useParams, useRouter } from "next/navigation";
+import { patchData } from "@/lib/handle-api";
+import { formatApiError } from "@/lib/format-api-error";
+import { toast } from "sonner";
+import CounterButton from "./CounterButton";
+import useEmblaCarousel from "embla-carousel-react";
+import { useApiResource } from "@/hooks/useApiResource";
+import ProductDescriptionDialog from "@/app/components/product-description/ProductDescriptionDialog";
+import { absolutizeImage } from "@/lib/utils/images";
 import {
-  addItemToCart,
-  updateCartItemQuantity,
-  removeCartItem,
-} from "@/lib/api/cart";
-import { useRouter } from "next/navigation";
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface CartItem {
   id: string;
@@ -41,70 +43,16 @@ interface CartSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   cartItems?: CartItem[];
-  suggestedItems?: SuggestedItem[];
-  onUpdateQuantity?: (itemId: string, quantity: number) => void;
-  onRemoveItem?: (itemId: string) => void;
-  onAddSuggestedItem?: (item: SuggestedItem) => void;
   onCheckout?: () => void;
 }
 
-const defaultCartItems: CartItem[] = [
-  {
-    id: "1",
-    name: "Brioche with Chocolate Chips",
-    price: 5.5,
-    quantity: 1,
-    imageUrl:
-      "https://img.cdn4dd.com/p/fit=cover,width=100,height=100,format=auto,quality=50/media/photosV2/7bb0efbd-1141-4518-bfe1-2cab3571478f-retina-large.jpg",
-  },
-];
-
-const defaultSuggestedItems: SuggestedItem[] = [
-  {
-    id: "s1",
-    name: "Spicy Tuna Maki",
-    price: 12.0,
-    imageUrl: "/images/sushi/menu-items/spicy-tuna-maki.jpg",
-  },
-  {
-    id: "s2",
-    name: "Salmon Nigiri",
-    price: 8.0,
-    imageUrl: "/images/sushi/menu-items/salmon-maki.jpg",
-  },
-  {
-    id: "s3",
-    name: "Dragon Elegance",
-    price: 18.0,
-    imageUrl: "/images/sushi/menu-items/dragon-elegance.jpg",
-  },
-  {
-    id: "s4",
-    name: "Rainbow Fusion",
-    price: 16.0,
-    imageUrl: "/images/sushi/menu-items/rainbow-fusion.jpg",
-  },
-  {
-    id: "s5",
-    name: "Mango Maki",
-    price: 10.0,
-    imageUrl: "/images/sushi/menu-items/mango-maki.jpg",
-  },
-  {
-    id: "s6",
-    name: "Tokyo Blossom",
-    price: 20.0,
-    imageUrl: "/images/sushi/menu-items/tokyo-blossom.jpg",
-  },
-];
-
+// --- API mappers ---
 function mapCartResponseToItems(apiCart: any): CartItem[] {
   const items = Array.isArray(apiCart?.items) ? apiCart.items : [];
-
   return items.map((line: any) => ({
-    id: String(line?.id ?? line?.productId ?? Math.random()),
+    id: String(line?.id ?? line?.cartItemId ?? line?.lineItemId ?? line?._id),
     name: line?.product?.name ?? line?.name ?? "Item",
-    price: Number(line?.product?.price ?? line?.price ?? 0),
+    price: Number(line?.unit_price ?? line?.product?.price ?? line?.price ?? 0),
     quantity: Number(line?.quantity ?? 1),
     imageUrl: line?.product?.imageUrl ?? line?.imageUrl ?? null,
     modifiers: Array.isArray(line?.modifiers)
@@ -113,47 +61,128 @@ function mapCartResponseToItems(apiCart: any): CartItem[] {
   }));
 }
 
+type ApiProduct =
+  | {
+      id: string;
+      name: string;
+      price?: number | string;
+      imageUrl?: string;
+      image?: string;
+      mainImageUrl?: string;
+      images?: { url?: string }[];
+    }
+  | any;
+
+function mapProductsToSuggested(
+  data: ApiProduct[] | undefined
+): SuggestedItem[] {
+  if (!Array.isArray(data)) return [];
+  const pickImage = (p: ApiProduct): string | null =>
+    absolutizeImage(
+      p.imageUrl ??
+        p.mainImageUrl ??
+        (Array.isArray(p.images) && p.images[0]?.url) ??
+        p.image
+    );
+
+  return data.map((p) => ({
+    id: String(p.id),
+    name: String(p.name ?? "Product"),
+    price: Number(p.price ?? 0),
+    imageUrl: pickImage(p) ?? null,
+  }));
+}
+
 export default function CartSidebar({
   isOpen,
   onClose,
-  cartItems = defaultCartItems,
-  suggestedItems = defaultSuggestedItems,
-  onUpdateQuantity,
-  onRemoveItem,
-  onAddSuggestedItem,
+  cartItems,
   onCheckout,
 }: CartSidebarProps) {
   const router = useRouter();
-  const locationId = process.env.NEXT_PUBLIC_LOCATION_ID as string;
-  const { cart, isLoading, error, mutate } = useCart({ locationId, cartId });
-
-  const apiItems = useMemo<CartItem[]>(() => {
-    if (cartItems && cartItems.length) return cartItems;
-    if (cart) return mapCartResponseToItems(cart);
-    return defaultCartItems; // graceful fallback pre-fetch
-  }, [cart, cartItems]);
-
-  const [internalCartItems, setInternalCartItems] =
-    useState<CartItem[]>(apiItems);
   const { currency } = useFormatters();
 
-  const hasItems = internalCartItems.length > 0;
-  const handleCheckout = async () => {
-    if (!hasItems) return;
+  const envLocationId = process.env.NEXT_PUBLIC_LOCATION_ID as string;
+  const { locationId: routeLocationId, cartId: routeCartId } = useParams<{
+    locationId: string;
+    cartId: string;
+  }>();
+  const locationId = (routeLocationId as string) || envLocationId;
+  const cartId = (routeCartId as string) || CART_ID_FALLBACK;
 
-    await mutate();
+  const {
+    cart,
+    mutate,
+    isLoading: cartLoading,
+    isValidating: cartValidating,
+  } = useCart({ locationId, cartId });
 
-    router.push(`/locations/${locationId}/carts/${cartId}/checkout`);
-  };
+  const hasExternalCartItems = Boolean(cartItems?.length);
+  const showCartSkeleton =
+    !hasExternalCartItems && !cart && (cartLoading || cartValidating);
 
-  // Update internal state when props change
-  React.useEffect(() => {
-    setInternalCartItems(apiItems);
-  }, [apiItems]);
+  const [busyLineId, setBusyLineId] = useState<string | null>(null);
+  const [productIdToOpen, setProductIdToOpen] = useState<string>("");
 
-  // Lock body scroll when cart is open - minimal approach
+  // Embla carousel for suggestions
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: "start",
+    skipSnaps: false,
+  });
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => {
+      setCanScrollPrev(emblaApi.canScrollPrev());
+      setCanScrollNext(emblaApi.canScrollNext());
+    };
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+    onSelect();
+    return () => {
+      emblaApi.off("select", onSelect);
+      emblaApi.off("reInit", onSelect);
+    };
+  }, [emblaApi]);
+  const onPrev = () => emblaApi?.scrollPrev();
+  const onNext = () => emblaApi?.scrollNext();
 
-  React.useEffect(() => {
+  // Live cart items
+  const apiItems = useMemo<CartItem[]>(() => {
+    if (cartItems?.length) return cartItems;
+    if (cart) return mapCartResponseToItems(cart);
+    return [];
+  }, [cart, cartItems]);
+
+  // Live suggested items (no fallbacks)
+  const recommendationsEndpoint =
+    locationId && cartId
+      ? `/api/v1/locations/${locationId}/carts/${cartId}/products`
+      : null;
+
+  const { data: recRaw, isLoading: recLoading } = useApiResource<ApiProduct[]>(
+    recommendationsEndpoint,
+    {
+      shouldFetch: Boolean(locationId && cartId),
+    }
+  );
+
+  const liveSuggested = useMemo(() => mapProductsToSuggested(recRaw), [recRaw]);
+  const showRecSkeleton = recLoading && !liveSuggested.length;
+  const showSuggestionsSection = showRecSkeleton || liveSuggested.length > 0;
+
+  const subtotal = useMemo(
+    () => apiItems.reduce((s, i) => s + i.price * i.quantity, 0),
+    [apiItems]
+  );
+
+  const placeholderImage =
+    "https://kzmps94w6wprloamplrj.lite.vusercontent.net/placeholder.svg?height=200&width=300";
+
+  // Body scroll lock
+  useEffect(() => {
     if (!isOpen) return;
     document.body.classList.add("cart-scroll-lock");
     const style = document.createElement("style");
@@ -166,107 +195,53 @@ export default function CartSidebar({
     };
   }, [isOpen]);
 
-  const [suggestedScrollPosition, setSuggestedScrollPosition] = useState(0);
-  const scrollSuggested = (direction: "left" | "right") => {
-    const container = document.getElementById("suggested-carousel");
-    if (!container) return;
-    const scrollAmount = 200;
-    const newPos =
-      direction === "left"
-        ? Math.max(0, suggestedScrollPosition - scrollAmount)
-        : suggestedScrollPosition + scrollAmount;
-    container.scrollTo({ left: newPos, behavior: "smooth" });
-    setSuggestedScrollPosition(newPos);
-  };
-
-  const optimisticMutate = async (next: CartItem[]) => {
-    setInternalCartItems(next);
+  // Quantity mutations
+  const setQuantity = async (lineId: string, nextQty: number) => {
     try {
-      // If you have a dedicated endpoint, call it here,
-      // e.g. await updateCartLines(locationId, cartId, next)
-    } finally {
-      // Re-fetch server state to prevent drift
+      setBusyLineId(lineId);
+      if (!locationId || !cartId) throw new Error("Missing IDs");
+      await patchData(
+        `/api/v1/locations/${locationId}/carts/${cartId}/cart-item/${lineId}/quantity`,
+        { quantity: nextQty }
+      );
       await mutate();
+    } catch (err) {
+      toast.error(formatApiError(err).message);
+    } finally {
+      setBusyLineId(null);
     }
   };
+  const handleIncrease = (lineId: string, qty: number) =>
+    setQuantity(lineId, qty + 1);
+  const handleDecrease = (lineId: string, qty: number) =>
+    setQuantity(lineId, Math.max(0, qty - 1));
+  const handleRemove = (lineId: string) => setQuantity(lineId, 0);
 
-  const handleQuantityChange = async (itemId: string, change: number) => {
-    const item = internalCartItems.find((i) => i.id === itemId);
-    if (!item) return;
-
-    const newQty = Math.max(0, item.quantity + change);
-    if (newQty === 0) {
-      await removeCartItem(locationId, cartId, itemId);
-      await mutate(); // refresh server truth
-      return;
-    }
-
-    await updateCartItemQuantity(locationId, cartId, itemId, newQty);
+  const handleCheckout = async () => {
+    if (!apiItems.length) return;
     await mutate();
-
-    const next = internalCartItems.map((i) =>
-      i.id === itemId ? { ...i, quantity: newQty } : i
-    );
-    onUpdateQuantity?.(itemId, newQty);
-    await optimisticMutate(next);
+    router.push(`/locations/${locationId}/carts/${cartId}/checkout`);
   };
-
-  const handleRemoveItem = async (itemId: string) => {
-    await removeCartItem(locationId, cartId, itemId);
-    await mutate();
-  };
-  const handleAddSuggestedItem = async (s: SuggestedItem) => {
-    // ⚠️ Your add endpoint likely requires a productId, not a line item id.
-    // If your SuggestedItem.id is *productId*, you're good. If not, map it.
-    await addItemToCart(locationId, cartId, {
-      productId: s.id, // or map to real productId
-      quantity: 1,
-      // modifiers: [...]
-    });
-    await mutate();
-  };
-  const subtotal = internalCartItems.reduce(
-    (sum, i) => sum + i.price * i.quantity,
-    0
-  );
 
   if (!isOpen) return null;
 
   return (
     <>
-      {/* Backdrop - covers everything including navbar and scrollbars */}
-      <div
-        className="fixed inset-0 bg-black/50 z-[999] overflow-hidden"
-        onClick={onClose}
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 999,
-        }}
-      />
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black/50 z-[999]" onClick={onClose} />
 
       {/* Sidebar */}
       <div
-        className="fixed right-0 top-0 h-full w-[430px] max-w-[430px] bg-backgrounddefault shadow-xl z-[1000] flex flex-col"
-        style={{
-          width: "430px",
-          maxWidth: "430px",
-          zIndex: 1000,
-        }}
+        className="fixed right-0 top-0 h-full w-[450px] max-w-[450px] bg-backgrounddefault shadow-xl z-[1000] flex flex-col"
         role="dialog"
         aria-modal="true"
         data-testid="OrderCart"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-borderdefault">
-          <div className="flex items-center gap-3">
-            <h2 className="font-heading-h4 text-textdefault text-lg tracking-wider">
-              YOUR ORDER
-            </h2>
-          </div>
+          <h2 className="font-heading-h4 text-textdefault text-lg tracking-wider">
+            YOUR ORDER
+          </h2>
           <Button
             variant="ghost"
             size="icon"
@@ -278,11 +253,26 @@ export default function CartSidebar({
           </Button>
         </div>
 
-        {/* Cart Content */}
-        <div className="flex-1 overflow-y-auto">
-          {/* Cart Items */}
+        {/* Items */}
+        <div className="flex-1 overflow-y-auto scrollbar-hide">
           <div className="p-6">
-            {internalCartItems.length === 0 ? (
+            {showCartSkeleton ? (
+              <div className="space-y-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-4 p-4 border border-borderdefault rounded-2xl animate-pulse"
+                  >
+                    <div className="w-16 h-16 rounded-lg bg-muted" />
+                    <div className="flex-1 min-w-0">
+                      <div className="h-4 bg-muted rounded w-2/3 mb-2" />
+                      <div className="h-4 bg-muted rounded w-1/3" />
+                    </div>
+                    <div className="w-24 h-8 bg-muted rounded-full" />
+                  </div>
+                ))}
+              </div>
+            ) : apiItems.length === 0 ? (
               <div className="text-center py-12">
                 <div className="flex flex-col items-center gap-3">
                   <div className="w-16 h-16 rounded-full bg-backgroundmuted flex items-center justify-center">
@@ -295,15 +285,12 @@ export default function CartSidebar({
               </div>
             ) : (
               <div className="space-y-4">
-                {internalCartItems.map((item) => (
+                {apiItems.map((item) => (
                   <div
                     key={item.id}
                     className="flex items-center gap-4 p-4 border border-borderdefault rounded-2xl hover:bg-backgroundmuted/30 transition-colors"
-                    role="listitem"
-                    aria-label={`click to open modal and edit item: ${item.name}`}
                     data-testid="OrderCartItem"
                   >
-                    {/* Item Image */}
                     <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                       <Image
                         src={item.imageUrl || "/placeholder.svg"}
@@ -314,7 +301,6 @@ export default function CartSidebar({
                       />
                     </div>
 
-                    {/* Item Details */}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-heading-h6 text-textdefault text-base tracking-wider truncate">
                         {item.name}
@@ -324,140 +310,138 @@ export default function CartSidebar({
                       </p>
                     </div>
 
-                    {/* Quantity Controls */}
-                    <div
-                      className="flex items-center gap-2"
-                      data-testid="QuantityContainer"
-                    >
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleRemoveItem(item.id)}
-                        aria-label="remove item from cart"
-                        data-testid="stepper-decrement-button"
-                        className="h-8 w-8 text-textmuted hover:text-red-600 hover:bg-backgroundmuted rounded-full"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-
-                      <span
-                        className="text-sm font-medium min-w-[2rem] text-center text-textdefault"
-                        data-testid="stepper-expanded-quantity"
-                      >
-                        {item.quantity} ×
-                      </span>
-
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleQuantityChange(item.id, 1)}
-                        aria-label="add one to cart"
-                        data-testid="stepper-increment-button"
-                        className="h-8 w-8 text-textmuted hover:text-green-600 hover:bg-backgroundmuted rounded-full"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <CounterButton
+                      quantity={item.quantity}
+                      isLoading={busyLineId === item.id}
+                      onIncrease={() => handleIncrease(item.id, item.quantity)}
+                      onDecrease={() =>
+                        item.quantity === 1
+                          ? handleRemove(item.id)
+                          : handleDecrease(item.id, item.quantity)
+                      }
+                    />
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Suggested Items Section */}
-          <div className="border-t border-borderdefault p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3
-                className="font-heading-h5 text-textdefault text-lg tracking-wider"
-                data-testid="order-cart-recommendation-title"
-              >
-                YOU MIGHT ALSO LIKE
-              </h3>
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => scrollSuggested("left")}
-                  aria-label="Previous button of carousel"
-                  className="h-8 w-8 hover:bg-backgroundmuted text-textdefault"
+          {/* Suggested — ONLY live, or nothing */}
+          {showSuggestionsSection && (
+            <div className="border-t border-borderdefault p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3
+                  className="font-heading-h5 text-textdefault text-lg tracking-wider"
+                  data-testid="order-cart-recommendation-title"
                 >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => scrollSuggested("right")}
-                  aria-label="Next button of carousel"
-                  className="h-8 w-8 hover:bg-backgroundmuted text-textdefault"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            {/* Suggested Items Carousel */}
-            <div className="overflow-hidden">
-              <div
-                id="suggested-carousel"
-                className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 items-stretch"
-                data-testid="order-cart-carousel-container"
-                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-              >
-                {suggestedItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex-shrink-0 w-32"
-                    data-testid="CarouselSuggestedItem"
-                    tabIndex={0}
+                  YOU MIGHT ALSO LIKE
+                </h3>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onPrev}
+                    aria-label="Previous"
+                    className="h-8 w-8 hover:bg-backgroundmuted text-textdefault"
+                    disabled={!canScrollPrev}
                   >
-                    <div className="bg-backgrounddefault rounded-2xl border border-borderdefault overflow-hidden hover:shadow-md transition-all h-full flex flex-col">
-                      <div className="relative">
-                        <div className="aspect-square">
-                          <Image
-                            src={item.imageUrl || "/placeholder.svg"}
-                            alt={item.name}
-                            width={128}
-                            height={128}
-                            className="w-full h-full object-cover"
-                            data-testid="CarouselItemImage"
-                          />
-                        </div>
-                        <div className="absolute bottom-0 right-0 p-2">
-                          <Button
-                            size="icon"
-                            variant="secondary"
-                            onClick={() => handleAddSuggestedItem(item)}
-                            aria-label="Add to cart"
-                            className="h-8 w-8 bg-backgroundprimary hover:bg-backgroundprimary/90 rounded-full shadow-md border border-borderdefault transition-all duration-200 hover:scale-105"
-                          >
-                            <Plus className="h-4 w-4 text-textinverse" />
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="p-3 flex-1 flex flex-col justify-between">
-                        <h4 className="text-xs font-heading-h6 text-textdefault line-clamp-2 mb-1 tracking-wider">
-                          {item.name}
-                        </h4>
-                        <p className="text-sm font-semibold text-textdefault">
-                          {currency(item.price)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onNext}
+                    aria-label="Next"
+                    className="h-8 w-8 hover:bg-backgroundmuted text-textdefault"
+                    disabled={!canScrollNext}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
+
+              <div className="relative">
+                <div className="overflow-hidden" ref={emblaRef}>
+                  <div className="flex gap-3">
+                    {(showRecSkeleton
+                      ? Array.from({ length: 8 })
+                      : liveSuggested
+                    ).map((raw, idx) => {
+                      const item = raw as SuggestedItem | undefined;
+
+                      return (
+                        <div
+                          key={item?.id ?? `skeleton-${idx}`}
+                          className="flex-[0_0_auto] w-36 sm:w-40 md:w-44"
+                          data-testid="CarouselSuggestedItem"
+                          tabIndex={0}
+                        >
+                          {showRecSkeleton ? (
+                            // Skeleton card--ItemVertical layout
+                            <Card className="gap-0 overflow-hidden p-0 animate-pulse">
+                              <div className="relative aspect-[4/3] w-full bg-muted" />
+                              <CardHeader className="p-4">
+                                <div className="h-4 bg-muted rounded w-3/4 mb-2" />
+                                <div className="h-4 bg-muted rounded w-1/3" />
+                              </CardHeader>
+                            </Card>
+                          ) : (
+                            // ItemVertical style
+                            <Card
+                              className="gap-0 overflow-hidden p-0 transition-all hover:shadow-md"
+                              onClick={() =>
+                                item && setProductIdToOpen(item.id)
+                              }
+                              role="button"
+                            >
+                              <div className="relative aspect-[4/3] w-full">
+                                <Image
+                                  src={item!.imageUrl || placeholderImage}
+                                  alt={item!.name}
+                                  fill
+                                  className="object-cover"
+                                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                  data-testid="CarouselItemImage"
+                                />
+                              </div>
+
+                              <CardHeader className="p-4">
+                                <CardTitle className="text-sm line-clamp-2">
+                                  {item!.name}
+                                </CardTitle>
+                                <CardDescription className="font-semibold">
+                                  {currency(item!.price)}
+                                </CardDescription>
+                              </CardHeader>
+                            </Card>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {productIdToOpen && (
+                <ProductDescriptionDialog
+                  onClose={() => setProductIdToOpen("")}
+                  locationId={locationId}
+                  productId={productIdToOpen}
+                  cartId={cartId}
+                />
+              )}
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Checkout Footer */}
+        {/* Footer */}
         <div className="border-t border-borderdefault p-6 bg-backgrounddefault">
           <Button
             onClick={handleCheckout ?? onCheckout}
-            className="w-full h-14 text-base font-heading-h6 tracking-wider bg-backgroundprimary hover:bg-backgroundprimary/90 text-textinverse rounded-2xl"
+            className="w-full h-14 text-base font-heading-h6 tracking-wider bg-backgroundprimary hover:bg-backgroundprimary/90 text-textinverse rounded-2xl disabled:opacity-60"
             size="lg"
-            data-anchor-id="CheckoutButton"
             data-testid="CheckoutButton"
+            disabled={!apiItems.length}
           >
             <div className="flex items-center justify-between w-full">
               <span>CHECKOUT</span>

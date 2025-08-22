@@ -1,11 +1,14 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { cartId } from "@/constants";
-import { useCart } from "@/hooks/useCart";
-import { Menu, ShoppingCart, X } from "lucide-react";
+import React from "react";
 import Link from "next/link";
-import React, { useState } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { Menu, ShoppingCart, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+import CartSidebar from "@/components/crave-ui/cart-component/cart-sidebar";
+import { useCart } from "@/hooks/useCart";
+import { cartId as CART_ID_FALLBACK } from "@/constants";
 
 const navigationItems = [
   { label: "MENU", shortLabel: "MENU", isActive: false, href: "/menu" },
@@ -21,22 +24,48 @@ const navigationItems = [
 type NavbarProps = { title?: string };
 
 export const Navbar = ({ title = "Tomodachi Sushii" }: NavbarProps) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const locationId = process.env.NEXT_PUBLIC_LOCATION_ID!;
+  const router = useRouter();
+  const params = useParams<{ locationId?: string; cartId?: string }>();
 
-  const { cart } = useCart({ locationId, cartId });
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [isCartOpen, setIsCartOpen] = React.useState(false);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+  // Resolve IDs from route or fallbacks
+  const envLocationId = process.env.NEXT_PUBLIC_LOCATION_ID!;
+  const locationId = (params?.locationId as string) || envLocationId;
+  const cartId = (params?.cartId as string) || CART_ID_FALLBACK;
+
+  // Live cart data for badge count
+  const { cart, mutate } = useCart({ locationId, cartId });
+
+  const itemCount = React.useMemo(() => {
+    const items = Array.isArray(cart?.items) ? cart!.items : [];
+    return items.reduce<number>(
+      (sum, it: any) => sum + Number(it?.quantity || 0),
+      0
+    );
+  }, [cart?.items]);
+
+  const toggleMobileMenu = () => setIsMobileMenuOpen((v) => !v);
+
+  const openCart = async () => {
+    await mutate();
+    setIsCartOpen(true);
+  };
+
+  const closeCart = () => setIsCartOpen(false);
+
+  const goToCheckout = () => {
+    setIsCartOpen(false);
+    router.push(`/locations/${locationId}/carts/${cartId}/checkout`);
   };
 
   return (
     <>
       {/* Main Navbar */}
       <nav className="relative bg-backgrounddefault rounded-xl overflow-hidden w-full max-w-none md:max-w-fit md:w-auto">
-        {/* Mobile & Desktop Layout */}
         <div className="flex items-center justify-between p-3 md:p-2 gap-2 md:gap-3">
-          {/* Mobile Menu Button (visible on mobile only) */}
+          {/* Mobile menu toggle */}
           <Button
             variant="outline"
             size="icon"
@@ -50,7 +79,7 @@ export const Navbar = ({ title = "Tomodachi Sushii" }: NavbarProps) => {
             )}
           </Button>
 
-          {/* Brand/Logo */}
+          {/* Brand */}
           <div className="flex items-center justify-center flex-1 md:flex-initial px-2">
             <Link
               href="/"
@@ -62,12 +91,12 @@ export const Navbar = ({ title = "Tomodachi Sushii" }: NavbarProps) => {
             </Link>
           </div>
 
-          {/* Desktop Navigation (hidden on mobile) */}
+          {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-1">
-            {navigationItems.map((item, index) => {
+            {navigationItems.map((item) => {
               const isBook = item.label === "BOOK A TABLE";
               return (
-                <Link key={index} href={item.href}>
+                <Link key={item.label} href={item.href}>
                   <Button
                     variant="ghost"
                     className={`inline-flex items-center justify-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
@@ -93,38 +122,41 @@ export const Navbar = ({ title = "Tomodachi Sushii" }: NavbarProps) => {
             })}
           </div>
 
-          {/* Cart Button */}
-
+          {/* Cart button with live badge */}
           <Button
             type="button"
             variant="outline"
             size="icon"
-            onClick={() => {}}
+            onClick={openCart}
             aria-haspopup="dialog"
-            // aria-expanded={isCartOpen}
+            aria-expanded={isCartOpen}
             aria-controls="cart-sidebar"
             className="flex items-center justify-center w-[44px] h-[44px] bg-backgroundmuted rounded-lg border border-borderdefault hover:bg-backgroundmuted flex-shrink-0"
           >
             <div className="relative">
               <ShoppingCart className="w-5 h-5 text-icondefault" />
-              {/* {itemCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-backgroundprimary text-textinverse text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                  {itemCount}
+              {itemCount > 0 && (
+                <span
+                  className="absolute -top-2 -right-2 bg-backgroundprimary text-textinverse text-[10px] font-bold rounded-full min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center leading-none"
+                  aria-label={`${itemCount} items in cart`}
+                >
+                  {itemCount > 99 ? "99+" : itemCount}
                 </span>
-              )} */}
+              )}
             </div>
+            <span className="sr-only">Open cart</span>
           </Button>
         </div>
 
-        {/* Mobile Menu Dropdown */}
+        {/* Mobile menu dropdown */}
         {isMobileMenuOpen && (
           <div className="md:hidden absolute top-full left-0 right-0 mt-2 bg-backgrounddefault rounded-xl border border-borderdefault shadow-xl z-50 overflow-hidden">
             <div className="flex flex-col p-2 gap-1">
-              {navigationItems.map((item, index) => {
+              {navigationItems.map((item) => {
                 const isBook = item.label === "BOOK A TABLE";
                 return (
                   <Link
-                    key={index}
+                    key={item.label}
                     href={item.href}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
@@ -156,13 +188,20 @@ export const Navbar = ({ title = "Tomodachi Sushii" }: NavbarProps) => {
         )}
       </nav>
 
-      {/* Mobile Menu Backdrop */}
+      {/* Mobile menu backdrop */}
       {isMobileMenuOpen && (
         <div
           className="md:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
+
+      {/* Cart sidebar */}
+      <CartSidebar
+        isOpen={isCartOpen}
+        onClose={closeCart}
+        onCheckout={goToCheckout}
+      />
     </>
   );
 };
