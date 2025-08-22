@@ -71,15 +71,15 @@ export const removeCartItem = async (
 export const updateOrderTime = async (
   locationId: string,
   cartId: string,
-  orderTime: string,
-  orderDate: string
+  updateData: {
+    pickupType: string;
+    orderDate: string;
+    orderTime: string;
+  }
 ) => {
   return putData(
     `/api/v1/locations/${locationId}/carts/${cartId}/update-order-time`,
-    {
-      orderTime,
-      orderDate,
-    }
+    updateData
   );
 };
 
@@ -91,7 +91,18 @@ export const applyPromoCode = async (
 ) => {
   return postData(`/api/v1/locations/${locationId}/discounts/apply-discount`, {
     cartId,
-    discountCode: promoCode,
+    code: promoCode,
+  });
+};
+
+// Remove promo code
+export const removePromoCode = async (
+  locationId: string,
+  cartId: string
+) => {
+  const { deleteData } = await import('./crave-client');
+  return deleteData(`/api/v1/locations/${locationId}/discounts/apply-discount`, {
+    cartId
   });
 };
 
