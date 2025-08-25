@@ -484,7 +484,7 @@ const CheckoutDetails = () => {
                               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                                 {daySlots.slice(0, 20).map((slot) => {
                                   const isSelected =
-                                    selectedTime === slot.value;
+                                    selectedTime === slot.value && selectedDay === slot.date;
                                   return (
                                     <label
                                       key={`${slot.date}-${slot.value}`}
