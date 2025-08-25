@@ -27,7 +27,6 @@ const stripePromise = loadStripe(
 const CheckoutPaymentForm = () => {
   const stripe = useStripe();
   const elements = useElements();
-  const router = useRouter();
   const { locationId, cartId } = useParams();
   const { data, isLoading } = useCartData();
   const [customerInfo, setCustomerInfo] = useState({

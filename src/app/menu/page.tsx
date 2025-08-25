@@ -8,6 +8,7 @@ import { useSushiMenuData } from "./useSushiMenuData";
 import { getLocationById } from "@/lib/api/location";
 import ProductDescriptionDialog from "../components/product-description/ProductDescriptionDialog";
 import { useCart } from "../providers/cart-provider";
+import { cartId as CART_ID_FALLBACK } from "@/constants";
 
 const Menu = () => {
   const [selectedProductId, setSelectedProductId] = useState<string>("");
@@ -149,8 +150,8 @@ const Menu = () => {
         <ProductDescriptionDialog
           productId={selectedProductId}
           locationId={ctxLocationId ?? locationId}
-          cartId={cartId ?? ""}
-          isAddToCartBlocked={!cartId}
+          cartId={cartId ?? CART_ID_FALLBACK}
+          isAddToCartBlocked={false}
           onClose={closeProduct}
         />
       )}

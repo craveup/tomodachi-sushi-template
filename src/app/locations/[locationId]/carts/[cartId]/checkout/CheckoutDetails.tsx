@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, Fragment } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,6 @@ import {
 } from "@/lib/api/cart";
 import useCartData from "@/app/hooks/use-cart-data";
 import { useApiResource } from "@/hooks/useApiResource";
-import { cn } from "@/lib/utils";
 import type { TimeIntervalsResponse, OrderDay } from "@/lib/api/types";
 
 const CheckoutDetails = () => {
