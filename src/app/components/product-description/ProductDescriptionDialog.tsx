@@ -12,7 +12,7 @@ function ProductDescriptionDialog(props: ProductDescriptionProps) {
   if (isDesktop) {
     return (
       <Dialog open={!!props.productId} onOpenChange={props.onClose}>
-        <DialogContent className="h-[90vh] overflow-hidden border-none p-0">
+        <DialogContent className="h-[90vh] overflow-hidden border-none p-0 z-[1050] [&>div:first-child]:z-[1050]">
           <VisuallyHidden>
             <DialogTitle />
           </VisuallyHidden>
@@ -27,7 +27,7 @@ function ProductDescriptionDialog(props: ProductDescriptionProps) {
       open={Boolean(props.productId)}
       onOpenChange={() => props.onClose()}
     >
-      <DrawerContent className="h-[90vh] overflow-hidden border-none p-0">
+      <DrawerContent className="h-[90vh] overflow-hidden border-none p-0 z-[1050] [&>div:first-child]:z-[1050]">
         {props.productId && <ProductDescriptionScreen {...props} />}
       </DrawerContent>
     </Drawer>
