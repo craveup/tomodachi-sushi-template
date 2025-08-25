@@ -63,7 +63,7 @@ export const Navbar = ({ title = "Tomodachi Sushii" }: NavbarProps) => {
   return (
     <>
       {/* Main Navbar */}
-      <nav className="relative bg-backgrounddefault rounded-xl overflow-hidden w-full max-w-none md:max-w-fit md:w-auto">
+      <nav className="relative bg-backgrounddefault rounded-xl w-full max-w-none md:max-w-fit md:w-auto md:overflow-hidden">
         <div className="flex items-center justify-between p-3 md:p-2 gap-2 md:gap-3">
           {/* Mobile menu toggle */}
           <Button
