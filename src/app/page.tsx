@@ -6,16 +6,11 @@ import SideCard from "./components/side-card";
 import RoundedEdge from "./components/rounded-edge";
 import { getLocationById } from "@/lib/api/location";
 import { notFound } from "next/navigation";
+import { location_Id } from "@/constants";
 
 export default async function TomodachiFrontpage() {
   try {
-    const locationId = process.env.NEXT_PUBLIC_LOCATION_ID;
-    if (!locationId) {
-      throw new Error("NEXT_PUBLIC_LOCATION_ID is not defined");
-    }
-
-    const locationData = await getLocationById(locationId);
-    console.log("locationData", locationData);
+    const locationData = await getLocationById(location_Id);
     if (!locationData) notFound();
 
     const socialIcons = [

@@ -9,6 +9,7 @@ import { useCart } from "@/hooks/useCart";
 import { SelectedModifierTypes } from "@/types/menu-types";
 import ItemCounterButton from "./ItemCounterButton";
 import { LoadingButton } from "@/components/ui/LoadingButton";
+import { location_Id as LOCATION_ID } from "@/constants";
 
 const ProductDescriptionActionButton = ({
   cartItem,
@@ -29,7 +30,7 @@ const ProductDescriptionActionButton = ({
 }) => {
   const [quantity, setQuantity] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { locationId } = cartItem;
+  const locationId = cartItem?.locationId ?? LOCATION_ID;
   const { mutate } = useCart({ locationId, cartId });
 
   const handleAddItemToCart = async () => {

@@ -2,13 +2,16 @@
 
 import React from "react";
 import Link from "next/link";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Menu, ShoppingCart, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import CartSidebar from "@/components/crave-ui/cart-component/cart-sidebar";
 import { useCart } from "@/hooks/useCart";
-import { cartId as CART_ID_FALLBACK } from "@/constants";
+import {
+  cart_Id as CART_ID_FALLBACK,
+  location_Id as LOCATION_ID,
+} from "@/constants";
 
 const navigationItems = [
   { label: "MENU", shortLabel: "MENU", isActive: false, href: "/menu" },
@@ -21,25 +24,23 @@ const navigationItems = [
   },
 ];
 
-type NavbarProps = { title?: string };
+type NavbarProps = { title: string };
 
-export const Navbar = ({ title = "Tomodachi Sushii" }: NavbarProps) => {
+export const Navbar = ({ title }: NavbarProps) => {
   const router = useRouter();
-  const params = useParams<{ locationId?: string; cartId?: string }>();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isCartOpen, setIsCartOpen] = React.useState(false);
 
   // Resolve IDs from route or fallbacks
-  const envLocationId = process.env.NEXT_PUBLIC_LOCATION_ID!;
-  const locationId = (params?.locationId as string) || envLocationId;
-  const cartId = (params?.cartId as string) || CART_ID_FALLBACK;
+  const locationId = LOCATION_ID;
+  const cartId = CART_ID_FALLBACK;
 
   // Live cart data for badge count
   const { cart, mutate } = useCart({ locationId, cartId });
 
   const itemCount = React.useMemo(() => {
-    const items = Array.isArray(cart?.items) ? cart!.items : [];
+    const items = cart?.items ?? [];
     return items.reduce<number>(
       (sum, it: any) => sum + Number(it?.quantity || 0),
       0

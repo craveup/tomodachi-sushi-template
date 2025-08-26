@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ClientIcon } from "./client-icon";
 import { useThemeClasses } from "../hooks/use-restaurant-theme";
+import { location_Id as LOCATION_ID } from "@/constants";
 
 // Initialize Stripe with publishable key
 const stripePromise = loadStripe(
@@ -198,8 +199,8 @@ export function StripePaymentElement({
       const API_BASE_URL =
         process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
       const API_KEY = process.env.NEXT_PUBLIC_CRAVE_API_KEY;
-      const locationId =
-        process.env.NEXT_PUBLIC_LOCATION_ID || "your_location_id_here";
+
+      const locationId = LOCATION_ID;
 
       if (!API_KEY) {
         // No API key configured, falling back to demo payment mode

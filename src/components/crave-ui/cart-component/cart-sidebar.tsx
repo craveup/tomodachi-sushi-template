@@ -6,7 +6,10 @@ import { X, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { useFormatters } from "@/lib/i18n/hooks";
 import { useCart } from "@/hooks/useCart";
-import { cartId as CART_ID_FALLBACK } from "@/constants";
+import {
+  cart_Id as CART_ID_FALLBACK,
+  location_Id as LOCATION_ID,
+} from "@/constants";
 import { useParams, useRouter } from "next/navigation";
 import { patchData } from "@/lib/handle-api";
 import { formatApiError } from "@/lib/format-api-error";
@@ -102,12 +105,11 @@ export default function CartSidebar({
   const router = useRouter();
   const { currency } = useFormatters();
 
-  const envLocationId = process.env.NEXT_PUBLIC_LOCATION_ID as string;
   const { locationId: routeLocationId, cartId: routeCartId } = useParams<{
     locationId: string;
     cartId: string;
   }>();
-  const locationId = (routeLocationId as string) || envLocationId;
+  const locationId = (routeLocationId as string) || LOCATION_ID;
   const cartId = (routeCartId as string) || CART_ID_FALLBACK;
 
   const {

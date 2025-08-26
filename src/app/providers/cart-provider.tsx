@@ -17,6 +17,7 @@ import {
   getCart,
 } from "@/lib/api/cart";
 import type { CartResponse } from "@/lib/api";
+import { location_Id as LOCATION_ID } from "@/constants";
 
 interface CartContextType {
   items: LocalCartItem[];
@@ -64,7 +65,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [apiCart, setApiCart] = useState<CartResponse | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  const locationId = process.env.NEXT_PUBLIC_LOCATION_ID || "demo-location";
+  const locationId = LOCATION_ID;
   const DEMO_MODE = false; // ← set via env if you want (e.g. NEXT_PUBLIC_DEMO_CART)
 
   // replace initializeCart with a real one (keeps your localStorage restore)

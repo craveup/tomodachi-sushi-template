@@ -12,7 +12,7 @@ import { useCart as useLiveCart } from "@/hooks/useCart";
 import { postData } from "@/lib/handle-api";
 import { formatApiError } from "@/lib/format-api-error";
 import { getCartId } from "@/lib/local-storage";
-
+import { location_Id as LOCATION_ID } from "@/constants";
 import type { MenuItem, ItemOptions } from "../types";
 import { ItemUnavailableActions } from "./product-description/ProductDescription";
 
@@ -35,9 +35,7 @@ export const TomodachiMenuSection = ({
 }: MenuSectionProps) => {
   const params = useParams<{ locationId?: string }>();
   const locationId =
-    (params?.locationId as string | undefined) ??
-    propLocationId ??
-    (process.env.NEXT_PUBLIC_LOCATION_ID as string);
+    (params?.locationId as string | undefined) ?? propLocationId ?? LOCATION_ID;
 
   const cartId = getCartId(locationId);
 
