@@ -7,6 +7,8 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogOverlay,
+  DialogPortal,
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
@@ -15,6 +17,8 @@ import {
   DrawerDescription,
   DrawerFooter,
   DrawerHeader,
+  DrawerOverlay,
+  DrawerPortal,
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { LoadingButton } from "@/components/ui/LoadingButton";
@@ -70,48 +74,60 @@ function SimpleDialog({
   if (isDesktop) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent
-          className={cn("h-[90vh] overflow-hidden border-none", className)}
-        >
-          {(isTextHeader || onGoBack) && (
-            <DialogHeader>
-              {onGoBack && (
-                <Button
-                  className="mb-4"
-                  onClick={onGoBack}
-                  size="icon"
-                  variant="ghost"
-                >
-                  <ArrowLeft />
-                </Button>
-              )}
+        <DialogPortal>
+          <DialogOverlay className="fixed inset-0 bg-black/5 z-[1100]" />
+          <DialogContent
+            className={cn(
+              "z-[1101] h-[90vh] overflow-hidden border-none",
+              className
+            )}
+          >
+            {(isTextHeader || onGoBack) && (
+              <DialogHeader>
+                {onGoBack && (
+                  <Button
+                    className="mb-4"
+                    onClick={onGoBack}
+                    size="icon"
+                    variant="ghost"
+                  >
+                    <ArrowLeft />
+                  </Button>
+                )}
 
-              {title && <DialogTitle>{title}</DialogTitle>}
-              {text && <DialogDescription>{text}</DialogDescription>}
-            </DialogHeader>
-          )}
-          <div className="flex-1 overflow-auto">{children}</div>
-          <DialogFooter>{actionButton}</DialogFooter>
-        </DialogContent>
+                {title && <DialogTitle>{title}</DialogTitle>}
+                {text && <DialogDescription>{text}</DialogDescription>}
+              </DialogHeader>
+            )}
+            <div className="flex-1 overflow-auto">{children}</div>
+            <DialogFooter>{actionButton}</DialogFooter>
+          </DialogContent>
+        </DialogPortal>
       </Dialog>
     );
   }
 
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
-      <DrawerContent
-        className={cn("h-[90vh] overflow-hidden border-none p-0", className)}
-      >
-        {isTextHeader && (
-          <DrawerHeader className="text-left">
-            {title && <DrawerTitle>{title}</DrawerTitle>}
-            {text && <DrawerDescription>{text}</DrawerDescription>}
-          </DrawerHeader>
-        )}
-        <div className="flex-1 overflow-auto px-4">{children}</div>
+      <DrawerPortal>
+        <DrawerOverlay className="fixed inset-0 bg-black/5 z-[1100]" />
+        <DrawerContent
+          className={cn(
+            "z-[1101] h-[90vh] overflow-hidden border-none p-0",
+            className
+          )}
+        >
+          {isTextHeader && (
+            <DrawerHeader className="text-left">
+              {title && <DrawerTitle>{title}</DrawerTitle>}
+              {text && <DrawerDescription>{text}</DrawerDescription>}
+            </DrawerHeader>
+          )}
+          <div className="flex-1 overflow-auto px-4">{children}</div>
 
-        <DrawerFooter className="pt-2">{actionButton}</DrawerFooter>
-      </DrawerContent>
+          <DrawerFooter className="pt-2">{actionButton}</DrawerFooter>
+        </DrawerContent>
+      </DrawerPortal>
     </Drawer>
   );
 }

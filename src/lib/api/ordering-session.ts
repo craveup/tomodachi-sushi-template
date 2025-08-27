@@ -2,21 +2,22 @@
 import { apiPost } from "@/lib/api/fetcher";
 
 export type StartOrderingSessionRequest = {
-    searchParams?: string;
-    existingCartId?: string | null;
-    marketplaceId?: string;
+  searchParams?: string;
+  existingCartId?: string | null;
+  marketplaceId?: string;
 };
 
 export type StartOrderingSessionResponse = {
-    cartId: string;
+  cartId: string;
+  errorMessage: string;
 };
 
 export function startOrderingSession(
-    locationId: string,
-    payload: StartOrderingSessionRequest
+  locationId: string,
+  payload: StartOrderingSessionRequest
 ) {
-    return apiPost<StartOrderingSessionResponse>(
-        `/api/v1/locations/${locationId}/ordering-sessions`,
-        payload
-    );
+  return apiPost<StartOrderingSessionResponse>(
+    `/api/v1/locations/${locationId}/ordering-sessions`,
+    payload
+  );
 }

@@ -43,7 +43,7 @@ export default async function TomodachiFrontpage() {
                          max-w-[90vw]
                          break-words
                          drop-shadow-2xl
-                         z-20"
+                         z-0"
               >
                 日本橋蛎殻町友達寿司
               </h1>

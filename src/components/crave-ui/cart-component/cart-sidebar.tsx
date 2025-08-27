@@ -105,11 +105,12 @@ export default function CartSidebar({
   const router = useRouter();
   const { currency } = useFormatters();
 
+  const envLocationId = LOCATION_ID;
   const { locationId: routeLocationId, cartId: routeCartId } = useParams<{
     locationId: string;
     cartId: string;
   }>();
-  const locationId = (routeLocationId as string) || LOCATION_ID;
+  const locationId = (routeLocationId as string) || envLocationId;
   const cartId = (routeCartId as string) || CART_ID_FALLBACK;
 
   const {

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 import { useCart } from "../providers/cart-provider";
@@ -175,9 +175,18 @@ export const TomodachiMenuSection = ({
                       onClick={(e) => handleAddToCart(e, item)}
                       disabled={isBusy}
                       className="w-8 h-8 sm:w-9 sm:h-9 lg:w-8 lg:h-8 bg-backgroundprimary hover:bg-backgroundprimary/90 active:bg-backgroundprimary/80 rounded-full flex items-center justify-center transition-colors disabled:opacity-50 touch-manipulation"
-                      aria-label={`Add ${item.name} to cart`}
+                      aria-label={
+                        isBusy
+                          ? `Adding ${item.name}…`
+                          : `Add ${item.name} to cart`
+                      }
+                      aria-busy={isBusy}
                     >
-                      <Plus className="w-4 h-4 sm:w-5 sm:h-5 lg:w-4 lg:h-4 text-textinverse" />
+                      {isBusy ? (
+                        <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 lg:w-4 lg:h-4 animate-spin text-textinverse" />
+                      ) : (
+                        <Plus className="w-4 h-4 sm:w-5 sm:h-5 lg:w-4 lg:h-4 text-textinverse" />
+                      )}
                     </button>
                   </div>
                 </div>

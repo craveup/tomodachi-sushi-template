@@ -1,7 +1,7 @@
 import { getCartId } from "@/lib/local-storage";
 import { useCart } from "@/hooks/useCart";
 import { useApiResource } from "@/hooks/useApiResource";
-import { Menu } from "@/types/menu-types";
+import { BundleMenu } from "@/types/menus";
 
 const useMenus = (locationId: string, isEnabled = true) => {
   const cartId = getCartId(locationId);
@@ -15,7 +15,7 @@ const useMenus = (locationId: string, isEnabled = true) => {
     isEnabled && cartData?.orderDate && cartData?.orderTime
   );
 
-  return useApiResource<Menu[]>(
+  return useApiResource<BundleMenu[]>(
     `/api/v1/locations/${locationId}/menus?orderDate=${cartData?.orderDate}&orderTime=${cartData?.orderTime}`,
     { shouldFetch }
   );

@@ -5,8 +5,9 @@ export const GOOGLE_MAP_API_KEY = process.env
   .NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string;
 export const NEXT_PUBLIC_STOREFRONT_URL = "https://testurl.com"; // TODO -- will add it.
 
-export const cart_Id = "68a476738692632db3626f0e";
-export const location_Id = process.env.NEXT_PUBLIC_LOCATION_ID as string;
+export const cart_Id = "68ad6c999d3102f956dbf190";
+export const location_Id = "68a2a400c31092a55901b2d5";
+// process.env.NEXT_PUBLIC_LOCATION_ID as string;
 
 export const imagePlaceholder =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAAE7AQMAAAA7IG32AAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAANQTFRFysrKceY6JgAAAC5JREFUeJztwQENAAAAwqD3T20PBxQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwI8BXYQAAeEOeqIAAAAASUVORK5CYII=";

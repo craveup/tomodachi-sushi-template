@@ -28,8 +28,16 @@ import {
   removePromoCode,
 } from "@/lib/api/cart";
 import useCartData from "@/app/hooks/use-cart-data";
-import { useApiResource } from "@/hooks/useApiResource";
+import useSWR from "swr";
 import type { TimeIntervalsResponse, OrderDay } from "@/lib/api/types";
+
+const formatTimeToAMPM = (time24: string) => {
+  const [hours, minutes] = time24.split(":");
+  const hour = parseInt(hours, 10);
+  const ampm = hour >= 12 ? "PM" : "AM";
+  const hour12 = hour % 12 || 12;
+  return `${hour12}:${minutes} ${ampm}`;
+};
 
 const CheckoutDetails = () => {
   const router = useRouter();
@@ -44,14 +52,23 @@ const CheckoutDetails = () => {
   const [promoSuccess, setPromoSuccess] = useState<string | null>(null);
   const [promoError, setPromoError] = useState<string | null>(null);
 
-  // Fetch time intervals from API
+  // Custom fetcher for Next.js API routes (no base URL)
+  const nextApiFetcher = async (url: string) => {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error("Failed to fetch");
+    }
+    return res.json();
+  };
+
+  // Fetch time intervals from Next.js API route
   const {
     data: timeIntervalsData,
     error: timeIntervalsError,
     isLoading: timeIntervalsLoading,
-  } = useApiResource<TimeIntervalsResponse>(
-    `/api/v1/locations/${locationId}/time-intervals`,
-    { shouldFetch: Boolean(locationId) }
+  } = useSWR<TimeIntervalsResponse>(
+    locationId ? `/api/time-intervals?locationId=${locationId}` : null,
+    nextApiFetcher
   );
 
   useEffect(() => {
@@ -394,124 +411,82 @@ const CheckoutDetails = () => {
                 ) : timeIntervalsError ? (
                   <ErrorMessage message="Failed to load available time slots. Please try again later." />
                 ) : timeIntervalsData?.orderDays ? (
-                  <div className="space-y-6 max-h-96 overflow-y-auto scrollbar-hide pr-2">
-                    {/* Flatten all intervals from all days into time slots */}
-                    {(() => {
-                      const allTimeSlots: Array<{
-                        value: string;
-                        label: string;
-                        date: string;
-                        time: string;
-                        dayOffset: number;
-                        dayLabel: string;
-                      }> = [];
+                  <div className="max-h-96 overflow-y-auto scrollbar-hide pr-2">
+                    <div className="space-y-8">
+                      {timeIntervalsData.orderDays.map((orderDay, dayIndex) => {
+                        const isToday = dayIndex === 0;
+                        const isTomorrow = dayIndex === 1;
+                        const isSelected = selectedDay === orderDay.value;
 
-                      timeIntervalsData.orderDays.forEach(
-                        (orderDay, dayIndex) => {
-                          orderDay.intervals.forEach((interval) => {
-                            allTimeSlots.push({
-                              value: interval,
-                              label: `${orderDay.label}, ${interval}`,
-                              date: orderDay.value,
-                              time: interval,
-                              dayOffset: dayIndex,
-                              dayLabel: orderDay.label,
-                            });
+                        const getDayLabel = () => {
+                          if (isToday) return "Today";
+                          if (isTomorrow) return "Tomorrow";
+                          return orderDay.label.split(",")[0]; // Just the day name part
+                        };
+
+                        const formatDateWithYear = (dateStr: string) => {
+                          const date = new Date(dateStr);
+                          return date.toLocaleDateString("en-US", {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
                           });
-                        }
-                      );
+                        };
 
-                      if (allTimeSlots.length === 0) {
                         return (
-                          <div className="text-center text-muted-foreground py-8">
-                            <Clock className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                            <p className="font-medium">
-                              No {orderType} slots available today
-                            </p>
-                            <p className="text-sm">
-                              Please try again tomorrow or choose a different
-                              order type.
-                            </p>
-                          </div>
-                        );
-                      }
-
-                      // Group slots by day for display
-                      const groupedSlots = allTimeSlots.reduce(
-                        (groups, slot) => {
-                          const day = slot.date;
-                          if (!groups[day]) groups[day] = [];
-                          groups[day].push(slot);
-                          return groups;
-                        },
-                        {} as Record<string, typeof allTimeSlots>
-                      );
-
-                      return Object.entries(groupedSlots).map(
-                        ([date, daySlots]) => {
-                          const isToday = daySlots[0].dayOffset === 0;
-                          const isTomorrow = daySlots[0].dayOffset === 1;
-
-                          return (
-                            <div key={date} className="space-y-3">
-                              {/* Day Header */}
-                              <div className="flex items-center gap-3">
-                                <div className="flex-1">
-                                  <h4 className="font-semibold text-foreground">
-                                    {isToday
-                                      ? "Today"
-                                      : isTomorrow
-                                      ? "Tomorrow"
-                                      : daySlots[0].dayLabel}
-                                  </h4>
-                                  <p className="text-sm text-muted-foreground">
-                                    {date}
-                                  </p>
-                                </div>
-                                {isToday && (
-                                  <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
-                                    Available Now
-                                  </span>
-                                )}
-                                {isTomorrow && (
-                                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
-                                    Next Day
-                                  </span>
-                                )}
+                          <div key={orderDay.value} className="space-y-3">
+                            {/* Day Header with Date */}
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h3 className="font-heading-h5 text-textdefault text-lg tracking-wider">
+                                  {getDayLabel()}
+                                </h3>
+                                <p className="text-sm text-textmuted font-text-small">
+                                  {formatDateWithYear(orderDay.value)}
+                                </p>
                               </div>
+                              {!isToday &&
+                                dayIndex <
+                                  timeIntervalsData.orderDays.length - 1 && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-xs px-3 py-1 h-8 rounded-full border-borderdefault hover:bg-none text-blue-600 bg-blue-200"
+                                  >
+                                    Next Day
+                                  </Button>
+                                )}
+                            </div>
 
-                              {/* Time Slots Grid - Original Design */}
-                              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                                {daySlots.slice(0, 20).map((slot) => {
-                                  const isSelected =
-                                    selectedTime === slot.value && selectedDay === slot.date;
+                            {/* Time Slots Grid - 4 columns to match design */}
+                            <div className="grid grid-cols-4 gap-3">
+                              {orderDay.intervals
+                                .slice(0, 20)
+                                .map((interval: any) => {
+                                  const isTimeSelected =
+                                    selectedTime === interval &&
+                                    selectedDay === orderDay.value;
                                   return (
                                     <label
-                                      key={`${slot.date}-${slot.value}`}
-                                      htmlFor={`${slot.date}-${slot.value}`}
-                                      className={`
-                                      relative cursor-pointer group transition-all duration-200 ease-in-out
-                                      ${
-                                        isSelected
-                                          ? "scale-105"
-                                          : "hover:scale-102 hover:shadow-md"
-                                      }
-                                    `}
+                                      key={`${orderDay.value}-${interval}`}
+                                      htmlFor={`${orderDay.value}-${interval}`}
+                                      className="relative cursor-pointer group transition-all duration-200 ease-in-out hover:scale-102"
                                     >
                                       <input
                                         type="radio"
-                                        id={`${slot.date}-${slot.value}`}
+                                        id={`${orderDay.value}-${interval}`}
                                         name="deliveryTime"
-                                        value={slot.value}
-                                        checked={isSelected}
+                                        value={interval}
+                                        checked={isTimeSelected}
                                         onChange={(e) => {
                                           const selectedValue = e.target.value;
                                           setSelectedTime(selectedValue);
                                           setSelectedInterval(selectedValue);
-                                          setSelectedDay(slot.date);
+                                          setSelectedDay(orderDay.value);
                                           handleUpdateOrderTime({
                                             pickupType: "LATER",
-                                            orderDate: slot.date,
+                                            orderDate: orderDay.value,
                                             orderTime: selectedValue,
                                           });
                                         }}
@@ -519,32 +494,29 @@ const CheckoutDetails = () => {
                                       />
                                       <div
                                         className={`
-                                        p-3 rounded-lg border-2 text-center transition-all duration-200
-                                        ${
-                                          isSelected
-                                            ? "text-white dark:text-white shadow-md transform"
-                                            : "border-border hover:border-muted-foreground bg-background hover:bg-muted/50"
-                                        }
-                                      `}
+                                      p-3 rounded-lg border-2 text-center transition-all duration-200 h-12 flex items-center justify-center
+                                      ${
+                                        isTimeSelected
+                                          ? "text-white dark:text-white shadow-md transform border-[hsl(var(--brand-accent))]"
+                                          : "border-border hover:border-muted-foreground bg-background hover:bg-muted/50"
+                                      }
+                                    `}
                                         style={{
-                                          backgroundColor: isSelected
-                                            ? "hsl(var(--brand-accent))"
-                                            : undefined,
-                                          borderColor: isSelected
+                                          backgroundColor: isTimeSelected
                                             ? "hsl(var(--brand-accent))"
                                             : undefined,
                                         }}
                                       >
                                         <div
                                           className={`font-medium text-sm ${
-                                            isSelected
+                                            isTimeSelected
                                               ? "text-white dark:text-white"
                                               : "text-foreground"
                                           }`}
                                         >
-                                          {slot.time}
+                                          {formatTimeToAMPM(interval)}
                                         </div>
-                                        {isSelected && (
+                                        {isTimeSelected && (
                                           <div className="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-sm">
                                             <Check className="h-3 w-3 text-green-600" />
                                           </div>
@@ -553,41 +525,25 @@ const CheckoutDetails = () => {
                                     </label>
                                   );
                                 })}
-                              </div>
-
-                              {/* Separator between days */}
-                              {Object.keys(groupedSlots).indexOf(date) <
-                                Object.keys(groupedSlots).length - 1 && (
-                                <div className="border-t border-border/50"></div>
-                              )}
                             </div>
-                          );
-                        }
-                      );
-                    })()}
+                          </div>
+                        );
+                      })}
 
-                    {/* Show total available slots count */}
-                    {timeIntervalsData.orderDays.reduce(
-                      (total, day) => total + day.intervals.length,
-                      0
-                    ) >= 20 && (
-                      <div className="text-center py-2 border-t border-border/50">
-                        <p className="text-sm text-muted-foreground">
-                          Showing next{" "}
-                          {Math.min(
-                            20,
-                            timeIntervalsData.orderDays.reduce(
-                              (total, day) => total + day.intervals.length,
-                              0
-                            )
-                          )}{" "}
-                          available slots
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          More times available after selection
-                        </p>
-                      </div>
-                    )}
+                      {/* Show additional info if needed */}
+                      {selectedTime && (
+                        <div className="text-center py-3 mt-4 border-t border-border/50">
+                          <p className="text-sm text-muted-foreground">
+                            Selected: {formatTimeToAMPM(selectedTime)} on{" "}
+                            {
+                              timeIntervalsData.orderDays.find(
+                                (day) => day.value === selectedDay
+                              )?.label
+                            }
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div className="text-center text-muted-foreground py-8">
@@ -801,7 +757,7 @@ const CheckoutDetails = () => {
                     <p className="text-sm text-green-800 dark:text-green-400">
                       {selectedDay && selectedInterval && (
                         <span className="block mb-1 font-medium">
-                          {selectedDay} at {selectedInterval}
+                          {selectedDay} at {formatTimeToAMPM(selectedInterval)}
                         </span>
                       )}
                       Click continue to proceed with payment

@@ -84,7 +84,7 @@ const CheckoutPaymentForm = () => {
         confirmParams: {
           return_url: `${
             window.location.origin
-          }/examples/leclerc-bakery/thank-you?displayName=${encodeURIComponent(
+          }/thank-you?displayName=${encodeURIComponent(
             data.restaurantDisplayName
           )}&locationId=${locationId}&cartId=${cartId}`,
           payment_method_data: {
