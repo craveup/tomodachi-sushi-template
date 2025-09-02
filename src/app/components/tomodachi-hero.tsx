@@ -15,7 +15,7 @@ export default function TomodachiHero() {
     <div className="relative w-full max-w-[1436px] h-[1032px] bg-black rounded-2xl overflow-hidden mx-auto">
       <div className="relative h-[1032px] bg-[url(/images/sushi/hero-background.png)] bg-cover bg-center">
         <header className="absolute top-12 left-12">
-          <Navbar />
+          <Navbar title=""/>
         </header>
 
         {/* Gradient overlay */}
