@@ -53,7 +53,7 @@ export default function TestAPIPage() {
           </div>
           <div>
             <strong>API Base URL:</strong>{" "}
-            {process.env.NEXT_PUBLIC_STORE_FRONT_API_URL}
+            {process.env.NEXT_PUBLIC_API_URL}
           </div>
           <div>
             <strong>API Key:</strong>{" "}

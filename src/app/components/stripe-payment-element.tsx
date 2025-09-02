@@ -197,7 +197,7 @@ export function StripePaymentElement({
 
       // Try to create cart with backend first
       const API_BASE_URL =
-        process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       const API_KEY = process.env.NEXT_PUBLIC_CRAVE_API_KEY;
 
       const locationId = LOCATION_ID;
