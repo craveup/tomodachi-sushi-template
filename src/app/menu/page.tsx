@@ -12,13 +12,13 @@ import {
   cart_Id as CART_ID_FALLBACK,
   location_Id as LOCATION_ID,
 } from "@/constants";
-import { useOrderingSession } from "@/hooks/use-ordering-session";
 import useMenus from "@/hooks/useMenus";
 import type { BundleCategory, BundleMenu } from "@/types/menus";
 
+export const dynamic = 'force-dynamic';
+
 const Menu = () => {
-  const { cartId } = useOrderingSession(LOCATION_ID);
-  console.log("cartId", cartId);
+  // const { cartId } = useOrderingSession(LOCATION_ID);
 
   const {
     data: menus,

@@ -76,7 +76,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
     try {
       // try restore
-      let cid = localStorage.getItem("tomodachi-cart-id");
+      const cid = localStorage.getItem("tomodachi-cart-id");
       if (cid) {
         const cart = await getCart(locationId, cid);
         setCartId(cid);

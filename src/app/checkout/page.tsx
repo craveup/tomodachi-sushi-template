@@ -517,7 +517,7 @@ export default function TomodachiCheckoutPage() {
                         );
 
                         return Object.entries(groupedSlots).map(
-                          ([date, daySlots]) => {
+                          ([date, daySlots]: any) => {
                             const isToday = daySlots[0].dayOffset === 0;
                             const isTomorrow = daySlots[0].dayOffset === 1;
 
