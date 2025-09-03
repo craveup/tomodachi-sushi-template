@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 export interface MenuItem {
   id: string;
@@ -90,10 +91,18 @@ export function Menu({
                   layout === "list" && "h-24 w-24 flex-shrink-0"
                 )}
               >
-                <img
+                <Image
                   src={item.image}
-                  alt={item.name}
-                  className="object-cover transition-all group-hover:scale-105"
+                  alt={item.name || "Menu item"}
+                  fill
+                  className="object-cover transition-all duration-200 group-hover:scale-105"
+                  sizes={
+                    layout === "list"
+                      ? "96px"
+                      : "(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
+                  }
+                  loading="lazy"
+                  // unoptimized // <- uncomment if the image domain isn't in next.config.js
                 />
                 {item.popular && (
                   <div className="absolute left-2 top-2 rounded-full bg-primary px-2 py-1 text-xs text-primary-foreground">

@@ -27,7 +27,6 @@ const stripePromise = loadStripe(
 const CheckoutPaymentForm = () => {
   const stripe = useStripe();
   const elements = useElements();
-  const router = useRouter();
   const { locationId, cartId } = useParams();
   const { data, isLoading } = useCartData();
   const [customerInfo, setCustomerInfo] = useState({
@@ -85,7 +84,7 @@ const CheckoutPaymentForm = () => {
         confirmParams: {
           return_url: `${
             window.location.origin
-          }/examples/leclerc-bakery/thank-you?displayName=${encodeURIComponent(
+          }/thank-you?displayName=${encodeURIComponent(
             data.restaurantDisplayName
           )}&locationId=${locationId}&cartId=${cartId}`,
           payment_method_data: {
@@ -196,7 +195,7 @@ const CheckoutPaymentForm = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <Link
-              href={`/examples/leclerc-bakery/locations/${locationId}/carts/${cartId}/checkout`}
+              href={`/locations/${locationId}/carts/${cartId}/checkout`}
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="h-5 w-5" />
@@ -456,7 +455,7 @@ const CheckoutPayment = () => {
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-16">
               <Link
-                href={`/examples/leclerc-bakery/locations/${locationId}/carts/${cartId}/checkout`}
+                href={`/locations/${locationId}/carts/${cartId}/checkout`}
                 className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ArrowLeft className="h-5 w-5" />

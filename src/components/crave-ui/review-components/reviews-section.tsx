@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Star, ThumbsUp, ThumbsDown, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface Review {
   id: string;
@@ -180,7 +181,9 @@ export default function ReviewsSection({
                     <div className="flex-1">
                       <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                         <div
-                          className={`${getRatingColor(rating)} h-3 rounded-full transition-all duration-500`}
+                          className={`${getRatingColor(
+                            rating
+                          )} h-3 rounded-full transition-all duration-500`}
                           style={{ width: `${getRatingPercentage(rating)}%` }}
                         />
                       </div>
@@ -268,10 +271,13 @@ export default function ReviewsSection({
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
                       {review.customerAvatar ? (
-                        <img
+                        <Image
                           src={review.customerAvatar}
                           alt={review.customerName}
+                          width={40}
+                          height={40}
                           className="w-10 h-10 rounded-full object-cover"
+                          loading="lazy"
                         />
                       ) : (
                         <span className="text-sm font-medium text-primary">
@@ -337,10 +343,13 @@ export default function ReviewsSection({
                         key={index}
                         className="relative aspect-square rounded-lg overflow-hidden"
                       >
-                        <img
+                        <Image
                           src={photo}
                           alt={`Review photo ${index + 1}`}
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          loading="lazy"
                         />
                       </div>
                     ))}

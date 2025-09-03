@@ -3,7 +3,6 @@
 import React from "react";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Navbar } from "../components/navbar";
 import { ChefHat, Award, Heart, Users, Clock, MapPin } from "lucide-react";
@@ -26,7 +25,7 @@ const About = () => {
 
         {/* Header */}
         <header className="absolute top-6 left-6 lg:top-12 lg:left-12 z-20">
-          <Navbar />
+          <Navbar title="TOMODACHI SUSHI" />
         </header>
 
         {/* Hero Content */}
