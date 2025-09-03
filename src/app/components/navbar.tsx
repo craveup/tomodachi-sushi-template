@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, {Suspense} from "react";
 import Link from "next/link";
 import {useRouter, useSearchParams} from "next/navigation";
 import { Menu, X } from "lucide-react";
@@ -27,7 +27,7 @@ const navigationItems = [
 
 const title = "Tomodachi Sushii"
 
-export const Navbar = () => {
+export const NavbarComp = () => {
   const router = useRouter();
  const searchParams = useSearchParams();
  const {cartId} = useCartStore();
@@ -181,5 +181,13 @@ export const Navbar = () => {
     </>
   );
 };
+
+export const Navbar = () => {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <NavbarComp />
+        </Suspense>
+    );
+}
 
 export default Navbar;

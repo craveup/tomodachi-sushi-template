@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import Image from "next/image";
 import {useParams, useSearchParams} from "next/navigation";
 import { toast } from "sonner";
@@ -23,7 +23,7 @@ interface MenuSectionProps {
   locationId?: string;
 }
 
-export const TomodachiMenuSection = ({
+const TomodachiMenuSectionContent = ({
   title,
   items,
   sectionId,
@@ -190,5 +190,13 @@ export const TomodachiMenuSection = ({
         })}
       </div>
     </section>
+  );
+};
+
+export const TomodachiMenuSection = (props: MenuSectionProps) => {
+  return (
+    <Suspense fallback={<div>Loading menu section...</div>}>
+      <TomodachiMenuSectionContent {...props} />
+    </Suspense>
   );
 };

@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Architecture
 
-This is a **Next.js 15 restaurant ordering application** built with React 19, TypeScript, and Tailwind CSS. The application showcases **Leclerc Bakery** with a sophisticated theming system and cart functionality.
+This is a **Next.js 15 restaurant ordering application template** built with React 19, TypeScript, and Tailwind CSS. The application can be themed for any restaurant type and currently showcases **Leclerc Bakery** as an example, featuring a sophisticated theming system and cart functionality.
 
 ### Core Architecture
 

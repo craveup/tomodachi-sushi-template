@@ -1,12 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { useOrderingSession } from "@/hooks/use-ordering-session";
 import { GetLocationViaSlugType } from "@/types/location-types";
 
 type Props = { location: GetLocationViaSlugType };
 
-export default function GetOrderingSession({ location }: Props) {
+function GetOrderingSessionContent({ location }: Props) {
   const { cartId, isLoading, error } = useOrderingSession(location.id);
   console.log("Cart ID:", cartId);
 
@@ -30,5 +30,13 @@ export default function GetOrderingSession({ location }: Props) {
     <div>
       <p>{cartId}</p>
     </div>
+  );
+}
+
+export default function GetOrderingSession(props: Props) {
+  return (
+    <Suspense fallback={<div><p>Loading...</p></div>}>
+      <GetOrderingSessionContent {...props} />
+    </Suspense>
   );
 }

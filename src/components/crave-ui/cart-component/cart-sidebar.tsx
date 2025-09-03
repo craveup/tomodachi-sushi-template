@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { X, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import Image from "next/image";
@@ -94,7 +94,7 @@ function mapProductsToSuggested(
   }));
 }
 
-export default function CartSidebar({
+function CartSidebarContent({
   isOpen,
   onClose,
   cartItems,
@@ -452,5 +452,13 @@ export default function CartSidebar({
         </div>
       </div>
     </>
+  );
+}
+
+export default function CartSidebar(props: CartSidebarProps) {
+  return (
+    <Suspense fallback={<div>Loading cart...</div>}>
+      <CartSidebarContent {...props} />
+    </Suspense>
   );
 }
