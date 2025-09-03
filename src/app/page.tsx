@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Facebook, Instagram, Twitter } from "lucide-react";
 import React from "react";
 import { Navbar } from "./components/navbar";
-import SideCard from "./components/side-card";
 import RoundedEdge from "./components/rounded-edge";
 import { getLocationById } from "@/lib/api/location";
 import { notFound } from "next/navigation";

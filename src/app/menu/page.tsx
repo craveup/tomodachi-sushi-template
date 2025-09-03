@@ -186,7 +186,7 @@ const Menu = () => {
         <ProductDescriptionDialog
           productId={selectedProductId}
           locationId={LOCATION_ID}
-          cartId={cartId ?? CART_ID_FALLBACK}
+          cartId={CART_ID_FALLBACK}
           isAddToCartBlocked={false}
           onClose={closeProduct}
         />
