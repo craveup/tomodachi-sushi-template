@@ -21,6 +21,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {location_Id} from "@/constants";
 
 interface CartItem {
   id: string;
@@ -171,7 +172,7 @@ export default function CartSidebar({
 
   const liveSuggested = useMemo(() => mapProductsToSuggested(recRaw), [recRaw]);
   const showRecSkeleton = recLoading && !liveSuggested.length;
-  const showSuggestionsSection = showRecSkeleton || liveSuggested.length > 0;
+  const showSuggestionsSection = (showRecSkeleton || liveSuggested.length > 0) && !!cartId;
 
   const subtotal = useMemo(
     () => apiItems.reduce((s, i) => s + i.price * i.quantity, 0),
@@ -220,7 +221,7 @@ export default function CartSidebar({
   const handleCheckout = async () => {
     if (!apiItems.length) return;
     await mutate();
-    router.push(`/carts/${cartId}/checkout`);
+    router.push(`/locations/${location_Id}/carts/${cartId}/checkout`);
   };
 
   if (!isOpen) return null;

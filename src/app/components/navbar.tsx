@@ -47,7 +47,7 @@ export const Navbar = () => {
 
   const goToCheckout = () => {
     setIsCartOpen(false);
-    router.push(`/carts/${cartId}/checkout`);
+    router.push(`/locations/${location_Id}/carts/${cartId}/checkout`);
   };
 
   return (
