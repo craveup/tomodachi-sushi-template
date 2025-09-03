@@ -59,12 +59,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${forum.variable} ${yujiMai.variable} ${wdxlLubrifont.variable} antialiased`}
       >
         <ErrorBoundary>
-            <AddressProvider>
+          <RestaurantThemeProvider defaultThemePath="/themes/leclerc-theme.json">
+          <AddressProvider>
               <CartProvider>
                 {children}
                 <CartWrapper />
               </CartProvider>
             </AddressProvider>
+          </RestaurantThemeProvider>
         </ErrorBoundary>
       </body>
     </html>
