@@ -10,7 +10,7 @@ function MenuPage(
     {
         searchParams,
     }: {
-        searchParams: Record<string, string | string[] | undefined>;
+        searchParams: any;
     }) {
     const cartId = searchParams.cartId;
 
