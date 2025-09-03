@@ -319,33 +319,29 @@ const CheckoutDetails = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="firstName">First Name</Label>
-                        <Input id="firstName" placeholder="John" />
+                        <Input id="firstName" />
                       </div>
                       <div>
                         <Label htmlFor="lastName">Last Name</Label>
-                        <Input id="lastName" placeholder="Doe" />
+                        <Input id="lastName" />
                       </div>
                     </div>
                     <div>
                       <Label htmlFor="phone">Phone Number</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="(555) 123-4567"
-                      />
+                      <Input id="phone" type="tel" />
                     </div>
                     <div>
                       <Label htmlFor="address">Delivery Address</Label>
-                      <Input id="address" placeholder="123 Main St" />
+                      <Input id="address" />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="apt">Apt/Suite</Label>
-                        <Input id="apt" placeholder="Apt 4B" />
+                        <Input id="apt" />
                       </div>
                       <div>
                         <Label htmlFor="zip">ZIP Code</Label>
-                        <Input id="zip" placeholder="10001" />
+                        <Input id="zip" />
                       </div>
                     </div>
                     <div>
