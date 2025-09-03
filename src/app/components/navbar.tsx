@@ -97,7 +97,7 @@ export const Navbar = () => {
                 <Link key={item.label} href={link}>
                   <Button
                     variant="ghost"
-                    className={`inline-flex items-center justify-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
+                    className={`inline-flex cursor-pointer items-center justify-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
                       isBook
                         ? "group bg-backgroundmuted border border-borderdefault hover:bg-backgroundprimary hover:text-textinverse"
                         : item.isActive

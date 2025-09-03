@@ -345,7 +345,7 @@ export default function CartSidebar({
                     size="icon"
                     onClick={onPrev}
                     aria-label="Previous"
-                    className="h-8 w-8 hover:bg-backgroundmuted text-textdefault"
+                    className="h-8 w-8 hover:bg-backgroundmuted text-textdefault cursor-pointer"
                     disabled={!canScrollPrev}
                   >
                     <ChevronLeft className="h-4 w-4" />
@@ -355,7 +355,7 @@ export default function CartSidebar({
                     size="icon"
                     onClick={onNext}
                     aria-label="Next"
-                    className="h-8 w-8 hover:bg-backgroundmuted text-textdefault"
+                    className="h-8 w-8 hover:bg-backgroundmuted text-textdefault cursor-pointer"
                     disabled={!canScrollNext}
                   >
                     <ChevronRight className="h-4 w-4" />
