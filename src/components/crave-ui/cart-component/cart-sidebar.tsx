@@ -6,11 +6,7 @@ import { X, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { useFormatters } from "@/lib/i18n/hooks";
 import { useCart } from "@/hooks/useCart";
-import {
-  cart_Id as CART_ID_FALLBACK,
-  location_Id as LOCATION_ID,
-} from "@/constants";
-import { useParams, useRouter } from "next/navigation";
+import {useParams, useRouter, useSearchParams} from "next/navigation";
 import { patchData } from "@/lib/handle-api";
 import { formatApiError } from "@/lib/format-api-error";
 import { toast } from "sonner";
@@ -79,12 +75,13 @@ type ApiProduct =
 function mapProductsToSuggested(
   data: ApiProduct[] | undefined
 ): SuggestedItem[] {
+  console.log(data, "data is her...");
   if (!Array.isArray(data)) return [];
   const pickImage = (p: ApiProduct): string | null =>
     absolutizeImage(
       p.imageUrl ??
         p.mainImageUrl ??
-        (Array.isArray(p.images) && p.images[0]?.url) ??
+        (Array.isArray(p.images) && p.images[0]) ??
         p.image
     );
 
@@ -105,13 +102,13 @@ export default function CartSidebar({
   const router = useRouter();
   const { currency } = useFormatters();
 
-  const envLocationId = LOCATION_ID;
-  const { locationId: routeLocationId, cartId: routeCartId } = useParams<{
-    locationId: string;
+  const { cartId: routeCartId } = useParams<{
     cartId: string;
   }>();
-  const locationId = (routeLocationId as string) || envLocationId;
-  const cartId = (routeCartId as string) || CART_ID_FALLBACK;
+
+  const locationId = location_Id;
+  const searchParams = useSearchParams();
+  const cartId = searchParams.get("cartId") || routeCartId;
 
   const {
     cart,
@@ -223,7 +220,7 @@ export default function CartSidebar({
   const handleCheckout = async () => {
     if (!apiItems.length) return;
     await mutate();
-    router.push(`/locations/${locationId}/carts/${cartId}/checkout`);
+    router.push(`/carts/${cartId}/checkout`);
   };
 
   if (!isOpen) return null;
@@ -391,7 +388,7 @@ export default function CartSidebar({
                           ) : (
                             // ItemVertical style
                             <Card
-                              className="gap-0 overflow-hidden p-0 transition-all hover:shadow-md"
+                              className="gap-0 overflow-hidden p-0 transition-all hover:shadow-md bg-background"
                               onClick={() =>
                                 item && setProductIdToOpen(item.id)
                               }

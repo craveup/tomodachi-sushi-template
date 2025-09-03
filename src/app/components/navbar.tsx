@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -29,9 +29,9 @@ const title = "Tomodachi Sushii"
 
 export const Navbar = () => {
   const router = useRouter();
-
+ const searchParams = useSearchParams();
  const {cartId} = useCartStore();
- const {cart, mutate} = useCart({locationId: location_Id, cartId})
+ const {cart, mutate} = useCart({locationId: location_Id, cartId: cartId || searchParams.get("cartId")});
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isCartOpen, setIsCartOpen] = React.useState(false);
