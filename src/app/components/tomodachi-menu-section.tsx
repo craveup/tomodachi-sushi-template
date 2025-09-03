@@ -2,18 +2,16 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import {useParams, useSearchParams} from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Plus } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
-import { useCart } from "../providers/cart-provider";
-import { useCart as useLiveCart } from "@/hooks/useCart";
+import { useCart } from "@/hooks/useCart";
 import { postData } from "@/lib/handle-api";
 import { formatApiError } from "@/lib/format-api-error";
-import { getCartId } from "@/lib/local-storage";
-import { location_Id as LOCATION_ID, cart_Id as CART_ID } from "@/constants";
-import type { MenuItem, ItemOptions } from "../types";
+import {location_Id as LOCATION_ID, location_Id} from "@/constants";
+import type { MenuItem } from "../types";
 import { ItemUnavailableActions } from "./product-description/ProductDescription";
 
 interface MenuSectionProps {
@@ -34,19 +32,14 @@ export const TomodachiMenuSection = ({
   locationId: propLocationId,
 }: MenuSectionProps) => {
   const params = useParams<{ locationId?: string }>();
+  const searchParams = useSearchParams();
   const locationId =
     (params?.locationId as string | undefined) ?? propLocationId ?? LOCATION_ID;
+  const cartId = searchParams.get("cartId");
 
-  const cartId =
-    (typeof CART_ID === "string" && CART_ID.trim() !== ""
-      ? CART_ID
-      : undefined) ?? (locationId ? getCartId(locationId) : undefined);
-
-  const { mutate } = useLiveCart({ locationId, cartId: cartId! });
+  const { mutate, isLoading } = useCart({ locationId: location_Id, cartId: cartId! });
 
   const [busyId, setBusyId] = useState<string | null>(null);
-
-  const { isLoading: providerBusy } = useCart();
 
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
@@ -59,16 +52,10 @@ export const TomodachiMenuSection = ({
   ): Promise<void> => {
     e.stopPropagation();
 
-    if (!locationId || !cartId) {
+    if (!location_Id || !cartId) {
       toast.error("Cart is not ready. Please refresh.");
       return;
     }
-
-    const defaultOptions: ItemOptions = {
-      warming: "room-temp",
-      packaging: "standard",
-      giftBox: false,
-    };
 
     try {
       setBusyId(item.id);
@@ -121,7 +108,7 @@ export const TomodachiMenuSection = ({
       {/* Items */}
       <div className="flex flex-col items-start gap-4 sm:gap-5 lg:gap-6 relative w-full">
         {items.map((item) => {
-          const isBusy = busyId === item.id || providerBusy;
+          const isBusy = busyId === item.id;
           return (
             <div
               key={item.id}

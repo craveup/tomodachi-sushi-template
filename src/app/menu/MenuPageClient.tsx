@@ -4,9 +4,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Navbar } from "../components/navbar";
 import { TomodachiMenuSection } from "../components/tomodachi-menu-section";
-import { getLocationById } from "@/lib/api/location";
 import ProductDescriptionDialog from "../components/product-description/ProductDescriptionDialog";
 import {
     cart_Id as CART_ID_FALLBACK,
@@ -14,6 +12,7 @@ import {
 } from "@/constants";
 import useMenus from "@/hooks/useMenus";
 import type { BundleCategory, BundleMenu } from "@/types/menus";
+import {CircularLoader} from "@/components/ui/CircularLoader";
 
 export const dynamic = "force-dynamic";
 
@@ -147,8 +146,11 @@ const MenuPageClient = () => {
                     >
 
                         {menusLoading && (
-                            <div className="px-4 py-8 opacity-60">Loading menu…</div>
+                            <div className="text-center mx-auto">
+                                <CircularLoader />
+                            </div>
                         )}
+
                         {menusError && !menusLoading && (
                             <div className="px-4 py-8 text-red-500">Failed to load menu.</div>
                         )}
