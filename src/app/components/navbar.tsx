@@ -1,17 +1,18 @@
 "use client";
 
-import React from "react";
+import React, {Suspense} from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Menu, ShoppingCart, X } from "lucide-react";
+import {useRouter, useSearchParams} from "next/navigation";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import CartSidebar from "@/components/crave-ui/cart-component/cart-sidebar";
 import { useCart } from "@/hooks/useCart";
 import {
-  cart_Id as CART_ID_FALLBACK,
-  location_Id as LOCATION_ID,
+    location_Id,
 } from "@/constants";
+import CartCountBtn from "@/app/components/CartCountBtn";
+import {useCartStore} from "@/store/cart-store";
 
 const navigationItems = [
   { label: "MENU", shortLabel: "MENU", isActive: false, href: "/menu" },
@@ -24,28 +25,16 @@ const navigationItems = [
   },
 ];
 
-type NavbarProps = { title: string };
+const title = "Tomodachi Sushii"
 
-export const Navbar = ({ title }: NavbarProps) => {
+export const NavbarComp = () => {
   const router = useRouter();
+ const searchParams = useSearchParams();
+ const {cartId} = useCartStore();
+ const {cart, mutate} = useCart({locationId: location_Id, cartId: cartId || searchParams.get("cartId")});
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isCartOpen, setIsCartOpen] = React.useState(false);
-
-  // Resolve IDs from route or fallbacks
-  const locationId = LOCATION_ID;
-  const cartId = CART_ID_FALLBACK;
-
-  // Live cart data for badge count
-  const { cart, mutate } = useCart({ locationId, cartId });
-
-  const itemCount = React.useMemo(() => {
-    const items = cart?.items ?? [];
-    return items.reduce<number>(
-      (sum, it: any) => sum + Number(it?.quantity || 0),
-      0
-    );
-  }, [cart?.items]);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen((v) => !v);
 
@@ -58,7 +47,7 @@ export const Navbar = ({ title }: NavbarProps) => {
 
   const goToCheckout = () => {
     setIsCartOpen(false);
-    router.push(`/locations/${locationId}/carts/${cartId}/checkout`);
+    router.push(`/locations/${location_Id}/carts/${cartId}/checkout`);
   };
 
   return (
@@ -95,12 +84,20 @@ export const Navbar = ({ title }: NavbarProps) => {
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-1">
             {navigationItems.map((item) => {
-              const isBook = item.label === "BOOK A TABLE";
+                const isBook = item.label === "BOOK A TABLE";
+                const isMenu = item.label === "MENU";
+
+                let link = item.href;
+
+                if(isMenu) {
+                    link = `${item.href}?cartId=${cartId}`;
+                }
+
               return (
-                <Link key={item.label} href={item.href}>
+                <Link key={item.label} href={link}>
                   <Button
                     variant="ghost"
-                    className={`inline-flex items-center justify-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
+                    className={`inline-flex cursor-pointer items-center justify-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
                       isBook
                         ? "group bg-backgroundmuted border border-borderdefault hover:bg-backgroundprimary hover:text-textinverse"
                         : item.isActive
@@ -124,29 +121,7 @@ export const Navbar = ({ title }: NavbarProps) => {
           </div>
 
           {/* Cart button with live badge */}
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={openCart}
-            aria-haspopup="dialog"
-            aria-expanded={isCartOpen}
-            aria-controls="cart-sidebar"
-            className="flex items-center justify-center w-[44px] h-[44px] bg-backgroundmuted rounded-lg border border-borderdefault hover:bg-backgroundmuted flex-shrink-0"
-          >
-            <div className="relative">
-              <ShoppingCart className="w-5 h-5 text-icondefault" />
-              {itemCount > 0 && (
-                <span
-                  className="absolute -top-2 -right-2 bg-backgroundprimary text-textinverse text-[10px] font-bold rounded-full min-w-[1.1rem] h-[1.1rem] px-1 flex items-center justify-center leading-none"
-                  aria-label={`${itemCount} items in cart`}
-                >
-                  {itemCount > 99 ? "99+" : itemCount}
-                </span>
-              )}
-            </div>
-            <span className="sr-only">Open cart</span>
-          </Button>
+          <CartCountBtn openCart={openCart} isCartOpen={isCartOpen} itemCount={cart?.totalQuantity ?? 0} />
         </div>
 
         {/* Mobile menu dropdown */}
@@ -206,5 +181,13 @@ export const Navbar = ({ title }: NavbarProps) => {
     </>
   );
 };
+
+export const Navbar = () => {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <NavbarComp />
+        </Suspense>
+    );
+}
 
 export default Navbar;

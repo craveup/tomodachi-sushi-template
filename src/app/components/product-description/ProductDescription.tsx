@@ -189,8 +189,13 @@ const ProductDescription = ({
           )}
         </div>
         <div className={`px-4 ${imageURL ? "py-4" : "pt-8"} mb-3`}>
-          <p className="text-3xl font-semibold">{name}</p>
-          {description && <ShowMoreText text={description as string} />}
+          <p className="text-3xl font-semibold mb-2">{name}</p>
+          {description && (
+            <ShowMoreText
+              text={description as string}
+              className="text-base sm:text-sm text-gray-700 dark:text-gray-300"
+            />
+          )}
         </div>
         <Separator />
 

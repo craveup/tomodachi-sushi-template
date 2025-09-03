@@ -60,7 +60,7 @@ export default function RootLayout({
       >
         <ErrorBoundary>
           <RestaurantThemeProvider defaultThemePath="/themes/leclerc-theme.json">
-            <AddressProvider>
+          <AddressProvider>
               <CartProvider>
                 {children}
                 <CartWrapper />

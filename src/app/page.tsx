@@ -3,16 +3,12 @@ import { Facebook, Instagram, Twitter } from "lucide-react";
 import React from "react";
 import { Navbar } from "./components/navbar";
 import RoundedEdge from "./components/rounded-edge";
-import { getLocationById } from "@/lib/api/location";
 import { notFound } from "next/navigation";
-import { location_Id } from "@/constants";
-import SideCards from "@/components/ui/SideCards";
+import SideCards from "@/app/components/SideCards";
+import OrderingSessionCompo from "@/app/components/OrderingSessionCompo";
 
 export default async function TomodachiFrontpage() {
   try {
-    const locationData = await getLocationById(location_Id);
-    if (!locationData) notFound();
-
     const socialIcons = [
       { icon: Instagram, label: "Instagram" },
       { icon: Facebook, label: "Facebook" },
@@ -21,6 +17,8 @@ export default async function TomodachiFrontpage() {
 
     return (
       <div className="flex flex-col min-h-screen lg:h-screen bg-backgrounddefault lg:overflow-hidden">
+        <OrderingSessionCompo />
+
         {/* Mobile and Desktop Layout */}
         <div className="flex flex-col lg:flex-row min-h-screen lg:min-h-0 lg:h-full p-3 lg:p-6 gap-3 lg:gap-4">
           {/* Hero Section */}
@@ -28,12 +26,12 @@ export default async function TomodachiFrontpage() {
             <div className="relative w-full h-[60vh] sm:h-[70vh] lg:h-full bg-[url(/images/sushi/hero-background.png)] bg-cover bg-center">
               {/* Header - Responsive positioning */}
               <header className="absolute top-4 left-4 right-4 sm:top-6 sm:left-6 sm:right-6 lg:top-12 lg:left-12 lg:right-auto z-10">
-                <Navbar title={locationData.restaurantDisplayName} />
+                <Navbar />
               </header>
 
               {/* Mobile: Japanese Title Overlay */}
               <h1
-                className="lg:hidden absolute 
+                className="lg:hidden absolute
                          top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center
                          font-yuji-mai text-white
                          text-3xl sm:text-4xl md:text-6xl
@@ -63,7 +61,7 @@ export default async function TomodachiFrontpage() {
                         key={index}
                         variant="outline"
                         size="icon"
-                        className="w-9 h-9 bg-backgroundmuted rounded-full border-borderdefault hover:bg-backgroundprimary hover:text-textinverse transition-colors"
+                        className="w-9 h-9 bg-backgroundmuted rounded-full cursor-pointer border-borderdefault hover:bg-blend-color-dodge hover:text-textinverse transition-colors"
                       >
                         <social.icon className="w-[18px] h-[18px] text-icondefault" />
                       </Button>

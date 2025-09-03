@@ -119,10 +119,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Initialize cart on component mount (only after hydration)
-  useEffect(() => {
-    if (!isHydrated) return;
-    initializeCart();
-  }, [initializeCart, isHydrated]);
+  // useEffect(() => {
+  //   if (!isHydrated) return;
+  //   initializeCart();
+  // }, [initializeCart, isHydrated]);
 
   const clearError = useCallback(() => {
     setError(null);

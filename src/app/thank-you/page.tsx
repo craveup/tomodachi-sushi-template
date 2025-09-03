@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Star } from "lucide-react";
+import {removeCartCartId} from "@/lib/local-storage";
 
 const ThankYouContent = () => {
   const searchParams = useSearchParams();
@@ -22,6 +23,9 @@ const ThankYouContent = () => {
       localStorage.removeItem("tomodachi-cart-id");
       localStorage.removeItem("crave_cart_data");
     }
+
+
+    removeCartCartId(locationId);
   }, []);
 
   const handleRatingClick = (value: number) => {

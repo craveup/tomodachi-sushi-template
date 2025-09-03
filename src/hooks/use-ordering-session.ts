@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { startOrderingSession } from "@/lib/api/ordering-session";
 import { getCartId, setCartId } from "@/lib/local-storage";
 import { formatApiError } from "@/lib/format-api-error";
+import {useCartStore} from "@/store/cart-store";
 
 type UseOrderingSessionResult = {
   cartId: string | null;
@@ -17,9 +18,9 @@ type UseOrderingSessionResult = {
 export function useOrderingSession(
   locationId: string
 ): UseOrderingSessionResult {
+  const { cartId, setCartIdState, isLoading, setIsLoading } = useCartStore()
+
   const params = useSearchParams();
-  const [cartId, setCartIdState] = useState<string | null>("");
-  const [isLoading, setIsLoading] = useState<boolean>(() => !cartId);
   const [error, setError] = useState("");
   const [orderingError, setOrderingError] = useState("");
 

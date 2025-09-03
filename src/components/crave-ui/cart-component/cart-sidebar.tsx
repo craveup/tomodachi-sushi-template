@@ -1,16 +1,12 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { X, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { useFormatters } from "@/lib/i18n/hooks";
 import { useCart } from "@/hooks/useCart";
-import {
-  cart_Id as CART_ID_FALLBACK,
-  location_Id as LOCATION_ID,
-} from "@/constants";
-import { useParams, useRouter } from "next/navigation";
+import {useParams, useRouter, useSearchParams} from "next/navigation";
 import { patchData } from "@/lib/handle-api";
 import { formatApiError } from "@/lib/format-api-error";
 import { toast } from "sonner";
@@ -25,6 +21,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {location_Id} from "@/constants";
 
 interface CartItem {
   id: string;
@@ -79,12 +76,13 @@ type ApiProduct =
 function mapProductsToSuggested(
   data: ApiProduct[] | undefined
 ): SuggestedItem[] {
+  console.log(data, "data is her...");
   if (!Array.isArray(data)) return [];
   const pickImage = (p: ApiProduct): string | null =>
     absolutizeImage(
       p.imageUrl ??
         p.mainImageUrl ??
-        (Array.isArray(p.images) && p.images[0]?.url) ??
+        (Array.isArray(p.images) && p.images[0]) ??
         p.image
     );
 
@@ -96,7 +94,7 @@ function mapProductsToSuggested(
   }));
 }
 
-export default function CartSidebar({
+function CartSidebarContent({
   isOpen,
   onClose,
   cartItems,
@@ -105,13 +103,13 @@ export default function CartSidebar({
   const router = useRouter();
   const { currency } = useFormatters();
 
-  const envLocationId = LOCATION_ID;
-  const { locationId: routeLocationId, cartId: routeCartId } = useParams<{
-    locationId: string;
+  const { cartId: routeCartId } = useParams<{
     cartId: string;
   }>();
-  const locationId = (routeLocationId as string) || envLocationId;
-  const cartId = (routeCartId as string) || CART_ID_FALLBACK;
+
+  const locationId = location_Id;
+  const searchParams = useSearchParams();
+  const cartId = searchParams.get("cartId") || routeCartId;
 
   const {
     cart,
@@ -174,7 +172,7 @@ export default function CartSidebar({
 
   const liveSuggested = useMemo(() => mapProductsToSuggested(recRaw), [recRaw]);
   const showRecSkeleton = recLoading && !liveSuggested.length;
-  const showSuggestionsSection = showRecSkeleton || liveSuggested.length > 0;
+  const showSuggestionsSection = (showRecSkeleton || liveSuggested.length > 0) && !!cartId;
 
   const subtotal = useMemo(
     () => apiItems.reduce((s, i) => s + i.price * i.quantity, 0),
@@ -223,7 +221,7 @@ export default function CartSidebar({
   const handleCheckout = async () => {
     if (!apiItems.length) return;
     await mutate();
-    router.push(`/locations/${locationId}/carts/${cartId}/checkout`);
+    router.push(`/locations/${location_Id}/carts/${cartId}/checkout`);
   };
 
   if (!isOpen) return null;
@@ -345,7 +343,7 @@ export default function CartSidebar({
                     size="icon"
                     onClick={onPrev}
                     aria-label="Previous"
-                    className="h-8 w-8 hover:bg-backgroundmuted text-textdefault"
+                    className="h-8 w-8 hover:bg-backgroundmuted text-textdefault cursor-pointer"
                     disabled={!canScrollPrev}
                   >
                     <ChevronLeft className="h-4 w-4" />
@@ -355,7 +353,7 @@ export default function CartSidebar({
                     size="icon"
                     onClick={onNext}
                     aria-label="Next"
-                    className="h-8 w-8 hover:bg-backgroundmuted text-textdefault"
+                    className="h-8 w-8 hover:bg-backgroundmuted text-textdefault cursor-pointer"
                     disabled={!canScrollNext}
                   >
                     <ChevronRight className="h-4 w-4" />
@@ -391,7 +389,7 @@ export default function CartSidebar({
                           ) : (
                             // ItemVertical style
                             <Card
-                              className="gap-0 overflow-hidden p-0 transition-all hover:shadow-md"
+                              className="gap-0 overflow-hidden p-0 transition-all hover:shadow-md bg-background"
                               onClick={() =>
                                 item && setProductIdToOpen(item.id)
                               }
@@ -454,5 +452,13 @@ export default function CartSidebar({
         </div>
       </div>
     </>
+  );
+}
+
+export default function CartSidebar(props: CartSidebarProps) {
+  return (
+    <Suspense fallback={<div>Loading cart...</div>}>
+      <CartSidebarContent {...props} />
+    </Suspense>
   );
 }

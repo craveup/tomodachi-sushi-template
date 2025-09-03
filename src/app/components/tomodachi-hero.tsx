@@ -15,7 +15,7 @@ export default function TomodachiHero() {
     <div className="relative w-full max-w-[1436px] h-[1032px] bg-black rounded-2xl overflow-hidden mx-auto">
       <div className="relative h-[1032px] bg-[url(/images/sushi/hero-background.png)] bg-cover bg-center">
         <header className="absolute top-12 left-12">
-          <Navbar title="TOMODACHI SUSHI" />
+          <Navbar />
         </header>
 
         {/* Gradient overlay */}
@@ -30,7 +30,7 @@ export default function TomodachiHero() {
                   key={index}
                   variant="outline"
                   size="icon"
-                  className="w-9 h-9 bg-backgroundmuted rounded-[500px] border-borderdefault hover:bg-backgroundprimary hover:text-textinverse transition-colors"
+                  className="w-9 h-9 cursor-pointer bg-backgroundmuted rounded-[500px] border-borderdefault hover:bg-blend-color-dodge hover:text-textinverse transition-colors"
                 >
                   <social.icon className="w-[18px] h-[18px] text-icondefault" />
                 </Button>
