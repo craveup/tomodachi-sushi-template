@@ -15,7 +15,7 @@ import {
 import useMenus from "@/hooks/useMenus";
 import type { BundleCategory, BundleMenu } from "@/types/menus";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 const Menu = () => {
   // const { cartId } = useOrderingSession(LOCATION_ID);
@@ -39,11 +39,14 @@ const Menu = () => {
   const menu: BundleMenu | undefined = menus?.[0];
 
   // Tabs from categories
-  const menuCategories =
-    menu?.categories?.map((c: BundleCategory) => ({
-      id: c.id,
-      label: c.name,
-    })) ?? [];
+  const menuCategories = React.useMemo(
+    () =>
+      (menu?.categories ?? []).map((c: BundleCategory) => ({
+        id: c.id,
+        label: c.name,
+      })),
+    [menu]
+  );
 
   // Build items for a visible section from category.products (no separate products hook)
   const getProductsForCategory = (category: BundleCategory) => {
@@ -80,6 +83,7 @@ const Menu = () => {
     }
   };
 
+  // 2) Make the scroll detector use the container-relative top
   useEffect(() => {
     const handleScroll = () => {
       if (!scrollContainerRef.current) return;
@@ -92,7 +96,8 @@ const Menu = () => {
       for (const id of menuCategories.map((c) => c.id)) {
         const el = sectionRefs.current[id];
         if (!el) continue;
-        const distance = Math.abs(scrollTop - el.offsetTop);
+        const sectionTop = el.offsetTop - container.offsetTop;
+        const distance = Math.abs(scrollTop - sectionTop);
         if (distance < closest) {
           closest = distance;
           current = id;
@@ -108,6 +113,12 @@ const Menu = () => {
       return () => container.removeEventListener("scroll", handleScroll);
     }
   }, [menuCategories]);
+
+  useEffect(() => {
+    if (!activeSection && menuCategories.length) {
+      setActiveSection(menuCategories[0].id);
+    }
+  }, [menuCategories, activeSection]);
 
   return (
     <div className="flex flex-col lg:flex-row items-start p-3 md:p-6 relative bg-backgrounddefault min-h-screen lg:h-screen lg:overflow-hidden">

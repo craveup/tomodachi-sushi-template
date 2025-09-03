@@ -111,7 +111,7 @@ export default function ReservationPage() {
 
         {/* Header */}
         <header className="absolute top-6 left-6 lg:top-12 lg:left-12 z-20">
-          <Navbar title=""/>
+          <Navbar title="TOMODACHI SUSHI" />
         </header>
 
         {/* Hero Content */}

@@ -4,7 +4,6 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Navbar } from "../components/navbar";
 import { CheckCircle, Star } from "lucide-react";
 
 const ThankYouContent = () => {
@@ -33,12 +32,7 @@ const ThankYouContent = () => {
 
   return (
     <div className="min-h-screen bg-backgrounddefault">
-      {/* Header */}
-      <header className="absolute top-6 left-6 lg:top-12 lg:left-12 z-20">
-        <Navbar title="Tomodachi Sushi" />
-      </header>
-
-      <main className="pt-32 pb-12">
+      <main className="py-12">
         <div className="max-w-2xl mx-auto px-6 text-center">
           <div className="space-y-8">
             {/* Success Icon */}

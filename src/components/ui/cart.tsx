@@ -10,6 +10,7 @@ import {
   calculateSubtotal,
 } from "@/lib/utils/price";
 import { Button } from "./button";
+import Image from "next/image";
 
 export interface CartProps extends React.HTMLAttributes<HTMLDivElement> {
   items: CartItem[];
@@ -86,11 +87,14 @@ export function Cart({
                 <div className="flex items-start justify-between">
                   <div className="flex gap-3">
                     {item.image && (
-                      <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-md bg-muted">
-                        <img
+                      <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-md bg-muted">
+                        <Image
                           src={item.image}
-                          alt={item.name}
-                          className="h-full w-full object-cover"
+                          alt={item.name || item.menuItem?.name || "Cart item"}
+                          fill
+                          className="object-cover"
+                          sizes="40px"
+                          loading="lazy"
                         />
                       </div>
                     )}

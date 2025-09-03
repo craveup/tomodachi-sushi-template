@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Plus, Heart, Clock, Star, AlertTriangle, Info } from "lucide-react";
+import { Plus, Heart, Clock, Star, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "./card";
 import { Button } from "./button";
 import {
@@ -12,6 +12,7 @@ import {
 } from "./dialog";
 import { cn } from "@/lib/utils";
 import { Badge } from "./badge";
+import Image from "next/image";
 
 export interface MenuItemCardProps {
   className?: string;
@@ -119,10 +120,13 @@ export function MenuItemCard({
         <CardContent className="p-4">
           <div className="flex gap-4">
             {image && (
-              <img
+              <Image
                 src={image}
                 alt={name}
+                width={80}
+                height={80}
                 className="h-20 w-20 rounded object-cover"
+                loading="lazy"
               />
             )}
             <div className="flex-1">
@@ -179,10 +183,13 @@ export function MenuItemCard({
       >
         <div className="relative aspect-[4/3] overflow-hidden">
           {image ? (
-            <img
+            <Image
               src={image}
               alt={name}
-              className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+              fill
+              className="object-cover transition-transform duration-200 group-hover:scale-105"
+              sizes="100vw"
+              loading="lazy"
             />
           ) : (
             <div className="h-full w-full bg-muted flex items-center justify-center">
@@ -228,10 +235,13 @@ export function MenuItemCard({
       {/* Image Section */}
       <div className="relative h-48 overflow-hidden bg-muted">
         {image ? (
-          <img
+          <Image
             src={image}
             alt={name}
-            className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+            fill
+            className="object-cover transition-transform duration-200 group-hover:scale-105"
+            sizes="100vw"
+            loading="lazy"
           />
         ) : (
           <div className="h-full w-full bg-muted flex items-center justify-center">
@@ -377,10 +387,13 @@ export function MenuItemCard({
 
           <div className="space-y-4">
             {image && (
-              <img
+              <Image
                 src={image}
                 alt={name}
-                className="w-full h-48 object-cover rounded-lg"
+                fill
+                className="object-cover rounded-lg"
+                sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw"
+                loading="lazy"
               />
             )}
 

@@ -5,6 +5,7 @@ import type React from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
+import Image from "next/image";
 
 interface RestaurantHeaderProps {
   storeName?: string;
@@ -64,10 +65,13 @@ export default function RestaurantHeader({
           aria-label={`${storeName} Home Page`}
           data-testid="HomeLogo"
         >
-          <img
+          <Image
             src={logoUrl}
             alt={storeName}
+            width={32}
+            height={32}
             className="h-8 w-8 object-contain rounded"
+            priority
           />
           <span className="hidden sm:block text-lg font-semibold">
             {storeName}
