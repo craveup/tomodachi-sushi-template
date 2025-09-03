@@ -17,6 +17,7 @@ import {
   getCart,
 } from "@/lib/api/cart";
 import type { CartResponse } from "@/lib/api";
+import { location_Id as LOCATION_ID } from "@/constants";
 
 interface CartContextType {
   items: LocalCartItem[];
@@ -64,13 +65,37 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [apiCart, setApiCart] = useState<CartResponse | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // Demo mode - disable API calls for local development
-  const locationId = process.env.NEXT_PUBLIC_LOCATION_ID || "demo-location";
+  const locationId = LOCATION_ID;
+  const DEMO_MODE = false; // ← set via env if you want (e.g. NEXT_PUBLIC_DEMO_CART)
 
-  // Demo mode - skip cart initialization (no API calls)
+  // replace initializeCart with a real one (keeps your localStorage restore)
   const initializeCart = useCallback(async () => {
-    console.log("Demo mode: Cart running locally without API");
-  }, []);
+    if (DEMO_MODE) {
+      console.log("Demo mode: Cart running locally without API");
+      return;
+    }
+    try {
+      // try restore
+      const cid = localStorage.getItem("tomodachi-cart-id");
+      if (cid) {
+        const cart = await getCart(locationId, cid);
+        setCartId(cid);
+        setApiCart(cart);
+        return;
+      }
+
+      // create new for this location
+      const created = await createCart(locationId);
+      const newCartId = created.cartId;
+      const fullCart = await getCart(locationId, newCartId);
+      setCartId(newCartId);
+      setApiCart(fullCart);
+      localStorage.setItem("tomodachi-cart-id", newCartId);
+    } catch (err) {
+      console.error("cart init failed", err);
+      setError("Could not initialize cart");
+    }
+  }, [locationId]);
 
   // Handle hydration - load data only after component has mounted
   useEffect(() => {
@@ -104,7 +129,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const openCart = useCallback(() => {
-    // Opening cart
     setIsCartOpen(true);
   }, []);
 
@@ -112,88 +136,107 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setIsCartOpen(false);
   }, []);
 
+  // in addToCart, call API when not in demo
   const addToCart = useCallback(
     async (item: MenuItem & { options: ItemOptions }) => {
-      // Adding item to cart
       setIsLoading(true);
       setError(null);
 
       try {
-        // Validate the item
         validateMenuItem(item);
 
-        // Demo mode - no cart initialization needed
+        if (DEMO_MODE) {
+          // keep your existing local add…
+          let finalPrice = item.price;
+          if (item.options.giftBox) {
+            finalPrice += 5.0;
+          }
 
-        // Demo mode - use local storage only (skip API calls)
-        let finalPrice = item.price;
-        if (item.options.giftBox) {
-          finalPrice += 5.0;
-        }
-
-        // Check if item with same id and options already exists
-        const existingItemIndex = items.findIndex(
-          (cartItem) =>
-            cartItem.id === item.id &&
-            JSON.stringify(cartItem.options) === JSON.stringify(item.options)
-        );
-
-        let newItems: LocalCartItem[];
-
-        if (existingItemIndex >= 0) {
-          // Item exists, increment quantity
-          newItems = items.map((cartItem, index) =>
-            index === existingItemIndex
-              ? { ...cartItem, quantity: cartItem.quantity + 1 }
-              : cartItem
+          const existingItemIndex = items.findIndex(
+            (cartItem) =>
+              cartItem.id === item.id &&
+              JSON.stringify(cartItem.options) === JSON.stringify(item.options)
           );
-        } else {
-          // New item, add to cart
-          const cartItem: LocalCartItem = {
-            ...item,
-            price: finalPrice,
-            cartId: `${item.id}-${Date.now()}-${Math.random()
-              .toString(36)
-              .substr(2, 9)}`,
-            quantity: 1,
-          };
-          newItems = [...items, cartItem];
+
+          let newItems: LocalCartItem[];
+
+          if (existingItemIndex >= 0) {
+            newItems = items.map((cartItem, index) =>
+              index === existingItemIndex
+                ? { ...cartItem, quantity: cartItem.quantity + 1 }
+                : cartItem
+            );
+          } else {
+            const cartItem: LocalCartItem = {
+              ...item,
+              price: finalPrice,
+              cartId: `${item.id}-${Date.now()}-${Math.random()
+                .toString(36)
+                .substr(2, 9)}`,
+              quantity: 1,
+            };
+            newItems = [...items, cartItem];
+          }
+          setItems(newItems);
+
+          if (typeof window !== "undefined") {
+            localStorage.setItem(
+              "tomodachi-cart-items",
+              JSON.stringify(newItems)
+            );
+          }
+
+          setIsCartOpen(true);
+          return;
         }
+
+        // LIVE API path
+        if (!cartId) {
+          await initializeCart();
+        }
+        const cid = cartId ?? localStorage.getItem("tomodachi-cart-id");
+        if (!cid) throw new Error("Cart not ready. Please try again.");
+
+        const payload = {
+          productId: item.id,
+          quantity: 1,
+          // If your API needs price/options/modifiers, include them here:
+          options: item.options, // matches your MenuItem + ItemOptions
+        };
+
+        await addItemToCart(locationId, cid, payload);
+
+        // reflect server cart in UI
+        const fresh = await getCart(locationId, cid);
+        setApiCart(fresh);
+        setCartId(cid);
+
+        // Optionally mirror into local items if your checkout reads from `items`
+        const mirrored: LocalCartItem = {
+          ...item,
+          price: item.price + (item.options.giftBox ? 5 : 0),
+          cartId: `${item.id}-${Date.now()}`,
+          quantity: 1,
+        };
+        const newItems = [...items, mirrored];
         setItems(newItems);
+        localStorage.setItem("tomodachi-cart-items", JSON.stringify(newItems));
 
-        // Save to localStorage
-        if (typeof window !== "undefined") {
-          localStorage.setItem(
-            "tomodachi-cart-items",
-            JSON.stringify(newItems)
-          );
-        }
-
-        // Automatically open the cart when an item is added
-        // Opening cart when item is added
         setIsCartOpen(true);
       } catch (err: any) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to add item to cart";
-        setError(errorMessage);
-        console.error("❌ Error adding item to cart:", err);
-        console.error("Error details:", {
-          message: err.message,
-          status: err.response?.status,
-          data: err.response?.data,
-          config: err.config,
-        });
-        throw err; // Re-throw so UI can handle it
+        setError(err?.message ?? "Failed to add item to cart");
+        console.error("addToCart failed", err);
+        throw err;
       } finally {
         setIsLoading(false);
       }
     },
-    [cartId, locationId, initializeCart, items, apiCart]
+    [cartId, initializeCart, items, DEMO_MODE]
   );
 
   const removeItem = (cartId: string) => {
     const newItems = items.filter((item) => item.cartId !== cartId);
     setItems(newItems);
-    // Save to localStorage
     if (typeof window !== "undefined") {
       localStorage.setItem("tomodachi-cart-items", JSON.stringify(newItems));
     }
@@ -207,7 +250,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
         item.cartId === cartId ? { ...item, quantity } : item
       );
       setItems(newItems);
-      // Save to localStorage
       if (typeof window !== "undefined") {
         localStorage.setItem("tomodachi-cart-items", JSON.stringify(newItems));
       }
@@ -216,7 +258,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = () => {
     setItems([]);
-    // Clear localStorage
     if (typeof window !== "undefined") {
       localStorage.removeItem("tomodachi-cart-items");
       localStorage.removeItem("tomodachi-cart-id");

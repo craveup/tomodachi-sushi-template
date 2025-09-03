@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "imagedelivery.net",
+        pathname: "/**",
+      },
     ],
     // Optimize images for better performance
     formats: ["image/webp", "image/avif"],

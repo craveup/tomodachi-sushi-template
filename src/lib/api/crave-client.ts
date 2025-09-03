@@ -1,9 +1,6 @@
 import axios from "axios";
 
-const STORE_FRONT_API_BASE_URL = process.env.NEXT_PUBLIC_STORE_FRONT_API_URL || "http://localhost:8000";
-
-// Local development mode flag
-const isLocalMode = process.env.NEXT_PUBLIC_LOCAL_MODE === 'true';
+const STORE_FRONT_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // SWR fetcher function
 export const fetcherSWR = async (
@@ -59,12 +56,6 @@ export const postData = async (
   data: Record<any, any>,
   baseUrl?: string,
 ) => {
-  // Local mode fallback
-  if (isLocalMode) {
-    console.log('🟡 Local mode enabled - using mock data for POST:', endpoint);
-    return getMockPostResponse(endpoint, data);
-  }
-
   try {
     console.log('POST request attempt:', {
       endpoint,
@@ -103,7 +94,7 @@ export const postData = async (
       console.log('🟡 API unavailable - falling back to mock data for POST:', endpoint);
       return getMockPostResponse(endpoint, data);
     }
-    
+
     throw error;
   }
 };

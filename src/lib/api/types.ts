@@ -174,11 +174,22 @@ export interface Product {
   modifierGroups?: any[];
 }
 
+// ✅ **Time Intervals API Response**
+export interface OrderDay {
+  value: string;
+  label: string;
+  intervals: string[];
+}
+
+export interface TimeIntervalsResponse {
+  orderDays: OrderDay[];
+}
+
 // ✅ **Legacy type aliases for backwards compatibility**
 export type Location = LocationData;
 export type Cart = CartResponse;
 export type MenuResponse = any;
-export type TimeInterval = any;
+export type TimeInterval = TimeIntervalsResponse;
 export type GratuitySettings = any;
 export type PaymentIntent = PaymentIntentResponse;
 export type DiscountCode = any;

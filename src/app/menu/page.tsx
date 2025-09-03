@@ -1,115 +1,135 @@
+/// app/menu/page.tsx
+
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Plus } from "lucide-react";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Navbar } from "../components/navbar";
-import { useCart } from "../providers/cart-provider";
-import { MenuItem } from "../types";
-import { menuData } from "../data/menu-data";
 import { TomodachiMenuSection } from "../components/tomodachi-menu-section";
+import { getLocationById } from "@/lib/api/location";
+import ProductDescriptionDialog from "../components/product-description/ProductDescriptionDialog";
+import {
+  cart_Id as CART_ID_FALLBACK,
+  location_Id as LOCATION_ID,
+} from "@/constants";
+import useMenus from "@/hooks/useMenus";
+import type { BundleCategory, BundleMenu } from "@/types/menus";
 
-const menuCategories = [
-  { id: "nigiri", label: "NIGIRI" },
-  { id: "uramaki", label: "ROLLS" },
-  { id: "special", label: "CHEF'S CREATIONS" },
-];
-
-// Import menu items from centralized data
-const nigiriItems = menuData["nigiri-sashimi"] || [];
-const uramakiItems = menuData["seasonal-rolls-handrolls"] || [];
-const specialRollsItems = menuData["chefs-creations-warm-dishes"] || [];
-
-// MenuSection component moved to ../components/tomodachi-menu-section.tsx
+export const dynamic = 'force-dynamic';
 
 const Menu = () => {
-  const [activeSection, setActiveSection] = useState("nigiri");
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({
-    nigiri: null,
-    uramaki: null,
-    special: null,
-  });
+  // const { cartId } = useOrderingSession(LOCATION_ID);
 
-  // Scroll to section when tab is clicked
+  const {
+    data: menus,
+    isLoading: menusLoading,
+    error: menusError,
+  } = useMenus(LOCATION_ID);
+  const [selectedProductId, setSelectedProductId] = useState<string>("");
+  const openProduct = useCallback((id: string) => setSelectedProductId(id), []);
+  const closeProduct = useCallback(() => setSelectedProductId(""), []);
+
+  const [title, setTitle] = useState("Tomodachi Sushii");
+  useEffect(() => {
+    getLocationById(LOCATION_ID)
+      .then((d) => setTitle(d?.restaurantDisplayName ?? "Tomodachi Sushii"))
+      .catch(() => setTitle("Tomodachi Sushii"));
+  }, []);
+
+  const menu: BundleMenu | undefined = menus?.[0];
+
+  // Tabs from categories
+  const menuCategories =
+    menu?.categories?.map((c: BundleCategory) => ({
+      id: c.id,
+      label: c.name,
+    })) ?? [];
+
+  // Build items for a visible section from category.products (no separate products hook)
+  const getProductsForCategory = (category: BundleCategory) => {
+    if (!category?.products?.length) return [];
+    return category.products.map((product) => ({
+      id: product.id,
+      name: product.name,
+      description: product.description ?? "",
+      price:
+        typeof product.price === "string"
+          ? parseFloat(product.price)
+          : product.price,
+      image: product.images?.[0] || null,
+      category: "signature" as const,
+      calories: 0,
+      isNew: false,
+      isPopular: false,
+      isGlutenFree: false,
+    }));
+  };
+
+  const [activeSection, setActiveSection] = useState<string>(
+    menuCategories[0]?.id ?? ""
+  );
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
+
   const scrollToSection = (sectionId: string) => {
     const section = sectionRefs.current[sectionId];
     if (section && scrollContainerRef.current) {
       const container = scrollContainerRef.current;
       const sectionTop = section.offsetTop - container.offsetTop;
-      container.scrollTo({
-        top: sectionTop - 20, // Small offset
-        behavior: "smooth",
-      });
+      container.scrollTo({ top: sectionTop - 20, behavior: "smooth" });
     }
   };
 
-  // Update active section based on scroll position
   useEffect(() => {
     const handleScroll = () => {
       if (!scrollContainerRef.current) return;
-
       const container = scrollContainerRef.current;
       const scrollTop = container.scrollTop;
 
-      let currentSection = "nigiri";
-      let closestDistance = Infinity;
+      let current = menuCategories[0]?.id ?? "";
+      let closest = Infinity;
 
-      Object.entries(sectionRefs.current).forEach(
-        ([sectionId, sectionElement]) => {
-          if (sectionElement) {
-            // Get the position of the section relative to the container
-            const sectionTop = sectionElement.offsetTop;
-            // Calculate distance from current scroll position
-            const distance = Math.abs(scrollTop - sectionTop);
-
-            if (distance < closestDistance) {
-              closestDistance = distance;
-              currentSection = sectionId;
-            }
-          }
+      for (const id of menuCategories.map((c) => c.id)) {
+        const el = sectionRefs.current[id];
+        if (!el) continue;
+        const distance = Math.abs(scrollTop - el.offsetTop);
+        if (distance < closest) {
+          closest = distance;
+          current = id;
         }
-      );
-
-      setActiveSection(currentSection);
+      }
+      setActiveSection(current);
     };
 
     const container = scrollContainerRef.current;
     if (container) {
       container.addEventListener("scroll", handleScroll);
-      // Call once to set initial state
       handleScroll();
       return () => container.removeEventListener("scroll", handleScroll);
     }
-  }, []);
+  }, [menuCategories]);
 
   return (
     <div className="flex flex-col lg:flex-row items-start p-3 md:p-6 relative bg-backgrounddefault min-h-screen lg:h-screen lg:overflow-hidden">
-      {/* Hero Section - Mobile: Reduced height, Desktop: Full side */}
+      {/* Hero */}
       <div className="relative w-full lg:flex-1 lg:grow h-[40vh] sm:h-[50vh] lg:h-full bg-black rounded-2xl overflow-hidden mb-4 lg:mb-0 lg:mr-4">
         <div className="relative w-full h-full bg-[url(/images/sushi/hero-background.png)] bg-cover bg-center">
-          {/* Gradient overlay */}
           <div className="absolute w-full h-[60%] lg:h-[381px] bottom-0 left-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,1)_100%)]">
-            {/* Menu Title - Responsive sizing */}
             <div className="absolute bottom-4 sm:bottom-6 lg:bottom-8 left-4 sm:left-8 lg:left-16 font-heading-large text-textdefault text-4xl sm:text-6xl lg:text-[112px] tracking-[1px] sm:tracking-[1.5px] lg:tracking-[2px] leading-none">
               MENU
             </div>
           </div>
-
-          {/* Navbar - Responsive positioning */}
           <header className="absolute top-3 sm:top-6 lg:top-12 left-3 sm:left-6 lg:left-12 right-3 sm:right-6 lg:right-auto">
-            <Navbar />
+            <Navbar title={title} />
           </header>
         </div>
       </div>
 
-      {/* Menu Content - Mobile: Full width, Desktop: Right side */}
+      {/* Menu Content */}
       <div className="flex flex-col items-start relative w-full lg:flex-1 lg:grow h-auto lg:h-full lg:min-h-0">
         <Card className="flex flex-col items-start gap-4 lg:gap-6 pt-4 sm:pt-6 lg:pt-8 pb-0 px-4 sm:px-6 lg:px-12 relative self-stretch w-full h-auto lg:h-full rounded-2xl border border-solid border-borderdefault bg-backgrounddefault overflow-hidden">
           <CardContent className="flex flex-col items-start gap-4 lg:gap-8 relative self-stretch w-full p-0">
-            {/* Category Tabs - Touch-friendly on mobile */}
+            {/* Tabs */}
             <div className="flex gap-1 sm:gap-2 relative self-stretch w-full items-center justify-center p-1 sm:p-2 rounded-xl">
               <div className="flex items-center justify-center gap-1 relative flex-1 grow">
                 {menuCategories.map((category) => (
@@ -131,39 +151,46 @@ const Menu = () => {
             </div>
           </CardContent>
 
-          {/* Scrollable Menu Sections */}
+          {/* Scrollable Sections */}
           <div
             ref={scrollContainerRef}
             className="flex flex-col items-start gap-6 lg:gap-8 relative self-stretch w-full flex-1 overflow-y-scroll px-0 pb-6 lg:pb-8 min-h-0 scrollbar-hide"
             style={{ scrollbarGutter: "stable" }}
           >
-            <TomodachiMenuSection
-              title="NIGIRI & SASHIMI"
-              items={nigiriItems}
-              sectionId="nigiri"
-              onSectionMount={(id, element) => {
-                sectionRefs.current[id] = element;
-              }}
-            />
-            <TomodachiMenuSection
-              title="SEASONAL ROLLS & HANDROLLS"
-              items={uramakiItems}
-              sectionId="uramaki"
-              onSectionMount={(id, element) => {
-                sectionRefs.current[id] = element;
-              }}
-            />
-            <TomodachiMenuSection
-              title="CHEF'S CREATIONS & WARM DISHES"
-              items={specialRollsItems}
-              sectionId="special"
-              onSectionMount={(id, element) => {
-                sectionRefs.current[id] = element;
-              }}
-            />
+            {menusLoading && (
+              <div className="px-4 py-8 opacity-60">Loading menu…</div>
+            )}
+            {menusError && !menusLoading && (
+              <div className="px-4 py-8 text-red-500">Failed to load menu.</div>
+            )}
+
+            {!menusLoading &&
+              !menusError &&
+              menu?.categories?.map((category) => (
+                <TomodachiMenuSection
+                  key={category.id}
+                  title={category.name}
+                  items={getProductsForCategory(category)}
+                  sectionId={category.id}
+                  onSectionMount={(id, el) => {
+                    sectionRefs.current[id] = el;
+                  }}
+                  onItemClick={(id: string) => openProduct(id)}
+                />
+              ))}
           </div>
         </Card>
       </div>
+
+      {selectedProductId && (
+        <ProductDescriptionDialog
+          productId={selectedProductId}
+          locationId={LOCATION_ID}
+          cartId={CART_ID_FALLBACK}
+          isAddToCartBlocked={false}
+          onClose={closeProduct}
+        />
+      )}
     </div>
   );
 };

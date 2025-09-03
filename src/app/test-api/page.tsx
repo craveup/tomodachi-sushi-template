@@ -3,14 +3,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { getLocation, createCart } from "@/lib/api/cart";
+import { location_Id as LOCATION_ID } from "@/constants";
 
 export default function TestAPIPage() {
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const locationId =
-    process.env.NEXT_PUBLIC_LOCATION_ID || "687336d833c0e05514856061";
+  const locationId = LOCATION_ID;
 
   const testLocationAPI = async () => {
     setLoading(true);
@@ -53,7 +53,7 @@ export default function TestAPIPage() {
           </div>
           <div>
             <strong>API Base URL:</strong>{" "}
-            {process.env.NEXT_PUBLIC_STORE_FRONT_API_URL}
+            {process.env.NEXT_PUBLIC_API_URL}
           </div>
           <div>
             <strong>API Key:</strong>{" "}

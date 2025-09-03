@@ -35,7 +35,7 @@ const ThankYouContent = () => {
     <div className="min-h-screen bg-backgrounddefault">
       {/* Header */}
       <header className="absolute top-6 left-6 lg:top-12 lg:left-12 z-20">
-        <Navbar />
+        <Navbar title="Tomodachi Sushi" />
       </header>
 
       <main className="pt-32 pb-12">

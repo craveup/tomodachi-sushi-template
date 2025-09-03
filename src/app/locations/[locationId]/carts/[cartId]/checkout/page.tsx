@@ -3,7 +3,7 @@ import Checkout from "./Checkout";
 
 export async function generateMetadata() {
   return {
-    title: "Checkout - Leclerc Bakery",
+    title: "Checkout - Tomodachi Sushi",
   };
 }
 
