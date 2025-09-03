@@ -500,53 +500,6 @@ export default function RestaurantHeaderDemo() {
     component: lazy(() => import("./payment-method-modal-demo")),
     source: `"use client"
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import PaymentMethodModal from "../ui/modals/payment-method-modal"
-import { CreditCard } from "lucide-react"
-
-export default function PaymentMethodModalDemo() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [savedPayment, setSavedPayment] = useState<any>(null)
-
-  const handleSave = (paymentData: any) => {
-    setSavedPayment(paymentData)
-    setIsOpen(false)
-  }
-
-  return (
-    <div className="w-full max-w-lg mx-auto space-y-4">
-      <Button onClick={() => setIsOpen(true)} className="flex items-center gap-2">
-        <CreditCard className="w-4 h-4" />
-        Add Payment Method
-      </Button>
-
-      <PaymentMethodModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        onSave={handleSave}
-        initialPaymentType="card"
-      />
-
-      {savedPayment && (
-        <Card className="p-4 bg-green-50 border-green-200">
-          <div className="text-sm text-green-800">
-            Payment method added: {savedPayment.type}
-          </div>
-        </Card>
-      )}
-    </div>
-  )
-}`,
-    files: ["registry/default/example/payment-method-modal-demo.tsx"],
-  },
-  "cart-sidebar": {
-    name: "cart-sidebar",
-    type: "components:example",
-    registryDependencies: ["cart-sidebar"],
-    component: lazy(() => import("./cart-sidebar-demo")),
-    source: `"use client"
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
