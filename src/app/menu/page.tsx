@@ -14,6 +14,7 @@ import {
 } from "@/constants";
 import useMenus from "@/hooks/useMenus";
 import type { BundleCategory, BundleMenu } from "@/types/menus";
+import { CircularLoader } from "@/components/ui/CircularLoader";
 
 export const dynamic = "force-dynamic";
 
@@ -154,7 +155,7 @@ const Menu = () => {
                     }`}
                   >
                     <span className="font-text-meta text-xs sm:text-xs tracking-wider leading-tight whitespace-nowrap text-center">
-                      {category.label}
+                      {category.label.split("&")[0].trim()}
                     </span>
                   </button>
                 ))}
@@ -169,7 +170,9 @@ const Menu = () => {
             style={{ scrollbarGutter: "stable" }}
           >
             {menusLoading && (
-              <div className="px-4 py-8 opacity-60">Loading menu…</div>
+              <div className="text-center mx-auto">
+                <CircularLoader />
+              </div>
             )}
             {menusError && !menusLoading && (
               <div className="px-4 py-8 text-red-500">Failed to load menu.</div>
