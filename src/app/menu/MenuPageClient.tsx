@@ -7,12 +7,12 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { TomodachiMenuSection } from "../components/tomodachi-menu-section";
 import ProductDescriptionDialog from "../components/product-description/ProductDescriptionDialog";
 import {
-    cart_Id as CART_ID_FALLBACK,
     location_Id as LOCATION_ID,
 } from "@/constants";
 import useMenus from "@/hooks/useMenus";
 import type { BundleCategory, BundleMenu } from "@/types/menus";
 import {CircularLoader} from "@/components/ui/CircularLoader";
+import {useCartStore} from "@/store/cart-store";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +25,7 @@ const MenuPageClient = () => {
     const [selectedProductId, setSelectedProductId] = useState<string>("");
     const openProduct = useCallback((id: string) => setSelectedProductId(id), []);
     const closeProduct = useCallback(() => setSelectedProductId(""), []);
-
+    const {cartId} = useCartStore();
     const menu: BundleMenu | undefined = menus?.[0];
 
     // Tabs from categories
@@ -177,7 +177,7 @@ const MenuPageClient = () => {
                 <ProductDescriptionDialog
                     productId={selectedProductId}
                     locationId={LOCATION_ID}
-                    cartId={CART_ID_FALLBACK}
+                    cartId={cartId}
                     isAddToCartBlocked={false}
                     onClose={closeProduct}
                 />
