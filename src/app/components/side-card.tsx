@@ -49,7 +49,7 @@ export default function SideCard({
                   <Button
                     variant="outline"
                     size="icon"
-                    className="w-8 h-8 bg-backgroundmuted rounded-full border-borderdefault hover:bg-white transition-colors group flex-shrink-0"
+                    className="w-8 h-8 bg-backgroundmuted cursor-pointer rounded-full border-borderdefault hover:bg-white transition-colors group flex-shrink-0"
                   >
                     <ArrowRight className="w-4 h-4 text-icondefault group-hover:text-gray-600 transition-colors" />
                   </Button>
@@ -58,7 +58,7 @@ export default function SideCard({
                 <Button
                   variant="outline"
                   size="icon"
-                  className="w-8 h-8 bg-backgroundmuted rounded-full border-borderdefault hover:bg-white transition-colors group flex-shrink-0"
+                  className="w-8 h-8 bg-backgroundmuted cursor-pointer rounded-full border-borderdefault hover:bg-white transition-colors group flex-shrink-0"
                 >
                   <ArrowRight className="w-4 h-4 text-icondefault group-hover:text-gray-600 transition-colors" />
                 </Button>

@@ -63,7 +63,7 @@ export default async function TomodachiFrontpage() {
                         key={index}
                         variant="outline"
                         size="icon"
-                        className="w-9 h-9 bg-backgroundmuted rounded-full border-borderdefault hover:bg-blend-color-dodge hover:text-textinverse transition-colors"
+                        className="w-9 h-9 bg-backgroundmuted rounded-full cursor-pointer border-borderdefault hover:bg-blend-color-dodge hover:text-textinverse transition-colors"
                       >
                         <social.icon className="w-[18px] h-[18px] text-icondefault" />
                       </Button>

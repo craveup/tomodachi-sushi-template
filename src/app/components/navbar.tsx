@@ -100,7 +100,7 @@ export const Navbar = ({ title }: NavbarProps) => {
                 <Link key={item.label} href={item.href}>
                   <Button
                     variant="ghost"
-                    className={`inline-flex items-center justify-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
+                    className={`inline-flex cursor-pointer items-center justify-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
                       isBook
                         ? "group bg-backgroundmuted border border-borderdefault hover:bg-backgroundprimary hover:text-textinverse"
                         : item.isActive
@@ -134,7 +134,7 @@ export const Navbar = ({ title }: NavbarProps) => {
             aria-controls="cart-sidebar"
             className="flex items-center justify-center w-[44px] h-[44px] bg-backgroundmuted rounded-lg border border-borderdefault hover:bg-backgroundmuted flex-shrink-0"
           >
-            <div className="relative">
+            <div className="relative cursor-pointer">
               <ShoppingCart className="w-5 h-5 text-icondefault" />
               {itemCount > 0 && (
                 <span
