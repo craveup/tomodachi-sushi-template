@@ -22,6 +22,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {location_Id} from "@/constants";
+import {useCartStore} from "@/store/cart-store";
 
 interface CartItem {
   id: string;
@@ -109,7 +110,9 @@ function CartSidebarContent({
 
   const locationId = location_Id;
   const searchParams = useSearchParams();
-  const cartId = searchParams.get("cartId") || routeCartId;
+  const cartStore = useCartStore();
+
+  const cartId = searchParams.get("cartId") || routeCartId || cartStore.cartId;
 
   const {
     cart,
@@ -117,10 +120,6 @@ function CartSidebarContent({
     isLoading: cartLoading,
     isValidating: cartValidating,
   } = useCart({ locationId, cartId });
-
-  const hasExternalCartItems = Boolean(cartItems?.length);
-  const showCartSkeleton =
-    !hasExternalCartItems && !cart && (cartLoading || cartValidating);
 
   const [busyLineId, setBusyLineId] = useState<string | null>(null);
   const [productIdToOpen, setProductIdToOpen] = useState<string>("");
@@ -257,7 +256,7 @@ function CartSidebarContent({
         {/* Items */}
         <div className="flex-1 overflow-y-auto scrollbar-hide">
           <div className="p-6">
-            {showCartSkeleton ? (
+            {cartLoading ? (
               <div className="space-y-4">
                 {Array.from({ length: 3 }).map((_, i) => (
                   <div
