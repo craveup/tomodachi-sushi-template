@@ -1,43 +1,73 @@
 // src/hooks/useCart.ts
-import { useParams } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
 import { useApiResource } from "./useApiResource";
 import { CartResponse } from "@/types/cart-types";
-import {
-  cart_Id as CART_ID_FALLBACK,
-  location_Id as LOCATION_ID,
-} from "@/constants";
+import { location_Id as DEFAULT_LOCATION_ID, DEFAULT_FULFILLMENT_METHOD } from "@/constants";
+import { useCartStore } from "@/store/cart-store";
+import { getCartId } from "@/lib/local-storage";
 
 type UseCartOptions = {
   locationId?: string;
-  cartId?: string;
+  cartId?: string | null;
   shouldFetch?: boolean;
 };
 
 export function useCart(options: UseCartOptions = {}) {
-  const routeParams = useParams<{ locationId?: string; cartId?: string }>();
+  const defaultLocationId = DEFAULT_LOCATION_ID;
+  const locationId = options.locationId ?? defaultLocationId;
+  const { cartId: storeCartId, setCartIdState } = useCartStore();
+  const [resolvedCartId, setResolvedCartId] = useState<string | null>(
+    options.cartId ?? storeCartId ?? null
+  );
 
-  const locationId =
-    options.locationId ?? routeParams?.locationId ?? LOCATION_ID;
-  const cartId = options.cartId ?? routeParams?.cartId ?? CART_ID_FALLBACK;
+  useEffect(() => {
+    if (!locationId) return;
 
-  // default true, but auto disables if IDs are missing
-  const shouldFetch = options.shouldFetch ?? true;
-  const effectiveShouldFetch = shouldFetch && Boolean(locationId && cartId);
+    if (options.cartId) {
+      setResolvedCartId(options.cartId);
+      if (options.cartId !== storeCartId) {
+        setCartIdState(options.cartId);
+      }
+      return;
+    }
+
+    if (storeCartId) {
+      setResolvedCartId(storeCartId);
+      return;
+    }
+
+    const storedCartId = getCartId(locationId, DEFAULT_FULFILLMENT_METHOD) || null;
+    if (storedCartId) {
+      setResolvedCartId(storedCartId);
+      setCartIdState(storedCartId);
+    }
+  }, [locationId, options.cartId, setCartIdState, storeCartId]);
+
+  const shouldFetchBase = options.shouldFetch ?? true;
+  const shouldFetch = Boolean(
+    shouldFetchBase && locationId && resolvedCartId
+  );
+
+  const endpoint =
+    shouldFetch && locationId && resolvedCartId
+      ? `/api/v1/locations/${locationId}/carts/${resolvedCartId}`
+      : null;
 
   const { data, error, errorMessage, isLoading, isValidating, mutate } =
-    useApiResource<CartResponse>(
-      effectiveShouldFetch && locationId && cartId
-        ? `/api/v1/locations/${locationId}/carts/${cartId}`
-        : null
-    );
+    useApiResource<CartResponse>(endpoint, { shouldFetch });
 
   return {
     cart: data,
+    cartId: resolvedCartId,
+    locationId,
     error,
     errorMessage,
     isLoading,
     isValidating,
     mutate,
-    shouldFetch: effectiveShouldFetch,
+    shouldFetch,
   };
 }
+

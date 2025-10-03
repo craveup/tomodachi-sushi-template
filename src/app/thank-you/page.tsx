@@ -5,7 +5,9 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Star } from "lucide-react";
-import {removeCartCartId} from "@/lib/local-storage";
+import { removeCartCartId } from "@/lib/local-storage";
+import { DEFAULT_FULFILLMENT_METHOD } from "@/constants";
+import { location_Id as LOCATION_ID } from "@/constants";
 
 const ThankYouContent = () => {
   const searchParams = useSearchParams();
@@ -13,7 +15,7 @@ const ThankYouContent = () => {
   const [hoveredRating, setHoveredRating] = useState(0);
 
   const displayName = searchParams.get("displayName") || "Tomodachi Sushi";
-  const locationId = searchParams.get("locationId");
+  const locationId = searchParams.get("locationId") ?? LOCATION_ID;
   const cartId = searchParams.get("cartId");
 
   useEffect(() => {
@@ -25,7 +27,7 @@ const ThankYouContent = () => {
     }
 
 
-    removeCartCartId(locationId);
+    removeCartCartId(locationId, DEFAULT_FULFILLMENT_METHOD);
   }, []);
 
   const handleRatingClick = (value: number) => {
@@ -183,3 +185,6 @@ const ThankYouPage = () => {
 };
 
 export default ThankYouPage;
+
+
+

@@ -1,24 +1,31 @@
-import { getCartId } from "@/lib/local-storage";
 import { useCart } from "@/hooks/useCart";
 import { useApiResource } from "@/hooks/useApiResource";
-import { BundleMenu } from "@/types/menus";
+import type { MenusResponse } from "@/types/menus";
+import { location_Id as DEFAULT_LOCATION_ID } from "@/constants";
 
-const useMenus = (locationId: string, isEnabled = true) => {
-  const cartId = getCartId(locationId);
+type UseMenusOptions = {
+  locationId?: string;
+  isEnabled?: boolean;
+};
 
-  const { cart: cartData } = useCart({
-    locationId: locationId,
-    cartId: cartId!,
+const useMenus = ({ locationId: overrideLocationId, isEnabled = true }: UseMenusOptions = {}) => {
+  const { cart, cartId, locationId: cartLocationId } = useCart({
+    locationId: overrideLocationId ?? undefined,
   });
 
+  const locationId = overrideLocationId ?? cartLocationId ?? cart?.locationId ?? DEFAULT_LOCATION_ID;
+  const orderDate = cart?.orderDate;
+  const orderTime = cart?.orderTime;
+
   const shouldFetch = Boolean(
-    isEnabled && cartData?.orderDate && cartData?.orderTime
+    isEnabled && locationId && cartId && orderDate && orderTime,
   );
 
-  return useApiResource<BundleMenu[]>(
-    `/api/v1/locations/${locationId}/menus?orderDate=${cartData?.orderDate}&orderTime=${cartData?.orderTime}`,
-    { shouldFetch }
-  );
+  const endpoint = shouldFetch
+    ? `/api/v1/locations/${locationId}/menus?orderDate=${orderDate}&orderTime=${orderTime}`
+    : null;
+
+  return useApiResource<MenusResponse>(endpoint, { shouldFetch });
 };
 
 export default useMenus;

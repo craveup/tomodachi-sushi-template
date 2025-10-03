@@ -6,7 +6,7 @@ import { X, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { useFormatters } from "@/lib/i18n/hooks";
 import { useCart } from "@/hooks/useCart";
-import {useParams, useRouter, useSearchParams} from "next/navigation";
+import { useRouter } from "next/navigation";
 import { patchData } from "@/lib/handle-api";
 import { formatApiError } from "@/lib/format-api-error";
 import { toast } from "sonner";
@@ -21,7 +21,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {location_Id} from "@/constants";
+import { location_Id as DEFAULT_LOCATION_ID } from "@/constants";
 
 interface CartItem {
   id: string;
@@ -103,20 +103,16 @@ function CartSidebarContent({
   const router = useRouter();
   const { currency } = useFormatters();
 
-  const { cartId: routeCartId } = useParams<{
-    cartId: string;
-  }>();
-
-  const locationId = location_Id;
-  const searchParams = useSearchParams();
-  const cartId = searchParams.get("cartId") || routeCartId;
-
   const {
     cart,
+    cartId,
+    locationId: resolvedLocationId,
     mutate,
     isLoading: cartLoading,
     isValidating: cartValidating,
-  } = useCart({ locationId, cartId });
+  } = useCart();
+
+  const locationId = resolvedLocationId ?? DEFAULT_LOCATION_ID;
 
   const hasExternalCartItems = Boolean(cartItems?.length);
   const showCartSkeleton =
@@ -218,10 +214,24 @@ function CartSidebarContent({
     setQuantity(lineId, Math.max(0, qty - 1));
   const handleRemove = (lineId: string) => setQuantity(lineId, 0);
 
-  const handleCheckout = async () => {
+  const handleCheckoutFallback = async () => {
     if (!apiItems.length) return;
-    await mutate();
-    router.push(`/locations/${location_Id}/carts/${cartId}/checkout`);
+    if (cartId) {
+      await mutate();
+    }
+    router.push("/checkout");
+  };
+
+  const handleCheckoutClick = async () => {
+    if (onCheckout) {
+      if (cartId) {
+        await mutate();
+      }
+      onCheckout();
+      return;
+    }
+
+    await handleCheckoutFallback();
   };
 
   if (!isOpen) return null;
@@ -428,7 +438,8 @@ function CartSidebarContent({
                   onClose={() => setProductIdToOpen("")}
                   locationId={locationId}
                   productId={productIdToOpen}
-                  cartId={cartId}
+                  cartId={cartId ?? ""}
+                  isAddToCartBlocked={!cartId}
                 />
               )}
             </div>
@@ -438,7 +449,7 @@ function CartSidebarContent({
         {/* Footer */}
         <div className="border-t border-borderdefault p-6 bg-backgrounddefault">
           <Button
-            onClick={handleCheckout ?? onCheckout}
+            onClick={handleCheckoutClick}
             className="w-full h-14 text-base font-heading-h6 tracking-wider bg-backgroundprimary hover:bg-backgroundprimary/90 text-textinverse rounded-2xl disabled:opacity-60"
             size="lg"
             data-testid="CheckoutButton"
@@ -462,3 +473,11 @@ export default function CartSidebar(props: CartSidebarProps) {
     </Suspense>
   );
 }
+
+
+
+
+
+
+
+

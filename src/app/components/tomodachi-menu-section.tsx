@@ -2,7 +2,6 @@
 
 import React, { useState, Suspense } from "react";
 import Image from "next/image";
-import {useParams, useSearchParams} from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Plus } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
@@ -10,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/useCart";
 import { postData } from "@/lib/handle-api";
 import { formatApiError } from "@/lib/format-api-error";
-import {location_Id as LOCATION_ID, location_Id} from "@/constants";
+import { location_Id as LOCATION_ID } from "@/constants";
 import type { MenuItem } from "../types";
 import { ItemUnavailableActions } from "./product-description/ProductDescription";
 
@@ -23,6 +22,8 @@ interface MenuSectionProps {
   locationId?: string;
 }
 
+const IMAGE_FALLBACK = "/images/sushi/menu-items/sushi-plate.jpg";
+
 const TomodachiMenuSectionContent = ({
   title,
   items,
@@ -31,16 +32,10 @@ const TomodachiMenuSectionContent = ({
   onItemClick,
   locationId: propLocationId,
 }: MenuSectionProps) => {
-  const params = useParams<{ locationId?: string }>();
-  const searchParams = useSearchParams();
-  const locationId =
-    (params?.locationId as string | undefined) ?? propLocationId ?? LOCATION_ID;
-  const cartId = searchParams.get("cartId");
-
-  const { mutate, isLoading } = useCart({ locationId: location_Id, cartId: cartId! });
+  const locationId = propLocationId ?? LOCATION_ID;
+  const { cartId, mutate } = useCart({ locationId });
 
   const [busyId, setBusyId] = useState<string | null>(null);
-
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   const handleImageError = (itemId: string) =>
@@ -52,8 +47,8 @@ const TomodachiMenuSectionContent = ({
   ): Promise<void> => {
     e.stopPropagation();
 
-    if (!location_Id || !cartId) {
-      toast.error("Cart is not ready. Please refresh.");
+    if (!locationId || !cartId) {
+      toast.error("Cart is not ready. Please try again in a moment.");
       return;
     }
 
@@ -83,109 +78,110 @@ const TomodachiMenuSectionContent = ({
     }
   };
 
+  const cartUnavailable = !cartId;
+
   return (
     <section
       ref={(el) => {
         if (sectionId && onSectionMount) onSectionMount(sectionId, el);
       }}
-      className="flex flex-col items-start gap-4 sm:gap-6 lg:gap-8 relative w-full"
+      className="flex flex-col gap-5 sm:gap-7 lg:gap-9"
     >
-      {/* Section header */}
-      <div className="flex items-center justify-center gap-2 sm:gap-3 lg:gap-4 relative self-stretch w-full">
-        <div className="inline-flex items-center justify-center px-0 py-[7px] relative">
-          <div className="relative w-1.5 h-1.5 sm:w-2 sm:h-2 border border-solid border-borderdefault -rotate-45" />
-          <Separator className="relative w-[30px] sm:w-[40px] lg:w-[50px] h-px bg-borderdefault" />
+      <div className="flex items-center justify-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-2">
+          <Separator className="h-px w-8 bg-borderdefault sm:w-12" />
+          <span className="block h-2 w-2 rotate-45 border border-borderdefault" />
         </div>
-        <h2 className="font-heading-h3 text-textdefault text-xl sm:text-2xl lg:text-[32px] tracking-[0.5px] sm:tracking-[0.75px] lg:tracking-[1px] leading-tight whitespace-nowrap">
+        <h2 className="font-heading-h3 text-textdefault text-xl sm:text-2xl lg:text-[32px] tracking-[0.5px] sm:tracking-[0.75px] lg:tracking-[1px] leading-tight uppercase">
           {title}
         </h2>
-        <div className="inline-flex items-center justify-center px-0 py-[7px] relative">
-          <Separator className="relative w-[30px] sm:w-[40px] lg:w-[50px] h-px bg-borderdefault" />
-          <div className="relative w-1.5 h-1.5 sm:w-2 sm:h-2 border border-solid border-borderdefault -rotate-45" />
+        <div className="flex items-center gap-2">
+          <span className="block h-2 w-2 rotate-45 border border-borderdefault" />
+          <Separator className="h-px w-8 bg-borderdefault sm:w-12" />
         </div>
       </div>
 
-      {/* Items */}
-      <div className="flex flex-col items-start gap-4 sm:gap-5 lg:gap-6 relative w-full">
+      <div className="flex flex-col gap-4 sm:gap-5">
         {items.map((item) => {
           const isBusy = busyId === item.id;
+          const itemImage = imageErrors[item.id] ? IMAGE_FALLBACK : item.image || IMAGE_FALLBACK;
+
           return (
-            <div
+            <article
               key={item.id}
               onClick={() => onItemClick?.(item.id)}
-              className="flex items-start gap-3 sm:gap-4 lg:gap-6 relative w-full min-h-[100px] sm:min-h-[110px] lg:min-h-[120px]"
+              className="group relative flex flex-col rounded-2xl border border-borderdefault/60 bg-backgroundmuted/10 p-4 sm:p-5 transition hover:border-backgroundprimary/60 hover:bg-backgroundmuted/20"
             >
-              {/* Image */}
-              <div className="relative w-[80px] h-[80px] sm:w-[100px] sm:h-[100px] lg:w-[120px] lg:h-[120px] flex-shrink-0 overflow-hidden rounded-xl sm:rounded-xl lg:rounded-2xl bg-backgroundmuted">
-                {imageErrors[item.id] ? (
-                  <div className="w-full h-full bg-backgroundmuted flex items-center justify-center">
-                    <svg
-                      className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-textmuted"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                  </div>
-                ) : (
+              <div className="flex items-start gap-4 sm:gap-5">
+                <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-backgroundmuted sm:h-24 sm:w-24">
                   <Image
-                    src={
-                      item.image || "/images/sushi/menu-items/sushi-plate.jpg"
-                    }
+                    src={itemImage}
                     alt={item.name}
                     fill
-                    className="object-cover transition-opacity duration-300"
-                    sizes="(max-width: 640px) 80px, (max-width: 768px) 100px, 120px"
-                    loading="lazy"
+                    className="object-cover"
+                    sizes="96px"
                     onError={() => handleImageError(item.id)}
                   />
-                )}
-              </div>
-
-              {/* Content */}
-              <div className="flex flex-col items-start gap-2 sm:gap-2.5 lg:gap-3 relative flex-1 min-w-0">
-                <div className="flex items-start justify-between relative self-stretch w-full">
-                  <h3 className="relative flex-1 min-w-0 font-heading-h5 text-textdefault text-base sm:text-lg lg:text-[22px] tracking-[0.5px] sm:tracking-[0.75px] lg:tracking-[1px] leading-tight pr-2 sm:pr-3 lg:pr-4">
-                    {item.name}
-                  </h3>
-
-                  <div className="flex items-center gap-2 sm:gap-2.5 lg:gap-3 flex-shrink-0">
-                    <span className="relative font-heading-h5 text-textdefault text-base sm:text-lg lg:text-[22px] tracking-[0.5px] sm:tracking-[0.75px] lg:tracking-[1px] leading-tight whitespace-nowrap">
-                      ${item.price.toFixed(2)}
-                    </span>
-
-                    {/* Add button -> posts to backend cart */}
-                    <button
-                      onClick={(e) => handleAddToCart(e, item)}
-                      disabled={isBusy}
-                      className="w-8 h-8 sm:w-9 sm:h-9 lg:w-8 lg:h-8 bg-backgroundprimary hover:bg-backgroundprimary/90 active:bg-backgroundprimary/80 rounded-full flex items-center justify-center transition-colors disabled:opacity-50 touch-manipulation"
-                      aria-label={
-                        isBusy
-                          ? `Adding ${item.name}…`
-                          : `Add ${item.name} to cart`
-                      }
-                      aria-busy={isBusy}
-                    >
-                      {isBusy ? (
-                        <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 lg:w-4 lg:h-4 animate-spin text-textinverse" />
-                      ) : (
-                        <Plus className="w-4 h-4 sm:w-5 sm:h-5 lg:w-4 lg:h-4 text-textinverse" />
-                      )}
-                    </button>
-                  </div>
                 </div>
 
-                <p className="relative self-stretch font-text-small text-textmuted text-xs sm:text-sm lg:text-[14px] leading-relaxed line-clamp-2 sm:line-clamp-3">
-                  {item.description}
-                </p>
+                <div className="flex min-w-0 flex-1 flex-col gap-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 space-y-1">
+                      <h3 className="truncate font-heading-h5 text-lg text-textdefault sm:text-xl">
+                        {item.name}
+                      </h3>
+                      {item?.subtitle && (
+                        <p className="truncate text-xs uppercase tracking-[0.25em] text-textmuted/70">
+                          {item.subtitle}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex flex-shrink-0 items-center gap-2">
+                      <span className="rounded-full bg-backgroundmuted px-3 py-1 text-sm font-semibold text-textdefault">
+                        ${item.price.toFixed(2)}
+                      </span>
+                      <button
+                        onClick={(e) => handleAddToCart(e, item)}
+                        disabled={isBusy || cartUnavailable}
+                        className="flex h-9 w-9 items-center justify-center rounded-full bg-backgroundprimary text-textinverse transition hover:bg-backgroundprimary/90 disabled:cursor-not-allowed disabled:opacity-50"
+                        aria-label={
+                          isBusy
+                            ? `Adding ${item.name}`
+                            : `Add ${item.name} to cart`
+                        }
+                        aria-busy={isBusy}
+                      >
+                        {isBusy ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Plus className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {item.description && (
+                    <p className="text-sm text-textmuted/90 sm:text-base line-clamp-3">
+                      {item.description}
+                    </p>
+                  )}
+
+                  {Array.isArray(item.badges) && item.badges.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {item.badges.map((badge) => (
+                        <span
+                          key={badge}
+                          className="rounded-full border border-borderdefault px-2 py-0.5 text-xs uppercase tracking-wide text-textmuted"
+                        >
+                          {badge}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            </article>
           );
         })}
       </div>
@@ -200,3 +196,4 @@ export const TomodachiMenuSection = (props: MenuSectionProps) => {
     </Suspense>
   );
 };
+

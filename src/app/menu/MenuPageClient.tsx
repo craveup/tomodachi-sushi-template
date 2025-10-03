@@ -1,46 +1,64 @@
-/// app/menu/page.tsx
-
 "use client";
 
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { TomodachiMenuSection } from "../components/tomodachi-menu-section";
-import ProductDescriptionDialog from "../components/product-description/ProductDescriptionDialog";
-import {
-  cart_Id as CART_ID_FALLBACK,
-  location_Id as LOCATION_ID,
-} from "@/constants";
+import { CircularLoader } from "@/components/ui/CircularLoader";
+import { useCart } from "@/hooks/useCart";
 import useMenus from "@/hooks/useMenus";
 import type { BundleCategory, BundleMenu } from "@/types/menus";
-import { CircularLoader } from "@/components/ui/CircularLoader";
+import { location_Id as LOCATION_ID } from "@/constants";
+import { MenuSwitcher } from "@/app/components/menu/menu-switcher";
+import ProductDescriptionDialog from "../components/product-description/ProductDescriptionDialog";
+import { TomodachiMenuSection } from "../components/tomodachi-menu-section";
 
 export const dynamic = "force-dynamic";
 
 const MenuPageClient = () => {
+  const { cartId, locationId: activeLocationId } = useCart();
+  const locationId = activeLocationId ?? LOCATION_ID;
+
   const {
-    data: menus,
+    data: menusData,
     isLoading: menusLoading,
     error: menusError,
-  } = useMenus(LOCATION_ID);
+  } = useMenus({ locationId });
+
+  const rawMenus = menusData?.menus;
+  const menus = useMemo(() => rawMenus ?? [], [rawMenus]);
+
+  const [selectedMenuId, setSelectedMenuId] = useState<string>(
+    () => menus[0]?.id ?? ""
+  );
   const [selectedProductId, setSelectedProductId] = useState<string>("");
+
   const openProduct = useCallback((id: string) => setSelectedProductId(id), []);
   const closeProduct = useCallback(() => setSelectedProductId(""), []);
 
-  const menu: BundleMenu | undefined = menus?.[0];
+  useEffect(() => {
+    if (!menus.length) {
+      setSelectedMenuId("");
+      return;
+    }
 
-  // Tabs from categories
-  const menuCategories = React.useMemo(
-    () =>
-      (menu?.categories ?? []).map((c: BundleCategory) => ({
-        id: c.id,
-        label: c.name,
-      })),
+    const hasSelectedMenu = menus.some((menu) => menu.id === selectedMenuId);
+    if (!hasSelectedMenu) {
+      setSelectedMenuId(menus[0].id);
+    }
+  }, [menus, selectedMenuId]);
+
+  const menu: BundleMenu | undefined = useMemo(
+    () => menus.find((entry) => entry.id === selectedMenuId) ?? menus[0],
+    [menus, selectedMenuId]
+  );
+
+  const menuCategories = useMemo(
+    () => (menu?.categories ?? []) as BundleCategory[],
     [menu]
   );
 
-  // Build items for a visible section from category.products (no separate products hook)
   const getProductsForCategory = (category: BundleCategory) => {
     if (!category?.products?.length) return [];
+
     return category.products.map((product) => ({
       id: product.id,
       name: product.name,
@@ -58,41 +76,55 @@ const MenuPageClient = () => {
     }));
   };
 
-  const [activeSection, setActiveSection] = useState<string>(
-    menuCategories[0]?.id ?? ""
-  );
+  const [activeSection, setActiveSection] = useState<string>("");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  useEffect(() => {
+    if (!menuCategories.length) {
+      setActiveSection("");
+      return;
+    }
+
+    const currentIsValid = menuCategories.some(
+      (category) => category.id === activeSection
+    );
+
+    if (!currentIsValid) {
+      setActiveSection(menuCategories[0].id);
+    }
+  }, [menuCategories, activeSection]);
 
   const scrollToSection = (sectionId: string) => {
     const section = sectionRefs.current[sectionId];
-    if (section && scrollContainerRef.current) {
-      const container = scrollContainerRef.current;
+    const container = scrollContainerRef.current;
+    if (section && container) {
       const sectionTop = section.offsetTop - container.offsetTop;
       container.scrollTo({ top: sectionTop - 20, behavior: "smooth" });
     }
   };
 
-  // 2) Make the scroll detector use the container-relative top
   useEffect(() => {
     const handleScroll = () => {
-      if (!scrollContainerRef.current) return;
       const container = scrollContainerRef.current;
+      if (!container) return;
       const scrollTop = container.scrollTop;
 
       let current = menuCategories[0]?.id ?? "";
       let closest = Infinity;
 
-      for (const id of menuCategories.map((c) => c.id)) {
-        const el = sectionRefs.current[id];
-        if (!el) continue;
-        const sectionTop = el.offsetTop - container.offsetTop;
+      for (const category of menuCategories) {
+        const element = sectionRefs.current[category.id];
+        if (!element) continue;
+
+        const sectionTop = element.offsetTop - container.offsetTop;
         const distance = Math.abs(scrollTop - sectionTop);
         if (distance < closest) {
           closest = distance;
-          current = id;
+          current = category.id;
         }
       }
+
       setActiveSection(current);
     };
 
@@ -104,80 +136,105 @@ const MenuPageClient = () => {
     }
   }, [menuCategories]);
 
-  useEffect(() => {
-    if (!activeSection && menuCategories.length) {
-      setActiveSection(menuCategories[0].id);
-    }
-  }, [menuCategories, activeSection]);
+  const isInitialLoading = menusLoading && menus.length === 0;
+  const hasMenuData = Boolean(menu && menuCategories.length);
 
   return (
     <>
-      {/* Menu Content */}
       <div className="flex flex-col items-start relative w-full lg:flex-1 lg:grow h-auto lg:h-full lg:min-h-0">
-        <Card className="flex flex-col items-start gap-4 lg:gap-6 pt-4 sm:pt-6 lg:pt-8 pb-0 px-4 sm:px-6 lg:px-12 relative self-stretch w-full h-auto lg:h-full rounded-2xl border border-solid border-borderdefault bg-backgrounddefault overflow-hidden">
-          <CardContent className="flex flex-col items-start gap-4 lg:gap-8 relative self-stretch w-full p-0">
-            {/* Tabs */}
-            <div className="flex gap-1 sm:gap-2 relative self-stretch w-full items-center justify-center p-1 sm:p-2 rounded-xl">
-              <div className="flex items-center justify-center gap-1 relative flex-1 grow">
-                {menuCategories.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => scrollToSection(category.id)}
-                    className={`px-2 sm:px-3 py-2 sm:py-2 inline-flex items-center justify-center gap-2.5 relative rounded-lg overflow-hidden border border-solid transition-colors cursor-pointer min-h-[44px] flex-1 sm:flex-initial ${
-                      activeSection === category.id
-                        ? "border-backgroundprimary bg-backgroundprimary text-textinverse"
-                        : "border-borderdefault bg-backgroundmuted text-textdefault hover:bg-backgroundprimary/10"
-                    }`}
-                  >
-                    <span className="font-text-meta text-xs sm:text-xs tracking-wider leading-tight whitespace-nowrap text-center">
-                      {category.label.split("&")[0].trim()}
-                    </span>
-                  </button>
-                ))}
-              </div>
+        <Card className="relative flex h-full w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-borderdefault bg-backgrounddefault shadow-lg">
+          <CardContent className="relative flex h-full flex-col p-0">
+            <div
+              ref={scrollContainerRef}
+              className="relative flex h-full flex-col overflow-y-auto"
+              style={{ scrollbarGutter: "stable both-edges" }}
+            >
+              {isInitialLoading ? (
+                <div className="flex h-full w-full items-center justify-center">
+                  <CircularLoader />
+                </div>
+              ) : (
+                <>
+                  {menus.length > 0 && (
+                    <div className="px-4 pt-6 pb-4 sm:px-6 lg:px-8">
+                      <MenuSwitcher
+                        menus={menus}
+                        activeMenuId={selectedMenuId}
+                        onChange={(menuId) => setSelectedMenuId(menuId)}
+                      />
+                    </div>
+                  )}
+
+                  {menuCategories.length > 0 && (
+                    <div className="sticky top-0 z-10 border-y border-borderdefault/40 bg-backgrounddefault/95 px-4 py-3 sm:px-6 lg:px-8 backdrop-blur-sm supports-[backdrop-filter]:bg-backgrounddefault/80">
+                      <div className="flex flex-wrap items-center justify-center gap-2">
+                        {menuCategories.map((category) => (
+                          <button
+                            key={category.id}
+                            onClick={() => scrollToSection(category.id)}
+                            className={`px-3 py-2 inline-flex items-center justify-center gap-2 rounded-lg border border-solid transition-colors cursor-pointer min-h-[40px] ${
+                              activeSection === category.id
+                                ? "border-backgroundprimary bg-backgroundprimary text-textinverse"
+                                : "border-borderdefault bg-backgroundmuted text-textdefault hover:bg-backgroundprimary/10"
+                            }`}
+                          >
+                            <span className="font-text-meta text-xs uppercase tracking-[0.2em]">
+                              {category.name.split("&")[0].trim()}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-6 px-4 pb-10 pt-6 sm:px-6 lg:px-8">
+                    {menusLoading && menus.length > 0 && (
+                      <div className="flex w-full justify-center">
+                        <CircularLoader />
+                      </div>
+                    )}
+
+                    {menusError && !menusLoading && (
+                      <div className="px-4 py-8 text-center text-red-500">
+                        Failed to load menu.
+                      </div>
+                    )}
+
+                    {!menusLoading && !menusError && !hasMenuData && (
+                      <div className="px-4 py-8 text-center text-textmuted">
+                        No menu is currently available.
+                      </div>
+                    )}
+
+                    {!menusLoading &&
+                      !menusError &&
+                      menu?.categories?.map((category) => (
+                        <TomodachiMenuSection
+                          key={category.id}
+                          title={category.name}
+                          items={getProductsForCategory(category)}
+                          sectionId={category.id}
+                          locationId={locationId}
+                          onSectionMount={(id, element) => {
+                            sectionRefs.current[id] = element;
+                          }}
+                          onItemClick={(id: string) => openProduct(id)}
+                        />
+                      ))}
+                  </div>
+                </>
+              )}
             </div>
           </CardContent>
-
-          {/* Scrollable Sections */}
-          <div
-            ref={scrollContainerRef}
-            className="flex flex-col items-start gap-6 lg:gap-8 relative self-stretch w-full flex-1 overflow-y-scroll px-0 pb-6 lg:pb-8 min-h-0 scrollbar-hide"
-            style={{ scrollbarGutter: "stable" }}
-          >
-            {menusLoading && (
-              <div className="text-center mx-auto">
-                <CircularLoader />
-              </div>
-            )}
-
-            {menusError && !menusLoading && (
-              <div className="px-4 py-8 text-red-500">Failed to load menu.</div>
-            )}
-
-            {!menusLoading &&
-              !menusError &&
-              menu?.categories?.map((category) => (
-                <TomodachiMenuSection
-                  key={category.id}
-                  title={category.name}
-                  items={getProductsForCategory(category)}
-                  sectionId={category.id}
-                  onSectionMount={(id, el) => {
-                    sectionRefs.current[id] = el;
-                  }}
-                  onItemClick={(id: string) => openProduct(id)}
-                />
-              ))}
-          </div>
         </Card>
       </div>
 
       {selectedProductId && (
         <ProductDescriptionDialog
           productId={selectedProductId}
-          locationId={LOCATION_ID}
-          cartId={CART_ID_FALLBACK}
-          isAddToCartBlocked={false}
+          locationId={locationId}
+          cartId={cartId ?? ""}
+          isAddToCartBlocked={!cartId}
           onClose={closeProduct}
         />
       )}

@@ -1,24 +1,21 @@
-import { useParams } from "next/navigation";
-import { CartResponse } from "@/lib/api/types";
-import useApiData from "./use-api-data";
-import { location_Id as LOCATION_ID, cart_Id as CART_ID } from "@/constants";
+import { useCart } from "@/hooks/useCart";
+import type { CartResponse } from "@/lib/api/types";
 
-const useCartData = (params?: { locationId: string; cartId: string }) => {
-  const urlParams = useParams();
+type UseCartDataParams = {
+  locationId?: string;
+  cartId?: string | null;
+};
 
-  const locationId =
-    params?.locationId ?? (urlParams?.locationId as string) ?? LOCATION_ID;
-  const cartId = params?.cartId ?? (urlParams?.cartId as string) ?? CART_ID;
-
-  const { data, error, mutate } = useApiData<CartResponse>(
-    `/api/v1/locations/${locationId}/carts/${cartId}`,
-    Boolean(locationId && cartId)
-  );
+const useCartData = (params?: UseCartDataParams) => {
+  const { cart, error, isLoading, mutate } = useCart({
+    locationId: params?.locationId,
+    cartId: params?.cartId ?? null,
+  });
 
   return {
-    data: data!,
+    data: cart as CartResponse | undefined,
     error,
-    isLoading: !data && !error,
+    isLoading,
     mutate,
   };
 };

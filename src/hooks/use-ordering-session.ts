@@ -2,11 +2,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { startOrderingSession } from "@/lib/api/ordering-session";
 import { getCartId, setCartId } from "@/lib/local-storage";
 import { formatApiError } from "@/lib/format-api-error";
-import {useCartStore} from "@/store/cart-store";
+import { useCartStore } from "@/store/cart-store";
+import { DEFAULT_FULFILLMENT_METHOD } from "@/constants";
 
 type UseOrderingSessionResult = {
   cartId: string | null;
@@ -16,47 +16,58 @@ type UseOrderingSessionResult = {
 };
 
 export function useOrderingSession(
-  locationId: string
+  locationId: string,
 ): UseOrderingSessionResult {
-  const { cartId, setCartIdState, isLoading, setIsLoading } = useCartStore()
-
-  const params = useSearchParams();
+  const { cartId, setCartIdState, isLoading, setIsLoading } = useCartStore();
   const [error, setError] = useState("");
   const [orderingError, setOrderingError] = useState("");
 
   useEffect(() => {
+    if (!locationId) {
+      return;
+    }
+
     let cancelled = false;
 
     async function init() {
-      // if we already have a cart, nothing to do
       if (cartId) {
         setIsLoading(false);
         return;
       }
 
-      try {
-        const payload = {
-          searchParams: params.toString(),
-          existingCartId: getCartId(locationId),
-        };
+      setIsLoading(true);
+      setError("");
+      setOrderingError("");
 
-        const response = await startOrderingSession(locationId, payload);
-        const { cartId: newCartId, errorMessage } = response;
+      const existingCartId =
+        getCartId(locationId, DEFAULT_FULFILLMENT_METHOD) || undefined;
+
+      try {
+        const { cartId: newCartId, errorMessage } = await startOrderingSession(
+          locationId,
+          {
+            existingCartId,
+            fulfillmentMethod: DEFAULT_FULFILLMENT_METHOD,
+          },
+        );
 
         if (cancelled) return;
 
-        if (newCartId) {
-          setCartId(locationId, newCartId);
-          setCartIdState(newCartId);
+        const nextCartId = newCartId ?? existingCartId ?? null;
+        if (nextCartId) {
+          setCartId(locationId, nextCartId, DEFAULT_FULFILLMENT_METHOD);
+          setCartIdState(nextCartId);
         }
 
-        setOrderingError(errorMessage);
+        setOrderingError(errorMessage ?? "");
       } catch (e) {
         if (cancelled) return;
         const { message } = formatApiError(e);
         setError(message);
       } finally {
-        if (!cancelled) setIsLoading(false);
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
     }
 
@@ -65,7 +76,7 @@ export function useOrderingSession(
     return () => {
       cancelled = true;
     };
-  }, [locationId, params]);
+  }, [cartId, locationId, setCartIdState, setIsLoading]);
 
   return { cartId, isLoading, error, orderingError };
 }

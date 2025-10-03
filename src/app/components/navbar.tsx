@@ -1,18 +1,14 @@
 "use client";
 
-import React, {Suspense} from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
-import {useRouter, useSearchParams} from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import CartSidebar from "@/components/crave-ui/cart-component/cart-sidebar";
 import { useCart } from "@/hooks/useCart";
-import {
-    location_Id,
-} from "@/constants";
 import CartCountBtn from "@/app/components/CartCountBtn";
-import {useCartStore} from "@/store/cart-store";
 
 const navigationItems = [
   { label: "MENU", shortLabel: "MENU", isActive: false, href: "/menu" },
@@ -25,13 +21,11 @@ const navigationItems = [
   },
 ];
 
-const title = "Tomodachi Sushii"
+const title = "Tomodachi Sushii";
 
 export const NavbarComp = () => {
   const router = useRouter();
- const searchParams = useSearchParams();
- const {cartId} = useCartStore();
- const {cart, mutate} = useCart({locationId: location_Id, cartId: cartId || searchParams.get("cartId")});
+  const { cart, cartId, mutate } = useCart();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isCartOpen, setIsCartOpen] = React.useState(false);
@@ -39,7 +33,9 @@ export const NavbarComp = () => {
   const toggleMobileMenu = () => setIsMobileMenuOpen((v) => !v);
 
   const openCart = async () => {
-    await mutate();
+    if (cartId) {
+      await mutate();
+    }
     setIsCartOpen(true);
   };
 
@@ -47,7 +43,7 @@ export const NavbarComp = () => {
 
   const goToCheckout = () => {
     setIsCartOpen(false);
-    router.push(`/locations/${location_Id}/carts/${cartId}/checkout`);
+    router.push("/checkout");
   };
 
   return (
@@ -84,17 +80,10 @@ export const NavbarComp = () => {
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-1">
             {navigationItems.map((item) => {
-                const isBook = item.label === "BOOK A TABLE";
-                const isMenu = item.label === "MENU";
-
-                let link = item.href;
-
-                if(isMenu) {
-                    link = `${item.href}?cartId=${cartId}`;
-                }
+              const isBook = item.label === "BOOK A TABLE";
 
               return (
-                <Link key={item.label} href={link}>
+                <Link key={item.label} href={item.href}>
                   <Button
                     variant="ghost"
                     className={`inline-flex cursor-pointer items-center justify-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${
@@ -121,7 +110,11 @@ export const NavbarComp = () => {
           </div>
 
           {/* Cart button with live badge */}
-          <CartCountBtn openCart={openCart} isCartOpen={isCartOpen} itemCount={cart?.totalQuantity ?? 0} />
+          <CartCountBtn
+            openCart={openCart}
+            isCartOpen={isCartOpen}
+            itemCount={cart?.totalQuantity ?? 0}
+          />
         </div>
 
         {/* Mobile menu dropdown */}
@@ -183,11 +176,11 @@ export const NavbarComp = () => {
 };
 
 export const Navbar = () => {
-    return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <NavbarComp />
-        </Suspense>
-    );
-}
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NavbarComp />
+    </Suspense>
+  );
+};
 
 export default Navbar;

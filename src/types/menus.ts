@@ -28,6 +28,14 @@ export type BundleMenu = {
   id: string;
   name: string;
   isActive: boolean;
-  time: string;
+  time?: string;
+  // Some payloads include additional metadata such as description or time ranges
+  timeRange?: string;
+  description?: string;
   categories: BundleCategory[];
 };
+export type MenusResponse = {
+  menus: BundleMenu[];
+  popularProducts: BundleProduct[];
+};
+
