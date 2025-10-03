@@ -56,11 +56,11 @@ const TomodachiMenuSectionContent = ({
       setBusyId(item.id);
 
       const payload = {
-        id: item.id,
+        productId: item.id,
         quantity: 1,
         specialInstructions: "",
         itemUnavailableAction: ItemUnavailableActions.REMOVE_ITEM,
-        selectedModifiers: [],
+        selections: [],
       };
 
       await postData(
@@ -196,4 +196,7 @@ export const TomodachiMenuSection = (props: MenuSectionProps) => {
     </Suspense>
   );
 };
+
+
+
 

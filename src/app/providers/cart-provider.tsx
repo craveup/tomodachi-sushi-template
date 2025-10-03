@@ -18,6 +18,7 @@ import {
 } from "@/lib/api/cart";
 import type { CartResponse } from "@/lib/api";
 import { location_Id as LOCATION_ID } from "@/constants";
+import { ItemUnavailableActions } from "@/app/components/product-description/ProductDescription";
 
 interface CartContextType {
   items: LocalCartItem[];
@@ -197,11 +198,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
         const cid = cartId ?? localStorage.getItem("tomodachi-cart-id");
         if (!cid) throw new Error("Cart not ready. Please try again.");
 
-        const payload = {
+                const payload = {
           productId: item.id,
           quantity: 1,
-          // If your API needs price/options/modifiers, include them here:
-          options: item.options, // matches your MenuItem + ItemOptions
+          specialInstructions: "",
+          itemUnavailableAction: ItemUnavailableActions.REMOVE_ITEM,
+          selections: [],
         };
 
         await addItemToCart(locationId, cid, payload);
@@ -307,3 +309,4 @@ export function useCart() {
   }
   return context;
 }
+

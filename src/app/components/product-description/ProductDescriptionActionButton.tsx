@@ -34,12 +34,18 @@ const ProductDescriptionActionButton = ({
   const { mutate } = useCart({ locationId, cartId });
 
   const handleAddItemToCart = async () => {
-    const addItemData = {
-      id: cartItem.id,
-      quantity: quantity,
-      specialInstructions: specialInstructions,
-      itemUnavailableAction: itemUnavailableAction,
-      selectedModifiers: selectedModifiers,
+        const addItemData = {
+      productId: cartItem.id,
+      quantity,
+      specialInstructions,
+      itemUnavailableAction,
+      selections: selectedModifiers.map((group) => ({
+        groupId: group.groupId,
+        selectedOptions: group.selectedOptions.map((option) => ({
+          optionId: option.id,
+          quantity: option.quantity,
+        })),
+      })),
     };
     const cart = await postData(
       `/api/v1/locations/${locationId}/carts/${cartId}/cart-item`,
@@ -101,3 +107,4 @@ const ProductDescriptionActionButton = ({
 };
 
 export default ProductDescriptionActionButton;
+
