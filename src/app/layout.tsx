@@ -67,7 +67,7 @@ export default function RootLayout({
                 <CartWrapper />
               </CartProvider>
             </AddressProvider>
-            <Toaster />
+            <Toaster position="top-center" />
           </RestaurantThemeProvider>
         </ErrorBoundary>
       </body>

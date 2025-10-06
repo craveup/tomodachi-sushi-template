@@ -34,7 +34,7 @@ const ProductDescriptionActionButton = ({
   const { mutate } = useCart({ locationId, cartId });
 
   const handleAddItemToCart = async () => {
-        const addItemData = {
+    const addItemData = {
       productId: cartItem.id,
       quantity,
       specialInstructions,
@@ -61,7 +61,9 @@ const ProductDescriptionActionButton = ({
 
     try {
       await handleAddItemToCart();
-      toast.success("Item added to cart", { position: "top-center" });
+      toast.success(`${cartItem.name} added to cart`, {
+        position: "top-center",
+      });
     } catch (error) {
       const formattedError = formatApiError(error);
 
@@ -107,4 +109,3 @@ const ProductDescriptionActionButton = ({
 };
 
 export default ProductDescriptionActionButton;
-
