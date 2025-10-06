@@ -30,6 +30,7 @@ import {
 import useCartData from "@/app/hooks/use-cart-data";
 import useSWR from "swr";
 import type { TimeIntervalsResponse, OrderDay } from "@/lib/api/types";
+import Image from "next/image";
 
 const formatTimeToAMPM = (time24: string) => {
   const [hours, minutes] = time24.split(":");
@@ -273,7 +274,9 @@ const CheckoutDetails = () => {
             {/* Order Type */}
             <Card>
               <CardHeader>
-                <CardTitle>Order Type</CardTitle>
+                <CardTitle className="font-heading-h4 text-textdefault text-lg tracking-wider">
+                  Order Type
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <RadioGroup
@@ -307,7 +310,7 @@ const CheckoutDetails = () => {
             {/* Delivery/Pickup Details */}
             <Card>
               <CardHeader>
-                <CardTitle>
+                <CardTitle className="font-heading-h4 text-textdefault text-lg tracking-wider">
                   {orderType === "delivery"
                     ? "Delivery Details"
                     : "Pickup Location"}
@@ -379,7 +382,7 @@ const CheckoutDetails = () => {
             {/* Time Selection */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 font-heading-h4 text-textdefault text-lg tracking-wider">
                   <Clock className="h-5 w-5" />
                   {orderType === "delivery" ? "Delivery Time" : "Pickup Time"}
                 </CardTitle>
@@ -547,7 +550,7 @@ const CheckoutDetails = () => {
             {/* Promo Code */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 font-heading-h4 text-textdefault text-lg tracking-wider">
                   <Tag className="h-5 w-5" />
                   Promo Code
                 </CardTitle>
@@ -659,24 +662,53 @@ const CheckoutDetails = () => {
           <div className="lg:col-span-1">
             <Card className="sticky top-24">
               <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
+                <CardTitle className="font-heading-h4 text-textdefault text-lg tracking-wider">
+                  Order Summary
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Items */}
                 <div className="space-y-3">
                   {data.items.map((item) => (
-                    <div key={item.id} className="flex justify-between text-sm">
-                      <div>
-                        <div className="font-medium text-foreground">
-                          {item.quantity}x {item.name}
-                        </div>
-                        {item.specialInstructions && (
-                          <div className="text-muted-foreground">
-                            {item.specialInstructions}
+                    <div
+                      key={item.id}
+                      className="flex items-center gap-4 pb-3 border-b border-borderdefault/30 last:border-none"
+                    >
+                      {/* Image */}
+                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-backgroundmuted">
+                        <Image
+                          src={item.imageUrl || "/placeholder.svg"}
+                          alt={item.name}
+                          fill
+                          className="object-cover"
+                          sizes="64px"
+                        />
+                      </div>
+
+                      {/* Middle: name, qty, special instructions */}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="font-medium text-foreground truncate">
+                              <span className="tabular-nums">
+                                {item.quantity}x
+                              </span>{" "}
+                              {item.name}
+                            </div>
                           </div>
+
+                          {/* Price (right) */}
+                          <div className="shrink-0 text-right font-medium text-foreground tabular-nums">
+                            ${Number(item.total).toFixed(2)}
+                          </div>
+                        </div>
+
+                        {item.specialInstructions && (
+                          <p className="mt-1 text-xs text-muted-foreground line-clamp-2 break-words">
+                            {item.specialInstructions}
+                          </p>
                         )}
                       </div>
-                      <div className="font-medium">${item.total}</div>
                     </div>
                   ))}
                 </div>
@@ -685,31 +717,31 @@ const CheckoutDetails = () => {
 
                 {/* Totals */}
                 <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between font-heading-h4 text-textdefault text-sm tracking-wide">
                     <span>Subtotal</span>
                     <span>${subtotal.toFixed(2)}</span>
                   </div>
                   {deliveryFee > 0 && (
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between font-heading-h4 text-textdefault text-sm tracking-wide">
                       <span>Delivery Fee</span>
                       <span>${deliveryFee.toFixed(2)}</span>
                     </div>
                   )}
                   {data?.discountTotal &&
                     parseFloat(data.discountTotal) > 0 && (
-                      <div className="flex justify-between text-sm text-green-600">
+                      <div className="flex justify-between font-heading-h4 text-sm tracking-wide text-green-600">
                         <span>Discount ({data.discountCode})</span>
                         <span>
                           -${parseFloat(data.discountTotal).toFixed(2)}
                         </span>
                       </div>
                     )}
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between font-heading-h4 text-textdefault text-sm tracking-wide">
                     <span>Tax</span>
                     <span>${tax.toFixed(2)}</span>
                   </div>
                   <Separator />
-                  <div className="flex justify-between font-semibold text-lg">
+                  <div className="flex justify-between font-semibold font-heading-h4 text-textdefault text-lg tracking-wider">
                     <span>Total</span>
                     <span style={{ color: "hsl(var(--brand-accent))" }}>
                       ${total.toFixed(2)}

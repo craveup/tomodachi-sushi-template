@@ -31,6 +31,7 @@ interface CartItem {
   quantity: number;
   imageUrl: string | null;
   modifiers?: string[];
+  specialInstructions?: string;
 }
 
 interface SuggestedItem {
@@ -59,6 +60,10 @@ function mapCartResponseToItems(apiCart: any): CartItem[] {
     modifiers: Array.isArray(line?.modifiers)
       ? line.modifiers.map((m: any) => m?.name ?? "").filter(Boolean)
       : undefined,
+    specialInstructions:
+      (line?.specialInstructions ?? line?.notes ?? line?.special_instructions)
+        ?.toString()
+        .trim() || undefined,
   }));
 }
 
@@ -300,7 +305,7 @@ function CartSidebarContent({
       titleClassName="font-heading-h4 text-textdefault text-lg tracking-wider"
       headerClassName="px-6 py-4 border-b border-borderdefault"
       description={sheetDescription}
-      className="flex h-full flex-col bg-backgrounddefault p-0 md:max-w-[550px]"
+      className="flex h-full flex-col bg-backgrounddefault p-0 md:max-w-[500px]"
       innerContentClassName="flex flex-col p-0"
       hideMainBtn
       hideCloseBtn
@@ -311,7 +316,7 @@ function CartSidebarContent({
         data-testid="OrderCart"
       >
         {/* Items */}
-        <div className="flex-1 overflow-y-auto min-h-0">
+        <div className="flex-1 overflow-hidden min-h-0">
           <div className="p-2">
             {showCartSkeleton ? (
               <div className="space-y-4">
@@ -342,51 +347,94 @@ function CartSidebarContent({
               </div>
             ) : (
               <div className="space-y-4">
-                {apiItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center gap-4 p-4 border border-borderdefault rounded-2xl hover:bg-backgroundmuted/30 transition-colors"
-                    data-testid="OrderCartItem"
-                  >
-                    <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                      <Image
-                        src={item.imageUrl || "/placeholder.svg"}
-                        alt={item.name}
-                        width={64}
-                        height={64}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+                {apiItems.map((item) => {
+                  const modifiersLabel = Array.isArray(item.modifiers)
+                    ? item.modifiers.filter(Boolean).join(", ")
+                    : "";
+                  const hasModifiers = Boolean(modifiersLabel);
+                  const specialInstructions = item.specialInstructions?.trim();
+                  const hasSpecialInstructions = Boolean(specialInstructions);
+                  const lineTotal = currency(item.price * item.quantity);
 
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-heading-h6 text-textdefault text-base tracking-wider truncate">
-                        {item.name}
-                      </h3>
-                      <p className="text-lg font-semibold text-textdefault mt-1">
-                        {currency(item.price)}
-                      </p>
-                    </div>
+                  return (
+                    <Card
+                      key={item.id}
+                      className="p-4"
+                      data-testid="OrderCartItem"
+                    >
+                      <div className="flex w-full gap-4 sm:gap-5">
+                        {/* Image */}
+                        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-backgroundmuted">
+                          <Image
+                            src={item.imageUrl || "/placeholder.svg"}
+                            alt={item.name}
+                            fill
+                            className="object-cover"
+                            sizes="80px"
+                          />
+                        </div>
 
-                    <CounterButton
-                      quantity={item.quantity}
-                      isLoading={busyLineId === item.id}
-                      onIncrease={() =>
-                        void handleIncrease(item.id, item.quantity, item.name)
-                      }
-                      onDecrease={() => {
-                        if (item.quantity === 1) {
-                          void handleRemove(item.id, item.quantity, item.name);
-                        } else {
-                          void handleDecrease(
-                            item.id,
-                            item.quantity,
-                            item.name
-                          );
-                        }
-                      }}
-                    />
-                  </div>
-                ))}
+                        {/* Middle: title, qty, modifiers, instructions */}
+                        <div className="min-w-0 flex-1 space-y-2">
+                          <div className="flex flex-wrap items-center gap-2 text-textdefault">
+                            <p className="text-sm font-semibold sm:text-base truncate">
+                              {item.name}
+                            </p>
+                            <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                              Qty {item.quantity}
+                            </span>
+                          </div>
+
+                          {hasModifiers && (
+                            <p className="line-clamp-2 text-xs text-textmuted">
+                              {modifiersLabel}
+                            </p>
+                          )}
+
+                          {hasSpecialInstructions && (
+                            <p className="line-clamp-2 text-xs text-textmuted">
+                              Special instructions: {specialInstructions}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Right: price (top-right) + counter under it */}
+                        <div className="flex flex-col items-end justify-start gap-2">
+                          <p className="text-sm font-semibold text-textdefault">
+                            {lineTotal}
+                          </p>
+
+                          <CounterButton
+                            quantity={item.quantity}
+                            isLoading={busyLineId === item.id}
+                            onIncrease={() =>
+                              void handleIncrease(
+                                item.id,
+                                item.quantity,
+                                item.name
+                              )
+                            }
+                            onDecrease={() => {
+                              if (item.quantity === 1) {
+                                void handleRemove(
+                                  item.id,
+                                  item.quantity,
+                                  item.name
+                                );
+                              } else {
+                                void handleDecrease(
+                                  item.id,
+                                  item.quantity,
+                                  item.name
+                                );
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                })}
               </div>
             )}
           </div>
