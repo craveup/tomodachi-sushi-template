@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
@@ -24,8 +24,10 @@ import { cn } from "@/lib/utils";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
 interface ResponsiveSheetProps {
-  title?: string;
-  description?: string;
+  title?: React.ReactNode;
+  titleClassName?: string;
+  description?: React.ReactNode;
+  headerClassName?: string;
   open: boolean;
   setOpen: (open: boolean) => void;
   onMainBtnClick?: () => void;
@@ -44,7 +46,9 @@ interface ResponsiveSheetProps {
 export function ResponsiveSheet(props: ResponsiveSheetProps) {
   const {
     title,
+    titleClassName,
     description,
+    headerClassName,
     open,
     setOpen,
     onMainBtnClick,
@@ -107,8 +111,10 @@ export function ResponsiveSheet(props: ResponsiveSheetProps) {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent className={className}>
           {shouldRenderHeader && (
-            <SheetHeader className="text-left">
-              <SheetTitle>{title}</SheetTitle>
+            <SheetHeader className={cn("text-left", headerClassName)}>
+              {title && (
+                <SheetTitle className={titleClassName}>{title}</SheetTitle>
+              )}
               {description && (
                 <SheetDescription>{description}</SheetDescription>
               )}
@@ -131,8 +137,10 @@ export function ResponsiveSheet(props: ResponsiveSheetProps) {
         className={cn("max-h-[100svh] h-[100svh] flex flex-col", className)}
       >
         {shouldRenderHeader && (
-          <DrawerHeader className="!text-left">
-            {title && <DrawerTitle>{title}</DrawerTitle>}
+          <DrawerHeader className={cn("!text-left", headerClassName)}>
+            {title && (
+              <DrawerTitle className={titleClassName}>{title}</DrawerTitle>
+            )}
             {description && (
               <DrawerDescription>{description}</DrawerDescription>
             )}

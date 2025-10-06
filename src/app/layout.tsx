@@ -10,6 +10,7 @@ import { AddressProvider } from "./providers/address-provider";
 import { RestaurantThemeProvider } from "./hooks/use-restaurant-theme";
 import { ErrorBoundary } from "./components/error-boundary";
 import { CartWrapper } from "./components/cart-wrapper";
+import { Toaster } from "@/components/ui/sonner";
 
 // Load Google Fonts
 const geistSans = Geist({
@@ -60,12 +61,13 @@ export default function RootLayout({
       >
         <ErrorBoundary>
           <RestaurantThemeProvider defaultThemePath="/themes/leclerc-theme.json">
-          <AddressProvider>
+            <AddressProvider>
               <CartProvider>
                 {children}
                 <CartWrapper />
               </CartProvider>
             </AddressProvider>
+            <Toaster />
           </RestaurantThemeProvider>
         </ErrorBoundary>
       </body>

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState, Suspense } from "react";
 import { Button } from "@/components/ui/button";
-import { X, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
+import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { useFormatters } from "@/lib/i18n/hooks";
 import { useCart } from "@/hooks/useCart";
@@ -196,26 +196,61 @@ function CartSidebarContent({
 
   // Quantity mutations
   const setQuantity = async (lineId: string, nextQty: number) => {
+    if (!locationId || !cartId) {
+      toast.error("Cart is not ready yet. Please try again.");
+      return false;
+    }
+
+    setBusyLineId(lineId);
     try {
-      setBusyLineId(lineId);
-      if (!locationId || !cartId) throw new Error("Missing IDs");
       await patchData(
         `/api/v1/locations/${locationId}/carts/${cartId}/cart-item/${lineId}/quantity`,
         { quantity: nextQty }
       );
       await mutate();
+      return true;
     } catch (err) {
       toast.error(formatApiError(err).message);
+      return false;
     } finally {
       setBusyLineId(null);
     }
   };
-  const handleIncrease = (lineId: string, qty: number) =>
-    setQuantity(lineId, qty + 1);
-  const handleDecrease = (lineId: string, qty: number) =>
-    setQuantity(lineId, Math.max(0, qty - 1));
-  const handleRemove = (lineId: string) => setQuantity(lineId, 0);
 
+  const getQuantityToastMessage = (
+    name: string | undefined,
+    previousQty: number,
+    nextQty: number
+  ) => {
+    const itemLabel = name?.trim() || "Item";
+    if (nextQty <= 0) return `${itemLabel} removed from your cart`;
+    if (nextQty > previousQty)
+      return `${itemLabel} quantity increased to ${nextQty}`;
+    if (nextQty < previousQty)
+      return `${itemLabel} quantity decreased to ${nextQty}`;
+    return `${itemLabel} quantity updated`;
+  };
+
+  const handleIncrease = async (lineId: string, qty: number, name?: string) => {
+    const nextQty = qty + 1;
+    const success = await setQuantity(lineId, nextQty);
+    if (success) {
+      toast.success(getQuantityToastMessage(name, qty, nextQty));
+    }
+  };
+  const handleDecrease = async (lineId: string, qty: number, name?: string) => {
+    const nextQty = Math.max(0, qty - 1);
+    const success = await setQuantity(lineId, nextQty);
+    if (success) {
+      toast.success(getQuantityToastMessage(name, qty, nextQty));
+    }
+  };
+  const handleRemove = async (lineId: string, qty: number, name?: string) => {
+    const success = await setQuantity(lineId, 0);
+    if (success) {
+      toast.success(getQuantityToastMessage(name, qty, 0));
+    }
+  };
   const handleCheckoutClick = async () => {
     if (!apiItems.length || !cartId) return;
 
@@ -240,7 +275,7 @@ function CartSidebarContent({
   const sheetDescription = "Review your items and proceed to checkout.";
 
   const sheetFooter = (
-    <div className="w-full space-y-4 p-2 sm:p-4 md:p-6">
+    <div className="w-full space-y-4 p-2 sm:p-4 md:p-4">
       <Button
         onClick={handleCheckoutClick}
         className="w-full h-14 text-base font-heading-h6 tracking-wider bg-backgroundprimary hover:bg-backgroundprimary/90 text-textinverse rounded-2xl disabled:opacity-60"
@@ -262,8 +297,10 @@ function CartSidebarContent({
       open={isOpen}
       setOpen={handleSheetOpenChange}
       title={sheetTitle}
+      titleClassName="font-heading-h4 text-textdefault text-lg tracking-wider"
+      headerClassName="px-6 py-4 border-b border-borderdefault"
       description={sheetDescription}
-      className="flex h-full flex-col bg-backgrounddefault p-0 md:max-w-[550px] [&>button]:hidden [&>div:first-child]:sr-only"
+      className="flex h-full flex-col bg-backgrounddefault p-0 md:max-w-[550px]"
       innerContentClassName="flex flex-col p-0"
       hideMainBtn
       hideCloseBtn
@@ -273,22 +310,6 @@ function CartSidebarContent({
         className="flex h-full min-h-0 flex-col bg-backgrounddefault"
         data-testid="OrderCart"
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-borderdefault">
-          <h2 className="font-heading-h4 text-textdefault text-lg tracking-wider">
-            YOUR ORDER
-          </h2>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            aria-label="Close"
-            className="h-8 w-8 hover:bg-backgroundmuted"
-          >
-            <X className="h-5 w-5 text-textdefault" />
-          </Button>
-        </div>
-
         {/* Items */}
         <div className="flex-1 overflow-y-auto min-h-0">
           <div className="p-2">
@@ -349,12 +370,20 @@ function CartSidebarContent({
                     <CounterButton
                       quantity={item.quantity}
                       isLoading={busyLineId === item.id}
-                      onIncrease={() => handleIncrease(item.id, item.quantity)}
-                      onDecrease={() =>
-                        item.quantity === 1
-                          ? handleRemove(item.id)
-                          : handleDecrease(item.id, item.quantity)
+                      onIncrease={() =>
+                        void handleIncrease(item.id, item.quantity, item.name)
                       }
+                      onDecrease={() => {
+                        if (item.quantity === 1) {
+                          void handleRemove(item.id, item.quantity, item.name);
+                        } else {
+                          void handleDecrease(
+                            item.id,
+                            item.quantity,
+                            item.name
+                          );
+                        }
+                      }}
                     />
                   </div>
                 ))}
