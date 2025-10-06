@@ -42,8 +42,10 @@ export const NavbarComp = () => {
   const closeCart = () => setIsCartOpen(false);
 
   const goToCheckout = () => {
+    if (!cart?.id || !cart?.locationId) return;
+
     setIsCartOpen(false);
-    router.push("/checkout");
+    router.push(`/locations/${cart.locationId}/carts/${cart.id}/checkout`);
   };
 
   return (
@@ -184,3 +186,8 @@ export const Navbar = () => {
 };
 
 export default Navbar;
+
+
+
+
+

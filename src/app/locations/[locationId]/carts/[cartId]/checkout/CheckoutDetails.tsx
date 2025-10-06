@@ -442,17 +442,6 @@ const CheckoutDetails = () => {
                                   {formatDateWithYear(orderDay.value)}
                                 </p>
                               </div>
-                              {!isToday &&
-                                dayIndex <
-                                  timeIntervalsData.orderDays.length - 1 && (
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="text-xs px-3 py-1 h-8 rounded-full border-borderdefault hover:bg-none text-blue-600 bg-blue-200"
-                                  >
-                                    Next Day
-                                  </Button>
-                                )}
                             </div>
 
                             {/* Time Slots Grid - 4 columns to match design */}

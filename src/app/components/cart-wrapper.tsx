@@ -8,7 +8,7 @@ import { menuData } from "../data/menu-data";
 
 export function CartWrapper() {
   const router = useRouter();
-  const { items, isCartOpen, closeCart } = useCart();
+  const { items, isCartOpen, closeCart, cartId, locationId } = useCart();
 
   // Convert provider items → CartSidebar format
   const cartItems = useMemo(
@@ -40,8 +40,9 @@ export function CartWrapper() {
   }, []);
 
   const handleCheckout = () => {
+    if (!cartId) return;
     closeCart();
-    router.push("/checkout");
+    router.push(`/locations/${locationId}/carts/${cartId}/checkout`);
   };
 
   return (
@@ -53,3 +54,4 @@ export function CartWrapper() {
     />
   );
 }
+

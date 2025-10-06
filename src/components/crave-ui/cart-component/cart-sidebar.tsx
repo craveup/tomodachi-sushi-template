@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useMemo, useState, Suspense } from "react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { location_Id as DEFAULT_LOCATION_ID } from "@/constants";
+import { ResponsiveSheet } from "@/components/ResponsiveSheet";
 
 interface CartItem {
   id: string;
@@ -168,7 +169,8 @@ function CartSidebarContent({
 
   const liveSuggested = useMemo(() => mapProductsToSuggested(recRaw), [recRaw]);
   const showRecSkeleton = recLoading && !liveSuggested.length;
-  const showSuggestionsSection = (showRecSkeleton || liveSuggested.length > 0) && !!cartId;
+  const showSuggestionsSection =
+    (showRecSkeleton || liveSuggested.length > 0) && !!cartId;
 
   const subtotal = useMemo(
     () => apiItems.reduce((s, i) => s + i.price * i.quantity, 0),
@@ -214,38 +216,61 @@ function CartSidebarContent({
     setQuantity(lineId, Math.max(0, qty - 1));
   const handleRemove = (lineId: string) => setQuantity(lineId, 0);
 
-  const handleCheckoutFallback = async () => {
-    if (!apiItems.length) return;
-    if (cartId) {
-      await mutate();
-    }
-    router.push("/checkout");
-  };
-
   const handleCheckoutClick = async () => {
+    if (!apiItems.length || !cartId) return;
+
     if (onCheckout) {
-      if (cartId) {
-        await mutate();
-      }
-      onCheckout();
+      await mutate();
+      await Promise.resolve(onCheckout());
       return;
     }
 
-    await handleCheckoutFallback();
+    await mutate();
+    router.push(`/locations/${locationId}/carts/${cartId}/checkout`);
   };
 
+  const handleSheetOpenChange = React.useCallback(
+    (nextOpen: boolean) => {
+      if (!nextOpen) onClose();
+    },
+    [onClose]
+  );
+
+  const sheetTitle = "YOUR ORDER";
+  const sheetDescription = "Review your items and proceed to checkout.";
+
+  const sheetFooter = (
+    <div className="w-full space-y-4 p-2 sm:p-4 md:p-6">
+      <Button
+        onClick={handleCheckoutClick}
+        className="w-full h-14 text-base font-heading-h6 tracking-wider bg-backgroundprimary hover:bg-backgroundprimary/90 text-textinverse rounded-2xl disabled:opacity-60"
+        size="lg"
+        data-testid="CheckoutButton"
+        disabled={!apiItems.length}
+      >
+        <div className="flex items-center justify-between w-full">
+          <span>CHECKOUT</span>
+          <span>{currency(subtotal)}</span>
+        </div>
+      </Button>
+    </div>
+  );
   if (!isOpen) return null;
 
   return (
-    <>
-      {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/50 z-[999]" onClick={onClose} />
-
-      {/* Sidebar */}
+    <ResponsiveSheet
+      open={isOpen}
+      setOpen={handleSheetOpenChange}
+      title={sheetTitle}
+      description={sheetDescription}
+      className="flex h-full flex-col bg-backgrounddefault p-0 md:max-w-[550px] [&>button]:hidden [&>div:first-child]:sr-only"
+      innerContentClassName="flex flex-col p-0"
+      hideMainBtn
+      hideCloseBtn
+      footer={sheetFooter}
+    >
       <div
-        className="fixed right-0 top-0 h-full w-[450px] max-w-[450px] bg-backgrounddefault shadow-xl z-[1000] flex flex-col"
-        role="dialog"
-        aria-modal="true"
+        className="flex h-full min-h-0 flex-col bg-backgrounddefault"
         data-testid="OrderCart"
       >
         {/* Header */}
@@ -265,8 +290,8 @@ function CartSidebarContent({
         </div>
 
         {/* Items */}
-        <div className="flex-1 overflow-y-auto scrollbar-hide">
-          <div className="p-6">
+        <div className="flex-1 overflow-y-auto min-h-0">
+          <div className="p-2">
             {showCartSkeleton ? (
               <div className="space-y-4">
                 {Array.from({ length: 3 }).map((_, i) => (
@@ -337,7 +362,7 @@ function CartSidebarContent({
             )}
           </div>
 
-          {/* Suggested — ONLY live, or nothing */}
+          {/* Suggested - ONLY live, or nothing */}
           {showSuggestionsSection && (
             <div className="border-t border-borderdefault p-6">
               <div className="flex items-center justify-between mb-6">
@@ -445,24 +470,8 @@ function CartSidebarContent({
             </div>
           )}
         </div>
-
-        {/* Footer */}
-        <div className="border-t border-borderdefault p-6 bg-backgrounddefault">
-          <Button
-            onClick={handleCheckoutClick}
-            className="w-full h-14 text-base font-heading-h6 tracking-wider bg-backgroundprimary hover:bg-backgroundprimary/90 text-textinverse rounded-2xl disabled:opacity-60"
-            size="lg"
-            data-testid="CheckoutButton"
-            disabled={!apiItems.length}
-          >
-            <div className="flex items-center justify-between w-full">
-              <span>CHECKOUT</span>
-              <span>{currency(subtotal)}</span>
-            </div>
-          </Button>
-        </div>
       </div>
-    </>
+    </ResponsiveSheet>
   );
 }
 
@@ -473,11 +482,3 @@ export default function CartSidebar(props: CartSidebarProps) {
     </Suspense>
   );
 }
-
-
-
-
-
-
-
-
