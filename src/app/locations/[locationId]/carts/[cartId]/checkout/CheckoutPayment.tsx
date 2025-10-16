@@ -220,8 +220,10 @@ const CheckoutPaymentForm = () => {
               {/* Customer Details */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Your details</CardTitle>
-                  <p className="text-sm text-muted-foreground">
+                  <CardTitle className="font-heading-h2 text-textdefault text-lg tracking-wider">
+                    Your details
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground font-heading-h4 tracking-wide">
                     Need a receipt? Please enter your email below
                   </p>
                 </CardHeader>
@@ -305,8 +307,10 @@ const CheckoutPaymentForm = () => {
               {/* Payment Details */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Enter your card details</CardTitle>
-                  <p className="text-sm text-muted-foreground">
+                  <CardTitle className="font-heading-h2 text-textdefault text-lg tracking-wider">
+                    Enter your card details
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground font-heading-h2 tracking-wide">
                     Your card details will collect securely and we use Stripe
                     for payment processing.
                   </p>
@@ -333,7 +337,9 @@ const CheckoutPaymentForm = () => {
             <div className="lg:col-span-1">
               <Card className="sticky top-24">
                 <CardHeader>
-                  <CardTitle>Summary</CardTitle>
+                  <CardTitle className="font-heading-h4 text-textdefault text-lg tracking-wider">
+                    Summary
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Items */}
@@ -344,16 +350,16 @@ const CheckoutPaymentForm = () => {
                         className="flex justify-between text-sm"
                       >
                         <div>
-                          <div className="font-medium text-foreground">
+                          <div className="font-medium font-heading-h2 text-textdefault text-lg tracking-wider">
                             {item.quantity}x {item.name}
                           </div>
                           {item.specialInstructions && (
                             <div className="text-muted-foreground">
-                              {item.specialInstructions}
+                              {item.specialInstructions}Make it spicy
                             </div>
                           )}
                         </div>
-                        <div className="font-medium">
+                        <div className="font-medium font-heading-h2 text-textdefault text-lg tracking-wide">
                           ${(parseFloat(item.total) || 0).toFixed(2)}
                         </div>
                       </div>
@@ -364,26 +370,31 @@ const CheckoutPaymentForm = () => {
 
                   {/* Totals */}
                   <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between font-heading-h2 text-textdefault text-lg tracking-wide">
                       <span>Subtotal</span>
                       <span>${subtotal.toFixed(2)}</span>
                     </div>
                     {tip > 0 && (
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between font-heading-h2 text-textdefault text-lg tracking-wide">
                         <span>Tip</span>
                         <span>${tip.toFixed(2)}</span>
                       </div>
                     )}
                     {(fees > 0 || tax > 0) && (
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between font-heading-h2 text-textdefault text-lg tracking-wide">
                         <span>Fees & Estimated Tax</span>
                         <span>${(fees + tax).toFixed(2)}</span>
                       </div>
                     )}
                     <Separator />
-                    <div className="flex justify-between font-semibold text-lg">
+                    <div className="flex justify-between font-heading-h2 text-textdefault text-lg tracking-wide">
                       <span>Total</span>
-                      <span style={{ color: "hsl(var(--brand-accent))" }}>
+                      <span
+                        style={{
+                          color: "hsl(var(--brand-accent))",
+                          fontWeight: "bold",
+                        }}
+                      >
                         ${calculatedTotal.toFixed(2)}
                       </span>
                     </div>

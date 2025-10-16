@@ -1,4 +1,4 @@
-import { fetchData, postData, putData } from "./crave-client";
+import { deleteData, fetchData, postData, putData } from "./crave-client";
 import {
   CartResponse,
   CartItem,
@@ -100,7 +100,6 @@ export const removePromoCode = async (
   locationId: string,
   cartId: string
 ) => {
-  const { deleteData } = await import('./crave-client');
   return deleteData(`/api/v1/locations/${locationId}/discounts/apply-discount`, {
     cartId
   });
@@ -113,7 +112,7 @@ export const updateCustomerInfo = async (
   customer: any
 ) => {
   return putData(
-    `/api/v1/locations/${locationId}/cart/${cartId}/validate-and-update`,
+    `/api/v1/locations/${locationId}/carts/${cartId}/validate-and-update`,
     customer
   );
 };

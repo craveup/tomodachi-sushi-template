@@ -11,7 +11,7 @@ import { postData } from "@/lib/handle-api";
 import { formatApiError } from "@/lib/format-api-error";
 import { location_Id as LOCATION_ID } from "@/constants";
 import type { MenuItem } from "../types";
-import { ItemUnavailableActions } from "./product-description/ProductDescription";
+import { ItemUnavailableActions } from "@/types/common";
 
 interface MenuSectionProps {
   title: string;
@@ -196,6 +196,7 @@ export const TomodachiMenuSection = (props: MenuSectionProps) => {
     </Suspense>
   );
 };
+
 
 
 
