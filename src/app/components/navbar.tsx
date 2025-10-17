@@ -41,11 +41,24 @@ export const NavbarComp = () => {
 
   const closeCart = () => setIsCartOpen(false);
 
-  const goToCheckout = () => {
-    if (!cart?.id || !cart?.locationId) return;
+  const goToCheckout = (nextUrl?: string) => {
+    const fallbackUrl =
+      nextUrl?.trim() ||
+      cart?.checkoutUrl?.trim() ||
+      (cart?.locationId && cart?.id
+        ? `/locations/${cart.locationId}/carts/${cart.id}/checkout`
+        : "");
+
+    if (!fallbackUrl) return;
 
     setIsCartOpen(false);
-    router.push(`/locations/${cart.locationId}/carts/${cart.id}/checkout`);
+
+    if (/^https?:\/\//i.test(fallbackUrl)) {
+      window.location.href = fallbackUrl;
+      return;
+    }
+
+    router.push(fallbackUrl);
   };
 
   return (
