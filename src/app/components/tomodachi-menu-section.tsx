@@ -48,7 +48,9 @@ const TomodachiMenuSectionContent = ({
     e.stopPropagation();
 
     if (!locationId || !cartId) {
-      toast.error("Cart is not ready. Please try again in a moment.");
+      toast.error("Cart is not ready. Please try again in a moment.", {
+        duration: 600,
+      });
       return;
     }
 
@@ -70,9 +72,12 @@ const TomodachiMenuSectionContent = ({
 
       await mutate();
 
-      toast.success(`${item.name} added to cart`, { position: "top-center" });
+      toast.success(`${item.name} added to cart`, {
+        position: "top-center",
+        duration: 600,
+      });
     } catch (err) {
-      toast.error(formatApiError(err).message);
+      toast.error(formatApiError(err).message, { duration: 600 });
     } finally {
       setBusyId(null);
     }
