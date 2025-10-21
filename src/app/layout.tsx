@@ -6,7 +6,6 @@ import "./styles/leclerc-fonts.css";
 
 // Providers
 import { CartProvider } from "./providers/cart-provider";
-import { AddressProvider } from "./providers/address-provider";
 import { RestaurantThemeProvider } from "./hooks/use-restaurant-theme";
 import { ErrorBoundary } from "./components/error-boundary";
 import { CartWrapper } from "./components/cart-wrapper";
@@ -61,12 +60,10 @@ export default function RootLayout({
       >
         <ErrorBoundary>
           <RestaurantThemeProvider defaultThemePath="/themes/leclerc-theme.json">
-            <AddressProvider>
-              <CartProvider>
-                {children}
-                <CartWrapper />
-              </CartProvider>
-            </AddressProvider>
+            <CartProvider>
+              {children}
+              <CartWrapper />
+            </CartProvider>
             <Toaster position="top-center" />
           </RestaurantThemeProvider>
         </ErrorBoundary>

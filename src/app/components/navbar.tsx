@@ -42,12 +42,7 @@ export const NavbarComp = () => {
   const closeCart = () => setIsCartOpen(false);
 
   const goToCheckout = (nextUrl?: string) => {
-    const fallbackUrl =
-      nextUrl?.trim() ||
-      cart?.checkoutUrl?.trim() ||
-      (cart?.locationId && cart?.id
-        ? `/locations/${cart.locationId}/carts/${cart.id}/checkout`
-        : "");
+    const fallbackUrl = nextUrl?.trim() || cart?.checkoutUrl?.trim() || "";
 
     if (!fallbackUrl) return;
 
@@ -199,7 +194,6 @@ export const Navbar = () => {
 };
 
 export default Navbar;
-
 
 
 

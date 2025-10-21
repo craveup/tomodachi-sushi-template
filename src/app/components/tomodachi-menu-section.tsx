@@ -22,7 +22,7 @@ interface MenuSectionProps {
   locationId?: string;
 }
 
-const IMAGE_FALLBACK = "/images/sushi/menu-items/sushi-plate.jpg";
+const IMAGE_FALLBACK = "/images/sushi/menu-items/salmon-maki.jpg";
 
 const TomodachiMenuSectionContent = ({
   title,
@@ -201,7 +201,6 @@ export const TomodachiMenuSection = (props: MenuSectionProps) => {
     </Suspense>
   );
 };
-
 
 
 
