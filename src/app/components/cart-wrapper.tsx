@@ -39,10 +39,25 @@ export function CartWrapper() {
     }));
   }, []);
 
-  const handleCheckout = () => {
-    if (!cartId) return;
+  const navigateToCheckout = (targetUrl: string) => {
+    if (/^https?:\/\//i.test(targetUrl)) {
+      window.location.href = targetUrl;
+    } else {
+      router.push(targetUrl);
+    }
+  };
+
+  const handleCheckout = (nextUrl?: string) => {
+    const targetUrl =
+      nextUrl?.trim() ||
+      (cartId
+        ? `/locations/${locationId}/carts/${cartId}/checkout`
+        : "");
+
+    if (!targetUrl) return;
+
     closeCart();
-    router.push(`/locations/${locationId}/carts/${cartId}/checkout`);
+    navigateToCheckout(targetUrl);
   };
 
   return (

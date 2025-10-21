@@ -63,11 +63,12 @@ const ProductDescriptionActionButton = ({
       await handleAddItemToCart();
       toast.success(`${cartItem.name} added to cart`, {
         position: "top-center",
+        duration: 600,
       });
     } catch (error) {
       const formattedError = formatApiError(error);
 
-      toast.error(formattedError.message);
+      toast.error(formattedError.message, { duration: 600 });
       setIsLoading(false);
 
       // TODO -- remove any type

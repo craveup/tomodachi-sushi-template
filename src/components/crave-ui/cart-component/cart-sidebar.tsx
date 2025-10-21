@@ -45,7 +45,7 @@ interface CartSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   cartItems?: CartItem[];
-  onCheckout?: () => void;
+  onCheckout?: (checkoutUrl?: string) => void | Promise<void>;
 }
 
 // --- API mappers ---
@@ -119,6 +119,7 @@ function CartSidebarContent({
   } = useCart();
 
   const locationId = resolvedLocationId ?? DEFAULT_LOCATION_ID;
+  const checkoutUrl = cart?.checkoutUrl?.trim() || null;
 
   const [busyLineId, setBusyLineId] = useState<string | null>(null);
   const [productIdToOpen, setProductIdToOpen] = useState<string>("");
@@ -198,7 +199,9 @@ function CartSidebarContent({
   // Quantity mutations
   const setQuantity = async (lineId: string, nextQty: number) => {
     if (!locationId || !cartId) {
-      toast.error("Cart is not ready yet. Please try again.");
+      toast.error("Cart is not ready yet. Please try again.", {
+        duration: 600,
+      });
       return false;
     }
 
@@ -211,7 +214,7 @@ function CartSidebarContent({
       await mutate();
       return true;
     } catch (err) {
-      toast.error(formatApiError(err).message);
+      toast.error(formatApiError(err).message, { duration: 600 });
       return false;
     } finally {
       setBusyLineId(null);
@@ -236,33 +239,51 @@ function CartSidebarContent({
     const nextQty = qty + 1;
     const success = await setQuantity(lineId, nextQty);
     if (success) {
-      toast.success(getQuantityToastMessage(name, qty, nextQty));
+      toast.success(getQuantityToastMessage(name, qty, nextQty), {
+        duration: 600,
+      });
     }
   };
   const handleDecrease = async (lineId: string, qty: number, name?: string) => {
     const nextQty = Math.max(0, qty - 1);
     const success = await setQuantity(lineId, nextQty);
     if (success) {
-      toast.success(getQuantityToastMessage(name, qty, nextQty));
+      toast.success(getQuantityToastMessage(name, qty, nextQty), {
+        duration: 600,
+      });
     }
   };
   const handleRemove = async (lineId: string, qty: number, name?: string) => {
     const success = await setQuantity(lineId, 0);
     if (success) {
-      toast.success(getQuantityToastMessage(name, qty, 0));
+      toast.success(getQuantityToastMessage(name, qty, 0), {
+        duration: 600,
+      });
     }
   };
   const handleCheckoutClick = async () => {
     if (!apiItems.length || !cartId) return;
 
-    if (onCheckout) {
-      await mutate();
-      await Promise.resolve(onCheckout());
+    if (!checkoutUrl) {
+      toast.error("Checkout is not available right now. Please try again.", {
+        duration: 600,
+      });
       return;
     }
 
     await mutate();
-    router.push(`/locations/${locationId}/carts/${cartId}/checkout`);
+
+    if (onCheckout) {
+      await Promise.resolve(onCheckout(checkoutUrl));
+      return;
+    }
+
+    if (/^https?:\/\//i.test(checkoutUrl)) {
+      window.location.href = checkoutUrl;
+      return;
+    }
+
+    router.push(checkoutUrl);
   };
 
   const handleSheetOpenChange = React.useCallback(
