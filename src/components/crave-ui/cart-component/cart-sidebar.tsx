@@ -82,7 +82,6 @@ type ApiProduct =
 function mapProductsToSuggested(
   data: ApiProduct[] | undefined
 ): SuggestedItem[] {
-  console.log(data, "data is her...");
   if (!Array.isArray(data)) return [];
   const pickImage = (p: ApiProduct): string | null =>
     absolutizeImage(
