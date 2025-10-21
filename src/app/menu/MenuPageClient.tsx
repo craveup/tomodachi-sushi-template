@@ -34,7 +34,7 @@ const MenuPageClient = () => {
 
   const openProduct = useCallback((id: string) => setSelectedProductId(id), []);
   const closeProduct = useCallback(() => setSelectedProductId(""), []);
-    const {cartId} = useCartStore();
+
   useEffect(() => {
     if (!menus.length) {
       setSelectedMenuId("");
