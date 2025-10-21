@@ -2,7 +2,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { startOrderingSession } from "@/lib/api/ordering-session";
+import {
+  startOrderingSession,
+  type StartOrderingSessionRequest,
+} from "@/lib/api/ordering-session";
 import { getCartId, setCartId } from "@/lib/local-storage";
 import { formatApiError } from "@/lib/format-api-error";
 import { useCartStore } from "@/store/cart-store";
@@ -41,14 +44,22 @@ export function useOrderingSession(
 
       const existingCartId =
         getCartId(locationId, DEFAULT_FULFILLMENT_METHOD) || undefined;
+      const redirectUrl =
+        typeof window !== "undefined" ? window.location.origin : undefined;
+
+      const payload: StartOrderingSessionRequest = {
+        existingCartId,
+        fulfillmentMethod: DEFAULT_FULFILLMENT_METHOD,
+      };
+
+      if (redirectUrl) {
+        payload.redirectURL = redirectUrl;
+      }
 
       try {
         const { cartId: newCartId, errorMessage } = await startOrderingSession(
           locationId,
-          {
-            existingCartId,
-            fulfillmentMethod: DEFAULT_FULFILLMENT_METHOD,
-          },
+          payload,
         );
 
         if (cancelled) return;
