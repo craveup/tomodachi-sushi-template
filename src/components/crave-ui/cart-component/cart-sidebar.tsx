@@ -120,10 +120,6 @@ function CartSidebarContent({
 
   const locationId = resolvedLocationId ?? DEFAULT_LOCATION_ID;
 
-  const hasExternalCartItems = Boolean(cartItems?.length);
-  const showCartSkeleton =
-    !hasExternalCartItems && !cart && (cartLoading || cartValidating);
-
   const [busyLineId, setBusyLineId] = useState<string | null>(null);
   const [productIdToOpen, setProductIdToOpen] = useState<string>("");
 
@@ -318,7 +314,7 @@ function CartSidebarContent({
         {/* Items */}
         <div className="flex-1 overflow-hidden min-h-0">
           <div className="p-2">
-            {showCartSkeleton ? (
+            {cartLoading ? (
               <div className="space-y-4">
                 {Array.from({ length: 3 }).map((_, i) => (
                   <div

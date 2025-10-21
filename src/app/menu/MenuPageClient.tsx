@@ -10,6 +10,7 @@ import { location_Id as LOCATION_ID } from "@/constants";
 import { MenuSwitcher } from "@/app/components/menu/menu-switcher";
 import ProductDescriptionDialog from "../components/product-description/ProductDescriptionDialog";
 import { TomodachiMenuSection } from "../components/tomodachi-menu-section";
+import {useCartStore} from "@/store/cart-store";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +34,7 @@ const MenuPageClient = () => {
 
   const openProduct = useCallback((id: string) => setSelectedProductId(id), []);
   const closeProduct = useCallback(() => setSelectedProductId(""), []);
-
+    const {cartId} = useCartStore();
   useEffect(() => {
     if (!menus.length) {
       setSelectedMenuId("");
