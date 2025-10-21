@@ -1,107 +1,56 @@
-import axios from "axios";
-import { getAuthToken } from "./local-storage";
-import { STORE_FRONT_API_BASE_URL } from "@/constants";
+import type { RequestConfig } from "@craveup/storefront-sdk";
+import {
+  apiDelete,
+  apiFetch,
+  apiPatch,
+  apiPost,
+  apiPut,
+  swrFetcher,
+} from "@/lib/api/fetcher";
 
-export const fetcherSWR = async (
-  endPoint: string,
-  baseUrl = STORE_FRONT_API_BASE_URL
-) => {
-  return handleRequestClientSide(endPoint, undefined, undefined, baseUrl).then(
-    (res) => res.data
-  );
-};
+export const fetcherSWR = async (endpoint: string) => swrFetcher(endpoint);
 
-// REST APIs Request handlers
-async function handleRequestClientSide(
-  endPoint: string,
-  method = "GET",
-  data?: Record<any, any>,
-  baseUrl = STORE_FRONT_API_BASE_URL
-) {
-  const fullEndpoint = `${baseUrl}${endPoint}`;
-
-  const token = getAuthToken();
-
-  return axios({
-    method: method,
-    url: fullEndpoint,
-    ...(data && { data }),
-    headers: {
-      "Content-Type": "application/json",
-      "X-API-Key": process.env.NEXT_PUBLIC_API_KEY as string,
-      ...(Boolean(token) && { Authorization: `Bearer ${token}` }),
-    },
-  });
-}
-
-export const fetchData = async (
-  endPoint: string,
-  baseUrl?: string,
-  revalidateTime?: number
-) => {
-  const response = await handleRequestClientSide(
-    endPoint,
-    undefined,
-    undefined,
-    baseUrl
-  );
-
-  return response.data;
-};
-
-export const postData = async (
+export const fetchData = async <T = unknown>(
   endpoint: string,
-  data: Record<any, any>,
-  baseUrl?: string
+  _baseUrl?: string,
+  _revalidateTime?: number,
+  config?: RequestConfig,
 ) => {
-  const response = await handleRequestClientSide(
-    endpoint,
-    "post",
-    data,
-    baseUrl
-  );
-
-  return response.data;
+  return apiFetch<T>(endpoint, config);
 };
 
-export const putData = async (
+export const postData = async <T = unknown>(
   endpoint: string,
-  data: Record<any, any>,
-  baseUrl?: string
+  data: Record<string, any>,
+  _baseUrl?: string,
+  config?: RequestConfig,
 ) => {
-  const response = await handleRequestClientSide(
-    endpoint,
-    "put",
-    data,
-    baseUrl
-  );
-  return response.data;
+  return apiPost<T>(endpoint, data, config);
 };
 
-export const patchData = async (
+export const putData = async <T = unknown>(
   endpoint: string,
-  data: Record<any, any>,
-  baseUrl?: string
+  data: Record<string, any>,
+  _baseUrl?: string,
+  config?: RequestConfig,
 ) => {
-  const response = await handleRequestClientSide(
-    endpoint,
-    "patch",
-    data,
-    baseUrl
-  );
-  return response.data;
+  return apiPut<T>(endpoint, data, config);
 };
 
-export const deleteData = async (
+export const patchData = async <T = unknown>(
   endpoint: string,
-  data?: Record<any, any>,
-  baseUrl?: string
+  data: Record<string, any>,
+  _baseUrl?: string,
+  config?: RequestConfig,
 ) => {
-  const response = await handleRequestClientSide(
-    endpoint,
-    "delete",
-    data,
-    baseUrl
-  );
-  return response.data;
+  return apiPatch<T>(endpoint, data, config);
+};
+
+export const deleteData = async <T = unknown>(
+  endpoint: string,
+  data?: Record<string, any>,
+  _baseUrl?: string,
+  config?: RequestConfig,
+) => {
+  return apiDelete<T>(endpoint, data, config);
 };

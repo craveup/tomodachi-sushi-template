@@ -9,6 +9,12 @@ export interface ApiError {
   message?: string;
 }
 
+export enum ItemUnavailableActions {
+  REMOVE_ITEM = 'remove_item',
+  CANCEL_ENTIRE_ORDER = 'cancel_entire_order',
+}
+
+
 export interface ProductDescriptionProps {
   productId: string;
   locationId: string;
@@ -16,3 +22,4 @@ export interface ProductDescriptionProps {
   onClose: () => void;
   isAddToCartBlocked?: boolean;
 }
+

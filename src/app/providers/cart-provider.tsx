@@ -18,7 +18,7 @@ import {
 } from "@/lib/api/cart";
 import type { CartResponse } from "@/lib/api";
 import { location_Id as LOCATION_ID } from "@/constants";
-import { ItemUnavailableActions } from "@/app/components/product-description/ProductDescription";
+import { ItemUnavailableActions } from "@/types/common";
 
 interface CartContextType {
   items: LocalCartItem[];
@@ -309,4 +309,5 @@ export function useCart() {
   }
   return context;
 }
+
 
