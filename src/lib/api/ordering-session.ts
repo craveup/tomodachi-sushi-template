@@ -5,7 +5,7 @@ export type StartOrderingSessionRequest = {
   existingCartId?: string | null;
   marketplaceId?: string | null;
   fulfillmentMethod: string;
-  redirectURL?: string;
+  returnUrl?: string;
 };
 
 export type StartOrderingSessionResponse = {

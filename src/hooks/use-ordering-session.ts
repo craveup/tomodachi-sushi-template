@@ -44,16 +44,16 @@ export function useOrderingSession(
 
       const existingCartId =
         getCartId(locationId, DEFAULT_FULFILLMENT_METHOD) || undefined;
-      const redirectUrl =
+      const returnUrl =
         typeof window !== "undefined" ? window.location.origin : undefined;
-
+      
       const payload: StartOrderingSessionRequest = {
         existingCartId,
         fulfillmentMethod: DEFAULT_FULFILLMENT_METHOD,
       };
 
-      if (redirectUrl) {
-        payload.redirectURL = redirectUrl;
+      if (returnUrl) {
+        payload.returnUrl = returnUrl;
       }
 
       try {
