@@ -4,11 +4,8 @@ import { Geist, Geist_Mono, Forum, Yuji_Mai } from "next/font/google";
 import "./globals.css";
 import "./styles/leclerc-fonts.css";
 
-// Providers
-import { CartProvider } from "./providers/cart-provider";
 import { RestaurantThemeProvider } from "./hooks/use-restaurant-theme";
 import { ErrorBoundary } from "./components/error-boundary";
-import { CartWrapper } from "./components/cart-wrapper";
 import { Toaster } from "@/components/ui/sonner";
 
 // Load Google Fonts
@@ -60,10 +57,7 @@ export default function RootLayout({
       >
         <ErrorBoundary>
           <RestaurantThemeProvider defaultThemePath="/themes/leclerc-theme.json">
-            <CartProvider>
-              {children}
-              <CartWrapper />
-            </CartProvider>
+            {children}
             <Toaster position="top-center" />
           </RestaurantThemeProvider>
         </ErrorBoundary>

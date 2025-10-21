@@ -58,9 +58,10 @@ The application uses a sophisticated theming system:
 
 ### State Management
 
-- **Cart Provider**: `src/app/providers/cart-provider.tsx` manages shopping cart state
-- **Address Provider**: `src/app/providers/address-provider.tsx` handles delivery addresses
-- **Theme Provider**: Manages theme switching and dark mode
+- **Cart Hook**: `src/hooks/useCart.ts` keeps the active cart in sync with the CraveUp API
+- **Cart Store**: `src/store/cart-store.ts` (Zustand) persists the current cart ID and loading state
+- **Ordering Session Hook**: `src/hooks/use-ordering-session.ts` bootstraps sessions and cart IDs
+- **Theme Provider**: `RestaurantThemeProvider` manages theme switching and dark mode
 
 ### Component Patterns
 
@@ -86,18 +87,15 @@ Required for full functionality:
 
 ### Testing Approach
 
-- **React Testing Library**: Available for component testing
-- **Test Utilities**: Custom test helpers in `src/lib/test-utils/`
-- **Mock Data**: Predefined mock data for development and testing
+- No dedicated automated tests are included; add React Testing Library suites as needed for your project
 
 ### Critical Architecture Details
 
 #### Advanced State Management Patterns
-- **Hybrid Cart Strategy**: Primary API-driven state with localStorage fallback for offline functionality
-- **Provider Hierarchy**: Error Boundary → Theme → Address → Cart (strict layering order)
-- **State Synchronization**: Real-time cart sync between API and local storage with optimistic updates
-- **Cart Initialization**: Automatic cart creation via `initializeCart()` with saved cart ID persistence
-- **Hydration Safety**: Client-side state hydration with SSR compatibility
+- **Hybrid Cart Strategy**: `useCart` pulls live data from the storefront API while `cart-store` keeps the active cart ID cached in Zustand/localStorage
+- **Session Bootstrapping**: `use-ordering-session` ensures a valid cart exists for the active location before menu interactions
+- **Cart Surface**: `CartSidebar` (used by the Navbar) consumes the live cart hook directly—no extra providers required
+- **Hydration Safety**: All cart hooks are client components with guarded localStorage access for SSR compatibility
 
 #### Theme Engine Implementation
 - **JSON-Driven Themes**: Load from `public/themes/` with runtime validation via `ThemeEngine.validateTheme()`
@@ -114,7 +112,7 @@ Required for full functionality:
 - **Hybrid API Approach**: Some endpoints use direct API calls, others use Next.js API routes
 
 #### Component Development Guidelines
-- **Follow Existing Patterns**: Reference `src/components/ui/example/` for new components
+- **Follow Existing Patterns**: Mirror production components in `src/app/components/` and `src/components/ui/`
 - **Compound Components**: Use for complex UI (cart, menu items)
 - **TypeScript**: Strict mode - always define proper interfaces in `src/types/`
 - **Styling**: Use theme engine variables, not hardcoded colors
@@ -123,8 +121,9 @@ Required for full functionality:
 - `src/lib/theme-engine.ts` - Theme system core with CSS custom properties generation
 - `src/lib/api/client.ts` - CraveUp API client with error handling
 - `src/lib/api/config.ts` - API configuration, endpoints, and security handling
-- `src/app/providers/cart-provider.tsx` - Cart state management with API/localStorage hybrid
+- `src/hooks/useCart.ts` - Cart data hook shared across screens and the cart sidebar
+- `src/components/crave-ui/cart-component/cart-sidebar.tsx` - Reusable cart surface driven by the storefront API
 - `src/app/hooks/use-restaurant-theme.tsx` - Theme management hooks and providers
 - `src/app/types.ts` - Core application type definitions
-- `public/themes/leclerc-theme.json` - Theme configuration with bakery-specific styling
+- `public/themes/leclerc-theme.json` - Theme configuration with sushi-specific styling
 - `components.json` - Shadcn/ui configuration (New York style, CSS variables enabled)
