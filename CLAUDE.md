@@ -52,7 +52,7 @@ The application uses a sophisticated theming system:
 ### API Integration
 
 - **Base Client**: `src/lib/api/client.ts` handles all CraveUp API interactions
-- **Environment Variables**: Requires `CRAVEUP_API_KEY` and `CRAVEUP_API_BASE_URL`
+- **Environment Variables**: Requires `NEXT_PUBLIC_CRAVEUP_API_KEY` and `CRAVEUP_API_BASE_URL`
 - **API Routes**: Next.js API routes in `src/api/` for server-side API calls
 - **Error Handling**: Custom error classes and response handling
 
@@ -80,8 +80,7 @@ The application uses a sophisticated theming system:
 ### Environment Variables
 
 Required for full functionality:
-- `CRAVEUP_API_KEY` - Server-side API key for CraveUp restaurant API
-- `NEXT_PUBLIC_CRAVEUP_API_KEY` - Client-side API key (fallback)
+- `NEXT_PUBLIC_CRAVEUP_API_KEY` - Storefront API key exposed to the client
 - `CRAVEUP_API_BASE_URL` - Base URL for API calls (defaults to localhost:8000)
 - `NEXT_PUBLIC_LOCATION_ID` - Required location ID for restaurant operations
 

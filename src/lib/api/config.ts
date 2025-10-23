@@ -3,11 +3,11 @@ export const CRAVEUP_API_BASE = process.env.CRAVEUP_API_BASE_URL || 'http://loca
 
 // Lazy API key getter - only throws when actually used
 export const getApiKey = () => {
-  const apiKey = process.env.CRAVEUP_API_KEY || process.env.NEXT_PUBLIC_CRAVEUP_API_KEY
+  const apiKey = process.env.NEXT_PUBLIC_CRAVEUP_API_KEY
   if (!apiKey) {
     // Only warn on server side when actually making API calls
     if (typeof window === 'undefined') {
-      console.warn('CRAVEUP_API_KEY not found. API features will not work.')
+      console.warn('NEXT_PUBLIC_CRAVEUP_API_KEY not found. API features will not work.')
     }
     return ''
   }
@@ -16,7 +16,7 @@ export const getApiKey = () => {
 
 // Server-side only API key getter - no client-side warnings
 export const getServerApiKey = () => {
-  return process.env.CRAVEUP_API_KEY || ''
+  return process.env.NEXT_PUBLIC_CRAVEUP_API_KEY || ''
 }
 
 // For backward compatibility - use getApiKey() function instead
@@ -56,7 +56,7 @@ export const endpoints = {
   product: (locationId: string, productId: string) => `${CRAVEUP_API_BASE}/api/v1/locations/${locationId}/products/${productId}`,
   timeIntervals: (locationId: string) => `${CRAVEUP_API_BASE}/api/v1/locations/${locationId}/time-intervals`,
   gratuity: (locationId: string) => `${CRAVEUP_API_BASE}/api/v1/locations/${locationId}/gratuity`,
-  
+
   // Cart endpoints
   carts: (locationId: string) => `/api/carts?locationId=${locationId}`,
   cart: (locationId: string, cartId: string) => `/api/carts/${cartId}?locationId=${locationId}`,
@@ -66,10 +66,10 @@ export const endpoints = {
   cartRoom: (locationId: string, cartId: string) => `${CRAVEUP_API_BASE}/api/v1/locations/${locationId}/carts/${cartId}/set-room`,
   cartOrderTime: (locationId: string, cartId: string) => `${CRAVEUP_API_BASE}/api/v1/locations/${locationId}/carts/${cartId}/update-order-time`,
   cartValidate: (locationId: string, cartId: string) => `${CRAVEUP_API_BASE}/api/v1/locations/${locationId}/cart/${cartId}/validate-and-update`,
-  
+
   // Payment endpoints
   paymentIntent: (locationId: string, cartId: string) => `${CRAVEUP_API_BASE}/api/v1/stripe/payment-intent?locationId=${locationId}&cartId=${cartId}`,
-  
+
   // Discount endpoints
   applyDiscount: (locationId: string) => `${CRAVEUP_API_BASE}/api/v1/locations/${locationId}/discounts/apply-discount`,
   removeDiscount: (locationId: string) => `${CRAVEUP_API_BASE}/api/v1/locations/${locationId}/discounts/apply-discount`
