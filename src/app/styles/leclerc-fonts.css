@@ -1,0 +1,96 @@
+/* Leclerc Bakery Custom Fonts */
+
+@font-face {
+  font-family: 'National2Web';
+  src: url('/fonts/leclerc/National2Web-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Pitch';
+  src: url('/fonts/leclerc/Pitch-Semibold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Platform';
+  src: url('/fonts/leclerc/Platform-Regular-Web.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Platform';
+  src: url('/fonts/leclerc/Platform-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Assistant';
+  src: url('/fonts/leclerc/assistant_n4.bcd3d09dcb631dec5544b8fb7b154ff234a44630.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GoogleSans';
+  src: url('/fonts/leclerc/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-mu0SC55I.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GoogleSans';
+  src: url('/fonts/leclerc/pxiByp8kv8JHgFVrLGT9Z1xlFd2JQEk.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Leclerc Typography System - CSS Variables for Tailwind */
+:root {
+  /* Display font for hero and major headings */
+  --font-leclerc-display: 'Pitch', 'Georgia', serif;
+  
+  /* Primary font for body text and UI */
+  --font-leclerc-primary: 'Platform', 'Inter', sans-serif;
+  
+  /* Accent font for special elements */
+  --font-leclerc-accent: 'National2Web', 'Times New Roman', serif;
+  
+  /* Supporting font for labels and metadata */
+  --font-leclerc-support: 'Assistant', 'Helvetica Neue', sans-serif;
+  
+  /* Alternative for modern touch */
+  --font-leclerc-modern: 'GoogleSans', 'Roboto', sans-serif;
+}
+
+/* Tailwind Custom Font Utilities */
+.font-leclerc-display {
+  font-family: var(--font-leclerc-display);
+}
+
+.font-leclerc-primary {
+  font-family: var(--font-leclerc-primary);
+}
+
+.font-leclerc-accent {
+  font-family: var(--font-leclerc-accent);
+}
+
+.font-leclerc-support {
+  font-family: var(--font-leclerc-support);
+}
+
+.font-leclerc-modern {
+  font-family: var(--font-leclerc-modern);
+}

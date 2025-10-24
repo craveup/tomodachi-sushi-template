@@ -1,145 +1,89 @@
-// app/(storefront)/page.tsx
+import { Button } from "@/components/ui/button";
+import { Facebook, Instagram, Twitter } from "lucide-react";
 import React from "react";
-import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar/Navbar";
-import { Container } from "@/components/ui/Container";
-import MerchantHeader from "@/app/components/MerchantHeader";
-import LocationsSection from "@/app/components/LocationsSection";
-import type { MerchantApiResponse } from "@/types/merchant-types";
-import { getMerchant } from "@/lib/api/merchant";
-import { getLocationById } from "@/lib/api/location";
-import type { GetLocationViaSlugType } from "@/types/location-types";
+import { Navbar } from "./components/navbar";
+import RoundedEdge from "./components/rounded-edge";
+import { notFound } from "next/navigation";
+import SideCards from "@/app/components/SideCards";
+import OrderingSessionCompo from "@/app/components/OrderingSessionCompo";
 
-async function resolveStoreIdentifier(): Promise<string | null> {
-  const storeIdentifier = process.env.NEXT_PUBLIC_ORG_SLUG?.trim();
-  if (!storeIdentifier) {
-    console.error("[storefront] NEXT_PUBLIC_ORG_SLUG env var is not set");
-    return null;
-  }
-  return storeIdentifier;
-}
-
-function resolveDefaultLocationId(): string | null {
-  const locationId = process.env.NEXT_PUBLIC_DEFAULT_LOCATION_ID?.trim();
-  return locationId ? locationId : null;
-}
-
-async function loadMerchant(storeIdentifier: string | null): Promise<MerchantApiResponse | null> {
-  if (!storeIdentifier) {
-    return null;
-  }
+export default async function TomodachiFrontpage() {
   try {
-    return await getMerchant(storeIdentifier);
-  } catch (error) {
-    console.error("[storefront] failed to load merchant", { storeIdentifier, error });
-    return null;
-  }
-}
+    const socialIcons = [
+      { icon: Instagram, label: "Instagram" },
+      { icon: Facebook, label: "Facebook" },
+      { icon: Twitter, label: "Twitter" },
+    ];
 
-async function loadLocation(locationId: string | null): Promise<GetLocationViaSlugType | null> {
-  if (!locationId) {
-    return null;
-  }
+    return (
+      <div className="flex flex-col min-h-screen lg:h-screen bg-backgrounddefault lg:overflow-hidden">
+        <OrderingSessionCompo />
 
-  try {
-    return await getLocationById(locationId);
-  } catch (error) {
-    console.error("[storefront] failed to load default location", { locationId, error });
-    return null;
-  }
-}
+        {/* Mobile and Desktop Layout */}
+        <div className="flex flex-col lg:flex-row min-h-screen lg:min-h-0 lg:h-full p-3 lg:p-6 gap-3 lg:gap-4">
+          {/* Hero Section */}
+          <div className="bg-black rounded-xl lg:rounded-2xl relative flex-1 overflow-hidden">
+            <div className="relative w-full h-[60vh] sm:h-[70vh] lg:h-full bg-[url(/images/sushi/hero-background.png)] bg-cover bg-center">
+              {/* Header - Responsive positioning */}
+              <header className="absolute top-4 left-4 right-4 sm:top-6 sm:left-6 sm:right-6 lg:top-12 lg:left-12 lg:right-auto z-10">
+                <Navbar />
+              </header>
 
-export async function generateMetadata(): Promise<Metadata> {
-  const defaultLocationId = resolveDefaultLocationId();
-  if (defaultLocationId) {
-    const location = await loadLocation(defaultLocationId);
+              {/* Mobile: Japanese Title Overlay */}
+              <h1
+                className="lg:hidden absolute
+                         top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center
+                         font-yuji-mai text-white
+                         text-3xl sm:text-4xl md:text-6xl
+                         tracking-wide
+                         leading-tight
+                         max-w-[90vw]
+                         break-words
+                         drop-shadow-2xl
+                         z-0"
+              >
+                日本橋蛎殻町友達寿司
+              </h1>
 
-    if (!location) {
-      return {
-        title: "Location Not Available",
-        description: "The requested location could not be found.",
-      };
-    }
+              {/* Desktop: Gradient overlay */}
+              <div className="hidden lg:block absolute inset-x-0 bottom-0 h-[clamp(320px,45vh,534px)] bg-[linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,1)_100%)]" />
 
-    const { restaurantDisplayName, restaurantBio, coverPhoto } = location;
-    const description =
-      restaurantBio?.trim() ||
-      `Browse the ${restaurantDisplayName} menu, check availability, and start an order.`;
+              {/* Social Icons - Desktop only */}
+              <div className="hidden lg:block absolute right-0 bottom-0 z-30">
+                <div className="flex flex-col items-center gap-4 pl-6 pr-4 pt-6 pb-4 bg-backgrounddefault rounded-[24px_0px_0px_0px]">
+                  <div>
+                    <RoundedEdge className="!top-[52px] !-left-6 !absolute" />
+                    <RoundedEdge className="!-top-6 !left-[140px] !absolute" />
+                  </div>
+                  <div className="inline-flex items-center gap-2">
+                    {socialIcons.map((social, index) => (
+                      <Button
+                        key={index}
+                        variant="outline"
+                        size="icon"
+                        className="w-9 h-9 bg-backgroundmuted rounded-full cursor-pointer border-borderdefault hover:bg-blend-color-dodge hover:text-textinverse transition-colors"
+                      >
+                        <social.icon className="w-[18px] h-[18px] text-icondefault" />
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
-    return {
-      title: `${restaurantDisplayName} — Menu & Ordering`,
-      description,
-      openGraph: {
-        title: `${restaurantDisplayName} — Menu & Ordering`,
-        description,
-        type: "website",
-        images: coverPhoto ? [{ url: coverPhoto }] : undefined,
-      },
-    };
-  }
+              {/* Desktop Japanese Title */}
+              <h1 className="hidden lg:block absolute bottom-[clamp(16px,6vh,77px)] left-12 right-12 w-auto font-yuji-mai text-textdefault text-[clamp(28px,4.2vw,72px)] tracking-normal leading-none whitespace-nowrap z-20">
+                日本橋蛎殻町友達寿司
+              </h1>
 
-  const storeIdentifier = await resolveStoreIdentifier();
-  const merchant = await loadMerchant(storeIdentifier);
-
-  if (!merchant) {
-    return {
-      title: "Storefront",
-      description: "Browse locations and place orders.",
-    };
-  }
-
-  const { name, bio, cover } = merchant;
-  const description = bio?.trim() || `Browse all ${name} locations and place orders for delivery, pickup, or dine in.`;
-
-  return {
-    title: `${name} — Locations & Ordering`,
-    description,
-    openGraph: {
-      title: `${name} — Locations & Ordering`,
-      description,
-      type: "website",
-      images: cover ? [{ url: cover }] : undefined,
-    },
-  };
-}
-
-export default async function StorefrontPage() {
-  const defaultLocationId = resolveDefaultLocationId();
-  if (defaultLocationId) {
-    redirect(`/${encodeURIComponent(defaultLocationId)}`);
-  }
-
-  const storeIdentifier = await resolveStoreIdentifier();
-  const merchant = await loadMerchant(storeIdentifier);
-
-  if (!merchant) {
+              {/* Mobile: Subtle gradient for text readability */}
+              <div className="lg:hidden absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/30 pointer-events-none"></div>
+            </div>
+          </div>
+          <SideCards />
+        </div>
+      </div>
+    );
+  } catch (e) {
     notFound();
   }
-
-  const { name, locations } = merchant;
-
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Navbar />
-
-      <main className="pt-14">
-        <MerchantHeader merchant={merchant} />
-
-        <Container className="space-y-6 py-12 md:py-16" id="locations">
-          <div className="space-y-2">
-            <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">Our Locations</h2>
-            <p className="text-sm text-muted-foreground md:text-base">
-              Find a {name} location near you and choose your preferred ordering method.
-            </p>
-          </div>
-
-          <LocationsSection locations={locations} />
-        </Container>
-      </main>
-
-      <Footer />
-    </div>
-  );
 }

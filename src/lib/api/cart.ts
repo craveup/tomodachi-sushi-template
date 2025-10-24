@@ -1,100 +1,169 @@
-import type {
-  AddCartItemPayload,
-  AddCartItemResponse,
-  LocationAddressDTO,
-  UpdateGratuityPayload,
-  UpdateOrderTimePayload,
-  ValidateAndUpdateCustomerPayload,
-  StorefrontCart,
-  RequestConfig
-} from '@craveup/storefront-sdk';
-import { storefrontClient } from '@/lib/storefront-client';
+import { deleteData, fetchData, postData, putData } from "./crave-client";
+import {
+  CartResponse,
+  CartItem,
+  LocationData,
+  ProductData,
+  PaymentIntentResponse,
+} from "./types";
 
-export function getCart(
+// Get cart data
+export const getCart = async (
+  locationId: string,
+  cartId: string
+): Promise<CartResponse> => {
+  return fetchData(`/api/v1/locations/${locationId}/carts/${cartId}`);
+};
+
+// Get location data
+export const getLocation = async (
+  locationId: string
+): Promise<LocationData> => {
+  return fetchData(`/api/v1/locations/${locationId}`);
+};
+
+// Get product recommendations for cart
+export const getCartRecommendations = async (
+  locationId: string,
+  cartId: string
+): Promise<ProductData[]> => {
+  return fetchData(`/api/v1/locations/${locationId}/carts/${cartId}/products`);
+};
+
+// Add item to cart
+export const addItemToCart = async (
   locationId: string,
   cartId: string,
-  config?: RequestConfig
-): Promise<StorefrontCart> {
-  return storefrontClient.cart.get(locationId, cartId, config);
-}
+  addItemData: any
+) => {
+  return postData(
+    `/api/v1/locations/${locationId}/carts/${cartId}/cart-item`,
+    addItemData
+  );
+};
 
-export function updateOrderTime(
-  locationId: string,
-  cartId: string,
-  payload: UpdateOrderTimePayload,
-  config?: RequestConfig
-): Promise<StorefrontCart | { success: true }> {
-  return storefrontClient.cart.updateOrderTime(locationId, cartId, payload, config);
-}
-
-export function validateAndUpdateCustomer(
-  locationId: string,
-  cartId: string,
-  payload: ValidateAndUpdateCustomerPayload,
-  config?: RequestConfig
-): Promise<{ success: true }> {
-  return storefrontClient.cart.validateAndUpdateCustomer(locationId, cartId, payload, config);
-}
-
-export function updateGratuity(
-  locationId: string,
-  cartId: string,
-  payload: UpdateGratuityPayload,
-  config?: RequestConfig
-): Promise<StorefrontCart> {
-  return storefrontClient.cart.updateGratuity(locationId, cartId, payload, config);
-}
-
-export function setDelivery(
-  locationId: string,
-  cartId: string,
-  payload: LocationAddressDTO,
-  config?: RequestConfig
-): Promise<{ success: true }> {
-  return storefrontClient.cart.setDelivery(locationId, cartId, payload, config);
-}
-
-export function setTable(
-  locationId: string,
-  cartId: string,
-  tableNumber: string,
-  config?: RequestConfig
-): Promise<{ success: true }> {
-  return storefrontClient.cart.setTable(locationId, cartId, tableNumber, config);
-}
-
-export function setRoom(
-  locationId: string,
-  cartId: string,
-  payload: { lastName: string; roomNumber: string },
-  config?: RequestConfig
-): Promise<{ success: true }> {
-  return storefrontClient.cart.setRoom(locationId, cartId, payload, config);
-}
-
-export function addCartItem(
-  locationId: string,
-  cartId: string,
-  payload: AddCartItemPayload,
-  config?: RequestConfig
-): Promise<AddCartItemResponse> {
-  return storefrontClient.cart.addItem(locationId, cartId, payload, config);
-}
-
-export function updateCartItemQuantity(
+// Update cart item quantity
+export const updateCartItemQuantity = async (
   locationId: string,
   cartId: string,
   itemId: string,
-  quantity: number,
-  config?: RequestConfig
-): Promise<StorefrontCart> {
-  return storefrontClient.cart.updateItemQuantity(locationId, cartId, itemId, quantity, config);
-}
+  quantity: number
+) => {
+  return putData(
+    `/api/v1/locations/${locationId}/carts/${cartId}/items/${itemId}`,
+    { quantity }
+  );
+};
 
-export function deleteCart(
+// Remove item from cart
+export const removeCartItem = async (
   locationId: string,
   cartId: string,
-  config?: RequestConfig
-): Promise<{ success: true }> {
-  return storefrontClient.cart.delete(locationId, cartId, config);
-}
+  itemId: string
+) => {
+  return putData(
+    `/api/v1/locations/${locationId}/carts/${cartId}/items/${itemId}`,
+    { quantity: 0 }
+  );
+};
+
+// Update order time
+export const updateOrderTime = async (
+  locationId: string,
+  cartId: string,
+  updateData: {
+    pickupType: string;
+    orderDate: string;
+    orderTime: string;
+  }
+) => {
+  return putData(
+    `/api/v1/locations/${locationId}/carts/${cartId}/update-order-time`,
+    updateData
+  );
+};
+
+// Apply promo code
+export const applyPromoCode = async (
+  locationId: string,
+  cartId: string,
+  promoCode: string
+) => {
+  return postData(`/api/v1/locations/${locationId}/discounts/apply-discount`, {
+    cartId,
+    code: promoCode,
+  });
+};
+
+// Remove promo code
+export const removePromoCode = async (
+  locationId: string,
+  cartId: string
+) => {
+  return deleteData(`/api/v1/locations/${locationId}/discounts/apply-discount`, {
+    cartId
+  });
+};
+
+// Update customer information
+export const updateCustomerInfo = async (
+  locationId: string,
+  cartId: string,
+  customer: any
+) => {
+  return putData(
+    `/api/v1/locations/${locationId}/carts/${cartId}/validate-and-update`,
+    customer
+  );
+};
+
+// Get payment intent
+export const getPaymentIntent = async (
+  locationId: string,
+  cartId: string
+): Promise<PaymentIntentResponse> => {
+  return fetchData(
+    `/api/v1/stripe/payment-intent?locationId=${locationId}&cartId=${cartId}`
+  );
+};
+
+// Create a new cart
+export const createCart = async (
+  locationId: string,
+  currentCartId: string | null = null,
+  fulfillmentMethod?: string
+): Promise<{ cartId: string }> => {
+  const searchParams = fulfillmentMethod
+    ? `fulfillmentMethod=${fulfillmentMethod}`
+    : "";
+  const cartData = {
+    marketplaceId: null,
+    searchParams: searchParams,
+    currentCartId: currentCartId,
+  };
+  return postData(`/api/v1/locations/${locationId}/carts`, cartData);
+};
+
+// Set table service fulfillment
+export const setTableService = async (
+  locationId: string,
+  cartId: string,
+  tableNumber: string
+) => {
+  return putData(`/api/v1/locations/${locationId}/carts/${cartId}/set-table`, {
+    tableNumber,
+  });
+};
+
+// Set room service fulfillment
+export const setRoomService = async (
+  locationId: string,
+  cartId: string,
+  lastName: string,
+  roomNumber: string
+) => {
+  return putData(`/api/v1/locations/${locationId}/carts/${cartId}/set-room`, {
+    lastName,
+    roomNumber,
+  });
+};

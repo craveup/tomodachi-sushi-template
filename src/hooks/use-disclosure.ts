@@ -7,8 +7,7 @@ function useDisclosure() {
     isOpen,
     onOpen: () => setIsOpen(true),
     onClose: () => setIsOpen(false),
-    onToggle: () => setIsOpen((prev) => !prev),
-    setOpen: setIsOpen,
+    onToggle: () => setIsOpen(!open),
   };
 }
 

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
@@ -24,8 +24,10 @@ import { cn } from "@/lib/utils";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
 interface ResponsiveSheetProps {
-  title?: string;
-  description?: string;
+  title?: React.ReactNode;
+  titleClassName?: string;
+  description?: React.ReactNode;
+  headerClassName?: string;
   open: boolean;
   setOpen: (open: boolean) => void;
   onMainBtnClick?: () => void;
@@ -44,7 +46,9 @@ interface ResponsiveSheetProps {
 export function ResponsiveSheet(props: ResponsiveSheetProps) {
   const {
     title,
+    titleClassName,
     description,
+    headerClassName,
     open,
     setOpen,
     onMainBtnClick,
@@ -70,15 +74,15 @@ export function ResponsiveSheet(props: ResponsiveSheetProps) {
       className={cn(
         "flex",
         isDesktop && "space-x-2.5",
-        !isDesktop && "flex-col space-y-2.5",
+        !isDesktop && "flex-col space-y-2.5"
       )}
     >
       {!hideCloseBtn && (
         <Button
           disabled={loading}
           onClick={() => setOpen(false)}
-          className='flex-1'
-          variant='outline'
+          className="flex-1"
+          variant="outline"
         >
           {cancelLabel}
         </Button>
@@ -90,7 +94,7 @@ export function ResponsiveSheet(props: ResponsiveSheetProps) {
           form={formId}
           type={onMainBtnClick ? "button" : "submit"}
           onClick={onMainBtnClick}
-          className='flex-1'
+          className="flex-1"
         >
           {submitLabel}
         </LoadingButton>
@@ -100,24 +104,28 @@ export function ResponsiveSheet(props: ResponsiveSheetProps) {
 
   const footerContent = footer ?? defaultFooter;
 
-  const contentComponent = <div className='px-2'>{children}</div>;
+  const contentComponent = <div className="px-2">{children}</div>;
 
   if (isDesktop) {
     return (
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent className={className}>
           {shouldRenderHeader && (
-            <SheetHeader className='text-left'>
-              <SheetTitle>{title}</SheetTitle>
+            <SheetHeader className={cn("text-left", headerClassName)}>
+              {title && (
+                <SheetTitle className={titleClassName}>{title}</SheetTitle>
+              )}
               {description && (
                 <SheetDescription>{description}</SheetDescription>
               )}
             </SheetHeader>
           )}
-          <div className={cn('flex-1 overflow-y-auto', innerContentClassName)}>
+          <div className={cn("flex-1 overflow-y-auto", innerContentClassName)}>
             {contentComponent}
           </div>
-          {footerContent && <SheetFooter className='pt-2'>{footerContent}</SheetFooter>}
+          {footerContent && (
+            <SheetFooter className="pt-2">{footerContent}</SheetFooter>
+          )}
         </SheetContent>
       </Sheet>
     );
@@ -126,24 +134,23 @@ export function ResponsiveSheet(props: ResponsiveSheetProps) {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerContent
-        className={cn(
-          'max-h-[100svh] h-[100svh] flex flex-col',
-          className,
-        )}
+        className={cn("max-h-[100svh] h-[100svh] flex flex-col", className)}
       >
         {shouldRenderHeader && (
-          <DrawerHeader className='!text-left'>
-            {title && <DrawerTitle>{title}</DrawerTitle>}
+          <DrawerHeader className={cn("!text-left", headerClassName)}>
+            {title && (
+              <DrawerTitle className={titleClassName}>{title}</DrawerTitle>
+            )}
             {description && (
               <DrawerDescription>{description}</DrawerDescription>
             )}
           </DrawerHeader>
         )}
-        <div className={cn('flex-1 overflow-y-auto', innerContentClassName)}>
+        <div className={cn("flex-1 overflow-y-auto", innerContentClassName)}>
           {contentComponent}
         </div>
         {footerContent && (
-          <DrawerFooter className='pt-2'>
+          <DrawerFooter className="pt-2">
             {footer ? (
               footerContent
             ) : (

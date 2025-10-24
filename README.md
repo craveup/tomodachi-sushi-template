@@ -1,57 +1,36 @@
-Tomodachi Sushi Storefront Template (Next.js)
-===========================================
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A single-location storefront template built with Next.js (App Router), TypeScript, SWR, Tailwind, and shadcn/ui. It integrates with the CraveUp Storefront API and mirrors the multi-location template so external developers have a consistent codebase to work from.
+## Getting Started
 
-Quickstart
-----------
-- Copy `.env.example` to `.env.local` and fill in the values.
-- Install dependencies with `pnpm install`.
-- Run the dev server: `pnpm dev` (defaults to port 3003).
-- Navigate to `http://localhost:3003`.
+First, run the development server:
 
-Environment
------------
-Client-visible variables must be prefixed with `NEXT_PUBLIC_`.
-- `NEXT_PUBLIC_CRAVEUP_API_KEY` — API key used to talk to the Storefront API.
-- `NEXT_PUBLIC_ORG_SLUG` — merchant slug that owns the location.
-- `NEXT_PUBLIC_DEFAULT_LOCATION_ID` — required for the single-location template; bypasses the organization landing page and renders the location directly.
-- `NEXT_PUBLIC_API_URL` — optional override for the Storefront API base URL.
-- `NEXT_PUBLIC_STOREFRONT_URL` — canonical storefront URL (optional, affects meta tags).
-- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` — enables delivery address autocomplete and map embeds.
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-Project Structure
------------------
-The folder layout mirrors the multi-location template for consistency:
-- `src/app/` — routes, layouts, and error/loading pages (`/[locationId]` handles the main experience).
-- `src/components/` — UI components (primitives live in `components/ui`).
-- `src/hooks/` — SWR data hooks (`useOrderingSession`, `useCart`, `useMenus`).
-- `src/lib/` — API client wrappers and utilities.
-- `src/types/` — TypeScript types that wrap the SDK exports.
-- `src/styles/globals.css` — Tailwind v4 setup shared across templates.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-API Client & Checkout
----------------------
-- `@craveup/storefront-sdk` powers all API access so the code stays concise.
-- `useOrderingSession` starts an ordering session automatically and stores the cart id.
-- The hosted checkout is used—`CartPanel` simply redirects to `cart.checkoutUrl`.
-- Fulfilment operations (delivery/table service room, tips, etc.) are implemented exactly like the reference template so developers can copy-paste between projects.
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-Testing & Quality
------------------
-- `pnpm lint` uses the shared ESLint config.
-- `pnpm build` ensures the app compiles cleanly.
-- The template ships without Jest tests, but files are organised for colocated specs should you add them.
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-Differences vs Multi-Location Template
---------------------------------------
-- The landing page automatically redirects to `/[NEXT_PUBLIC_DEFAULT_LOCATION_ID]`.
-- Merchant metadata (title/description/OpenGraph) is derived from that location instead of the org overview.
-- Everything else—components, hooks, styling, tooling—matches the shared reference so diffs stay small.
+## Learn More
 
-Extending
----------
-- Update `src/lib/api/*` if you need to call different endpoints; the signatures are typed.
-- Replace `src/components` or add pages while keeping the existing shadcn primitives.
-- Follow `STYLEGUIDE.md` for naming, spacing, and composition guidelines.
+To learn more about Next.js, take a look at the following resources:
 
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

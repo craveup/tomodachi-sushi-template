@@ -1,6 +1,9 @@
-import type { RequestConfig } from '@craveup/storefront-sdk';
-import { storefrontClient } from '@/lib/storefront-client';
+// /app/lib/api/location.ts
+import { GetLocationViaSlugType } from "@/types/location-types";
+import { apiFetch } from "./fetcher";
 
-export function getLocationById(locationId: string, config?: RequestConfig) {
-  return storefrontClient.locations.getById(locationId, config);
+export async function getLocationById(
+  locationId: string
+): Promise<GetLocationViaSlugType> {
+  return apiFetch(`/api/v1/locations/${locationId}`);
 }

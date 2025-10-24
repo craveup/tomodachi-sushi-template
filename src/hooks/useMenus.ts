@@ -1,35 +1,29 @@
 import { useCart } from "@/hooks/useCart";
 import { useApiResource } from "@/hooks/useApiResource";
-import { BundleMenu } from "@/types/menus";
-import { Product } from "@/types";
-import { useOrderInfoStore } from "@/app/[locationId]/store/orderInfo-store";
+import type { MenusResponse } from "@/types/menus";
+import { location_Id as DEFAULT_LOCATION_ID } from "@/constants";
 
-export type MenusResponse = {
-  menus: BundleMenu[];
-  popularProducts: Product[];
+type UseMenusOptions = {
+  locationId?: string;
+  isEnabled?: boolean;
 };
 
-const useMenus = () => {
-  const { orderSessionError } = useOrderInfoStore();
-  const { cart } = useCart();
-  const {locationId} = useOrderInfoStore();
+const useMenus = ({ locationId: overrideLocationId, isEnabled = true }: UseMenusOptions = {}) => {
+  const { cart, cartId, locationId: cartLocationId } = useCart({
+    locationId: overrideLocationId ?? undefined,
+  });
 
-  const hasCartTiming =
-    Boolean(cart?.locationId) && Boolean(cart?.orderDate) && Boolean(cart?.orderTime);
+  const locationId = overrideLocationId ?? cartLocationId ?? cart?.locationId ?? DEFAULT_LOCATION_ID;
+  const orderDate = cart?.orderDate;
+  const orderTime = cart?.orderTime;
 
-  let endpoint: string | null = null;
+  const shouldFetch = Boolean(
+    isEnabled && locationId && cartId && orderDate && orderTime,
+  );
 
-  if (locationId) {
-    if (hasCartTiming) {
-      endpoint = `/api/v1/locations/${locationId}/menus?orderDate=${encodeURIComponent(
-        cart!.orderDate,
-      )}&orderTime=${encodeURIComponent(cart!.orderTime)}`;
-    } else if (orderSessionError) {
-      endpoint = `/api/v1/locations/${locationId}/menus?menuOnly=true`;
-    }
-  }
-
-  const shouldFetch = Boolean(endpoint);
+  const endpoint = shouldFetch
+    ? `/api/v1/locations/${locationId}/menus?orderDate=${orderDate}&orderTime=${orderTime}`
+    : null;
 
   return useApiResource<MenusResponse>(endpoint, { shouldFetch });
 };

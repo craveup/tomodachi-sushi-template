@@ -1,112 +1,93 @@
 // src/hooks/use-ordering-session.ts
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { startOrderingSession } from "@/lib/api/ordering-session";
+import { useEffect, useState } from "react";
+import {
+  startOrderingSession,
+  type StartOrderingSessionRequest,
+} from "@/lib/api/ordering-session";
 import { getCartId, setCartId } from "@/lib/local-storage";
 import { formatApiError } from "@/lib/format-api-error";
-import { FulfilmentMethods } from "@/contracts";
-import { useOrderInfoStore } from "@/app/[locationId]/store/orderInfo-store";
+import { useCartStore } from "@/store/cart-store";
+import { DEFAULT_FULFILLMENT_METHOD } from "@/constants";
 
-export type OrderingSessionStatus = "loading" | "error" | "ready";
-
-export type UseOrderingSessionResult = {
+type UseOrderingSessionResult = {
   cartId: string | null;
-  status: OrderingSessionStatus;
-  error?: string;
+  isLoading: boolean;
+  error: string;
+  orderingError: string;
 };
 
-type UseOrderingSessionOptions = {
-  locationId: string;
-  preferredFulfillment?: string | null;
-};
-
-type StartOrderingSessionPayload = {
-  existingCartId: string | null;
-  marketplaceId?: string;
-  fulfillmentMethod: FulfilmentMethods;
-};
-
-export function useOrderingSession({
-  locationId,
-  preferredFulfillment,
-}: UseOrderingSessionOptions): UseOrderingSessionResult {
-  const {
-    cartId: sessionCartId,
-    setOrderInfo,
-    setOrderSessionError,
-  } = useOrderInfoStore();
-
-  const [status, setStatus] = useState<OrderingSessionStatus>(
-    () => (sessionCartId ? "ready" : "loading"),
-  );
-  const [error, setError] = useState<string | undefined>();
-
-  const fulfillmentMethod = useMemo(() => {
-    if (!preferredFulfillment) return FulfilmentMethods.TAKEOUT;
-    const normalized = preferredFulfillment.trim().toLowerCase().replace(/-/g, '_');
-    const match = (Object.values(FulfilmentMethods) as string[]).find(
-      (value) => value === normalized,
-    );
-    return (match as FulfilmentMethods | undefined) ?? FulfilmentMethods.TAKEOUT;
-  }, [preferredFulfillment]);
+export function useOrderingSession(
+  locationId: string,
+): UseOrderingSessionResult {
+  const { cartId, setCartIdState, isLoading, setIsLoading } = useCartStore();
+  const [error, setError] = useState("");
+  const [orderingError, setOrderingError] = useState("");
 
   useEffect(() => {
-    if (sessionCartId) {
-      setStatus("ready");
-      setError(undefined);
+    if (!locationId) {
       return;
     }
 
     let cancelled = false;
 
-    async function bootstrapSession() {
-      setStatus("loading");
-      setError(undefined);
+    async function init() {
+      if (cartId) {
+        setIsLoading(false);
+        return;
+      }
 
-      const payload: StartOrderingSessionPayload = {
-        existingCartId: getCartId(locationId, fulfillmentMethod),
-        fulfillmentMethod,
+      setIsLoading(true);
+      setError("");
+      setOrderingError("");
+
+      const existingCartId =
+        getCartId(locationId, DEFAULT_FULFILLMENT_METHOD) || undefined;
+      const returnUrl =
+        typeof window !== "undefined" ? window.location.origin : undefined;
+      
+      const payload: StartOrderingSessionRequest = {
+        existingCartId,
+        fulfillmentMethod: DEFAULT_FULFILLMENT_METHOD,
       };
 
+      if (returnUrl) {
+        payload.returnUrl = returnUrl;
+      }
+
       try {
-        const response = await startOrderingSession(locationId, payload);
+        const { cartId: newCartId, errorMessage } = await startOrderingSession(
+          locationId,
+          payload,
+        );
+
         if (cancelled) return;
 
-        const nextCartId = response.cartId;
+        const nextCartId = newCartId ?? existingCartId ?? null;
         if (nextCartId) {
-          setCartId(locationId, nextCartId, fulfillmentMethod);
-          setOrderInfo({ cartId: nextCartId, locationId });
-        } else { 
-          setOrderInfo({ locationId });
+          setCartId(locationId, nextCartId, DEFAULT_FULFILLMENT_METHOD);
+          setCartIdState(nextCartId);
         }
 
-        setOrderSessionError(response.errorMessage ?? "");
-        setStatus("ready");
-      } catch (err) {
+        setOrderingError(errorMessage ?? "");
+      } catch (e) {
         if (cancelled) return;
-        const { message } = formatApiError(err);
+        const { message } = formatApiError(e);
         setError(message);
-        setStatus("error");
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
     }
 
-    bootstrapSession();
+    init();
 
     return () => {
       cancelled = true;
     };
-  }, [
-    locationId,
-    fulfillmentMethod,
-    sessionCartId,
-    setOrderInfo,
-    setOrderSessionError,
-  ]);
+  }, [cartId, locationId, setCartIdState, setIsLoading]);
 
-  return {
-    cartId: sessionCartId || null,
-    status,
-    error,
-  };
+  return { cartId, isLoading, error, orderingError };
 }
