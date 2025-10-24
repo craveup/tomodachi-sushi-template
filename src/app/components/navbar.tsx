@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 import CartSidebar from "@/components/crave-ui/cart-component/cart-sidebar";
 import { useCart } from "@/hooks/useCart";
@@ -119,12 +120,15 @@ export const NavbarComp = () => {
             })}
           </div>
 
-          {/* Cart button with live badge */}
-          <CartCountBtn
-            openCart={openCart}
-            isCartOpen={isCartOpen}
-            itemCount={cart?.totalQuantity ?? 0}
-          />
+          {/* Theme toggle + cart */}
+          <div className="flex items-center gap-2">
+            <ThemeToggle className="flex-shrink-0" />
+            <CartCountBtn
+              openCart={openCart}
+              isCartOpen={isCartOpen}
+              itemCount={cart?.totalQuantity ?? 0}
+            />
+          </div>
         </div>
 
         {/* Mobile menu dropdown */}
@@ -194,7 +198,5 @@ export const Navbar = () => {
 };
 
 export default Navbar;
-
-
 
 

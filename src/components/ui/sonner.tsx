@@ -5,23 +5,51 @@ import { Toaster as Sonner } from "sonner";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
+const STORAGE_KEY = "tomodachi-theme";
+
 const Toaster = ({ theme, ...props }: ToasterProps) => {
-  const [resolvedTheme, setResolvedTheme] = useState<
-    NonNullable<ToasterProps["theme"]>
-  >(theme ?? "dark");
+  const [resolvedTheme, setResolvedTheme] =
+    useState<NonNullable<ToasterProps["theme"]>>("light");
 
   useEffect(() => {
+    if (typeof window === "undefined") {
+      if (theme) {
+        setResolvedTheme(theme);
+      }
+      return;
+    }
+
     if (theme) {
       setResolvedTheme(theme);
       return;
     }
 
-    if (typeof window !== "undefined") {
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)",
-      ).matches;
-      setResolvedTheme(prefersDark ? "dark" : "light");
-    }
+    const root = document.documentElement;
+    const detectTheme = () => {
+      setResolvedTheme(root.classList.contains("dark") ? "dark" : "light");
+    };
+
+    detectTheme();
+
+    const observer = new MutationObserver(detectTheme);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleMediaChange = () => {
+      try {
+        if (window.localStorage.getItem(STORAGE_KEY)) return;
+      } catch (error) {
+        // Swallow storage access errors and fall back to system preference.
+      }
+      detectTheme();
+    };
+
+    media.addEventListener("change", handleMediaChange);
+
+    return () => {
+      observer.disconnect();
+      media.removeEventListener("change", handleMediaChange);
+    };
   }, [theme]);
 
   return (

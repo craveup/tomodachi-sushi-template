@@ -18,6 +18,7 @@ This repository contains a **Next.js 15** storefront template for the fictional 
 - **App Router** under `src/app/` with server and client components
 - **UI Layer** built on shadcn/ui (`src/components/ui/`) with sushi-specific composites in `src/app/components/`
 - **Styling** handled by Tailwind CSS and CSS custom properties configured in `src/app/globals.css`
+- **Theme Handling** via a tiny inline script + `ThemeToggle` client control (no external theme engine)
 - **State & Data** powered by SWR hooks and a lightweight Zustand store (`src/store/cart-store.ts`)
 - **API Access** routed through the CraveUp Storefront SDK (`@craveup/storefront-sdk`) plus a small Next.js API helper (`src/lib/api/fetcher.ts`)
 
@@ -26,6 +27,7 @@ This repository contains a **Next.js 15** storefront template for the fictional 
 - `src/app/page.tsx` – landing hero composed of `Navbar`, `SideCards`, and `OrderingSessionCompo`
 - `src/app/menu/MenuPageClient.tsx` – client-driven menu explorer with category tabs and product modal
 - `src/components/crave-ui/cart-component/cart-sidebar.tsx` – cart surface shared across the experience
+- `src/components/ui/theme-toggle.tsx` – localStorage-aware dark/light switch used by the navbar
 - `src/hooks/useCart.ts` / `src/hooks/useMenus.ts` – SWR hooks for carts and menus
 - `src/hooks/use-ordering-session.ts` – ensures a cart exists for the active location; persists IDs via localStorage
 - `src/lib/handle-api.ts` & `src/lib/api/fetcher.ts` – shared HTTP helpers that wrap the storefront SDK

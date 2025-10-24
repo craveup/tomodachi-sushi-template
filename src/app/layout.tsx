@@ -5,6 +5,44 @@ import "./globals.css";
 import { ErrorBoundary } from "./components/error-boundary";
 import { Toaster } from "@/components/ui/sonner";
 
+const themeInitScript = `
+(() => {
+  const storageKey = "tomodachi-theme";
+  const root = document.documentElement;
+  const apply = (isDark) => {
+    root.classList.toggle("dark", isDark);
+    root.dataset.theme = isDark ? "dark" : "light";
+  };
+  try {
+    const stored = localStorage.getItem(storageKey);
+    if (stored === "dark" || stored === "light") {
+      apply(stored === "dark");
+    } else {
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      apply(prefersDark);
+    }
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = (event) => {
+      try {
+        if (localStorage.getItem(storageKey)) {
+          return;
+        }
+      } catch (error) {
+        // ignore storage access errors
+      }
+      apply(event.matches);
+    };
+    media.addEventListener("change", handleChange);
+  } catch (error) {
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    apply(media.matches);
+    media.addEventListener("change", (event) => {
+      apply(event.matches);
+    });
+  }
+})();
+`;
+
 // Load Google Fonts
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,7 +86,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${forum.variable} ${yujiMai.variable} ${wdxlLubrifont.variable} antialiased`}
       >
