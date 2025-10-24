@@ -38,17 +38,23 @@ export function useOrderingSession(
         return;
       }
 
+      const existingCartId =
+        getCartId(locationId, DEFAULT_FULFILLMENT_METHOD) || undefined;
+
+      if (existingCartId) {
+        setCartIdState(existingCartId);
+        setIsLoading(false);
+        return;
+      }
+
       setIsLoading(true);
       setError("");
       setOrderingError("");
 
-      const existingCartId =
-        getCartId(locationId, DEFAULT_FULFILLMENT_METHOD) || undefined;
       const returnUrl =
         typeof window !== "undefined" ? window.location.origin : undefined;
-      
+
       const payload: StartOrderingSessionRequest = {
-        existingCartId,
         fulfillmentMethod: DEFAULT_FULFILLMENT_METHOD,
       };
 
@@ -64,7 +70,7 @@ export function useOrderingSession(
 
         if (cancelled) return;
 
-        const nextCartId = newCartId ?? existingCartId ?? null;
+        const nextCartId = newCartId ?? null;
         if (nextCartId) {
           setCartId(locationId, nextCartId, DEFAULT_FULFILLMENT_METHOD);
           setCartIdState(nextCartId);
