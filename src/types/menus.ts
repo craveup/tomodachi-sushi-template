@@ -1,3 +1,12 @@
+import { Currencies } from "@/contracts";
+import {Product} from "@/types/menu-types";
+
+export type ModifierItem = {
+  id: string;
+  name: string;
+  price?: string;
+};
+
 type Modifier = {
   id: string;
   name: string;
@@ -5,37 +14,38 @@ type Modifier = {
   isFixed: boolean;
   required: boolean;
   quantity: number;
-  items: any[];
+  items: ModifierItem[];
 };
 
 export type BundleProduct = {
-  id: string;
-  name: string;
-  price: string | number;
-  description?: string;
-  availability?: any;
-  images: string[];
-  modifiers: Modifier[];
+    id: string;
+    name: string;
+    price: string;
+    displayPrice: string;
+    description: string;
+    availability: string;
+    images: string[];
+    currency: Currencies;
+    modifierIds: string[];
+    modifiers: Modifier[];
 };
 
 export type BundleCategory = {
-  id: string;
-  name: string;
-  products: BundleProduct[];
+    id: string;
+    name: string;
+    products: Product[];
 };
 
 export type BundleMenu = {
-  id: string;
-  name: string;
-  isActive: boolean;
-  time?: string;
-  // Some payloads include additional metadata such as description or time ranges
-  timeRange?: string;
-  description?: string;
-  categories: BundleCategory[];
+    id: string;
+    name: string;
+    isActive: boolean;
+    time: string;
+    // Optional fields tolerated by UI components
+    timeRange?: string;
+    image?: string;
+    description?: string;
+    itemCount?: number;
+    imageUrl?: string;
+    categories: BundleCategory[];
 };
-export type MenusResponse = {
-  menus: BundleMenu[];
-  popularProducts: BundleProduct[];
-};
-

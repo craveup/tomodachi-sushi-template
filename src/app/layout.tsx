@@ -1,66 +1,43 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, Forum, Yuji_Mai } from "next/font/google";
-
-import "./globals.css";
-import "./styles/leclerc-fonts.css";
-
-import { RestaurantThemeProvider } from "./hooks/use-restaurant-theme";
-import { ErrorBoundary } from "./components/error-boundary";
+import type { Metadata, Viewport } from "next";
+import {Figtree} from "next/font/google";
+import "@/styles/globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
-// Load Google Fonts
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const figtree = Figtree({ subsets: ["latin"] });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const forum = Forum({
-  variable: "--font-forum",
-  subsets: ["latin"],
-  weight: "400",
-});
-
-// Yuji Mai for Japanese text
-const yujiMai = Yuji_Mai({
-  variable: "--font-yuji-mai",
-  subsets: ["latin"],
-  weight: "400",
-});
-
-// WDXL Lubrifont JP N for Japanese text (using Google Fonts)
-// Import via CSS since it's available on Google Fonts
-const wdxlLubrifont = {
-  variable: "--font-wdxl-jp",
+export const metadata: Metadata = {
+  title: {
+    default: "Crave",
+    template: "%s",
+  },
+  description: "Browse and order from Crave locations.",
+  icons: {
+    icon: "/cravelogo.png",
+    shortcut: "/cravelogo.png",
+    apple: "/cravelogo.png",
+  },
 };
 
-// App Metadata
-export const metadata: Metadata = {
-  title: "Tomodachi Sushi - Authentic Japanese Cuisine",
-  description:
-    "Experience authentic Japanese sushi and rolls at Tomodachi Sushi. Fresh ingredients, traditional flavors, and a modern dining experience.",
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "cyan" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
+  ],
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${forum.variable} ${yujiMai.variable} ${wdxlLubrifont.variable} antialiased`}
-      >
-        <ErrorBoundary>
-          <RestaurantThemeProvider defaultThemePath="/themes/leclerc-theme.json">
-            {children}
-            <Toaster position="top-center" />
-          </RestaurantThemeProvider>
-        </ErrorBoundary>
+    <html lang='en' suppressHydrationWarning>
+      <body className={figtree.className}>
+        <ThemeProvider>
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

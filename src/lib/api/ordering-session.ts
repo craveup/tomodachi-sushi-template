@@ -1,24 +1,10 @@
-// src/lib/api/ordering-session.ts
-import { apiPost } from "@/lib/api/fetcher";
-
-export type StartOrderingSessionRequest = {
-  existingCartId?: string | null;
-  marketplaceId?: string | null;
-  fulfillmentMethod: string;
-  returnUrl?: string;
-};
-
-export type StartOrderingSessionResponse = {
-  cartId: string;
-  errorMessage?: string;
-};
+import type { StartOrderingSessionRequest, StartOrderingSessionResponse, RequestConfig } from '@craveup/storefront-sdk';
+import { storefrontClient } from '@/lib/storefront-client';
 
 export function startOrderingSession(
   locationId: string,
   payload: StartOrderingSessionRequest,
-) {
-  return apiPost<StartOrderingSessionResponse>(
-    `/api/v1/locations/${locationId}/ordering-sessions`,
-    payload,
-  );
+  config?: RequestConfig
+): Promise<StartOrderingSessionResponse> {
+  return storefrontClient.orderingSessions.start(locationId, payload, config);
 }

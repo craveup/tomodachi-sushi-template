@@ -1,67 +1,18 @@
 // src/hooks/useCart.ts
-"use client";
-
-import { useEffect, useState } from "react";
+import { useOrderInfoStore } from "@/app/[locationId]/store/orderInfo-store";
+import { StorefrontCart } from "@/types/cart-types";
 import { useApiResource } from "./useApiResource";
-import { CartResponse } from "@/types/cart-types";
-import { location_Id as DEFAULT_LOCATION_ID, DEFAULT_FULFILLMENT_METHOD } from "@/constants";
-import { useCartStore } from "@/store/cart-store";
-import { getCartId } from "@/lib/local-storage";
 
-type UseCartOptions = {
-  locationId?: string;
-  cartId?: string | null;
-  shouldFetch?: boolean;
-};
+export function useCart() {
+  const { cartId, locationId } = useOrderInfoStore();
+  const shouldFetch = Boolean(locationId && cartId);
 
-export function useCart(options: UseCartOptions = {}) {
-  const defaultLocationId = DEFAULT_LOCATION_ID;
-  const locationId = options.locationId ?? defaultLocationId;
-  const { cartId: storeCartId, setCartIdState } = useCartStore();
-  const [resolvedCartId, setResolvedCartId] = useState<string | null>(
-    options.cartId ?? storeCartId ?? null
+  const { data, error, errorMessage, isLoading, isValidating, mutate } = useApiResource<StorefrontCart>(
+    shouldFetch ? `/api/v1/locations/${locationId}/carts/${cartId}` : null,
   );
-
-  useEffect(() => {
-    if (!locationId) return;
-
-    if (options.cartId) {
-      setResolvedCartId(options.cartId);
-      if (options.cartId !== storeCartId) {
-        setCartIdState(options.cartId);
-      }
-      return;
-    }
-
-    if (storeCartId) {
-      setResolvedCartId(storeCartId);
-      return;
-    }
-
-    const storedCartId = getCartId(locationId, DEFAULT_FULFILLMENT_METHOD) || null;
-    if (storedCartId) {
-      setResolvedCartId(storedCartId);
-      setCartIdState(storedCartId);
-    }
-  }, [locationId, options.cartId, setCartIdState, storeCartId]);
-
-  const shouldFetchBase = options.shouldFetch ?? true;
-  const shouldFetch = Boolean(
-    shouldFetchBase && locationId && resolvedCartId
-  );
-
-  const endpoint =
-    shouldFetch && locationId && resolvedCartId
-      ? `/api/v1/locations/${locationId}/carts/${resolvedCartId}`
-      : null;
-
-  const { data, error, errorMessage, isLoading, isValidating, mutate } =
-    useApiResource<CartResponse>(endpoint, { shouldFetch });
 
   return {
-    cart: data,
-    cartId: resolvedCartId,
-    locationId,
+    cart: data!,
     error,
     errorMessage,
     isLoading,
@@ -70,4 +21,3 @@ export function useCart(options: UseCartOptions = {}) {
     shouldFetch,
   };
 }
-

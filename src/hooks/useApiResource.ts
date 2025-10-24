@@ -1,16 +1,16 @@
 // src/hooks/useApiResource.ts
 import useSWR, { SWRResponse } from "swr";
+import { swrFetcher } from "@/lib/api/fetcher";
 import { SWR_CONFIG } from "@/constants";
 import { formatApiError } from "@/lib/format-api-error";
-import { fetcherSWR } from "@/lib/handle-api";
 
 type UseApiResourceOptions = Partial<typeof SWR_CONFIG> & {
   shouldFetch?: boolean;
 };
 
 export function useApiResource<T = unknown>(
-  endpoint: string | null,
-  options: UseApiResourceOptions = {}
+    endpoint: string | null,
+    options: UseApiResourceOptions = {}
 ) {
   const { shouldFetch = true, ...swrOptions } = options;
 
@@ -18,7 +18,7 @@ export function useApiResource<T = unknown>(
 
   const { data, error, mutate, isValidating }: SWRResponse<T> = useSWR<T>(
     key,
-    fetcherSWR,
+    swrFetcher,
     { ...SWR_CONFIG, ...swrOptions }
   );
 
@@ -26,8 +26,8 @@ export function useApiResource<T = unknown>(
 
   return {
     data,
-    error, // raw error
-    errorMessage, // human-readable string
+    error,          // raw error
+    errorMessage,   // human-readable string
     isLoading: !data && !error,
     isValidating,
     mutate,
