@@ -9,120 +9,64 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Production server**: `npm run start`
 - **Linting**: `npm run lint`
 
-## Project Architecture
+## Project Overview
 
-This is a **Next.js 15 restaurant ordering application template** built with React 19, TypeScript, and Tailwind CSS. The application can be themed for any restaurant type and currently showcases **Leclerc Bakery** as an example, featuring a sophisticated theming system and cart functionality.
+This repository contains a **Next.js 15** storefront template for the fictional **Tomodachi Sushi** restaurant. It targets React 19 and TypeScript, and leans on Tailwind CSS plus shadcn/ui primitives for styling and interaction patterns. The template demonstrates a consumer ordering experience with a live cart, product modal, reservation form, and multi-page marketing flow.
 
-### Core Architecture
+### Architecture Highlights
 
-- **App Router**: Uses Next.js App Router with TypeScript
-- **UI Framework**: Shadcn/ui components with Radix UI primitives
-- **Styling**: Tailwind CSS with custom theme system
-- **State Management**: React Context for cart and address management
-- **Data Fetching**: SWR and TanStack Query for API calls
+- **App Router** under `src/app/` with server and client components
+- **UI Layer** built on shadcn/ui (`src/components/ui/`) with sushi-specific composites in `src/app/components/`
+- **Styling** handled by Tailwind CSS and CSS custom properties configured in `src/app/globals.css`
+- **State & Data** powered by SWR hooks and a lightweight Zustand store (`src/store/cart-store.ts`)
+- **API Access** routed through the CraveUp Storefront SDK (`@craveup/storefront-sdk`) plus a small Next.js API helper (`src/lib/api/fetcher.ts`)
 
-### Key Features
+### Key Modules
 
-1. **Dynamic Theming System**: Custom theme engine (`src/lib/theme-engine.ts`) that loads JSON theme configurations and applies CSS custom properties
-2. **Restaurant API Integration**: Client for CraveUp API with cart management, product fetching, and payment processing
-3. **Multi-Provider Architecture**: Layered providers for theming, cart, and address management
-4. **Component Library**: Extensive UI component system in `src/components/ui/` and restaurant-specific components
+- `src/app/page.tsx` – landing hero composed of `Navbar`, `SideCards`, and `OrderingSessionCompo`
+- `src/app/menu/MenuPageClient.tsx` – client-driven menu explorer with category tabs and product modal
+- `src/components/crave-ui/cart-component/cart-sidebar.tsx` – cart surface shared across the experience
+- `src/hooks/useCart.ts` / `src/hooks/useMenus.ts` – SWR hooks for carts and menus
+- `src/hooks/use-ordering-session.ts` – ensures a cart exists for the active location; persists IDs via localStorage
+- `src/lib/handle-api.ts` & `src/lib/api/fetcher.ts` – shared HTTP helpers that wrap the storefront SDK
+- `src/app/components/product-description/*` – product modal, modifier selection, and supporting UI
 
-### Directory Structure
+### Data & State Flow
 
-- `src/app/` - Next.js app router pages and layouts
-- `src/components/` - Reusable UI components
-  - `ui/` - Shadcn/ui base components
-  - `crave-ui/` - Restaurant-specific UI components
-- `src/lib/` - Utilities and API clients
-  - `api/` - CraveUp API integration
-  - `theme-engine.ts` - Theme management system
-- `src/hooks/` - Custom React hooks
-- `public/` - Static assets including theme JSON files
+1. `useOrderingSession` starts an ordering session and seeds the cart ID (stored in Zustand + localStorage).
+2. `useCart` reads the active cart via SWR and exposes `cart`, `cartId`, and `mutate` to UI components.
+3. `useMenus` fetches menus for the resolved location and active ordering context.
+4. `CartSidebar` and `MenuPageClient` share these hooks to keep the cart and product details in sync.
 
-### Theme System
+### Styling Notes
 
-The application uses a sophisticated theming system:
+- Core palettes and typography live in `src/app/globals.css`.
+- Assets are under `public/images/sushi/`.
+- No runtime theme engine is present; components consume design tokens directly via CSS variables or Tailwind classes.
 
-- **Theme Engine**: `src/lib/theme-engine.ts` converts JSON themes to CSS custom properties
-- **Theme Provider**: `src/app/hooks/use-restaurant-theme.tsx` provides React context for theme management
-- **Theme Configuration**: JSON files in `public/themes/` define color schemes, typography, and animations
-- **Dark Mode Support**: Built-in dark mode with localStorage persistence
+### Types & Utilities
 
-### API Integration
-
-- **Base Client**: `src/lib/api/client.ts` handles all CraveUp API interactions
-- **Environment Variables**: Requires `NEXT_PUBLIC_CRAVEUP_API_KEY` and `CRAVEUP_API_BASE_URL`
-- **API Routes**: Next.js API routes in `src/api/` for server-side API calls
-- **Error Handling**: Custom error classes and response handling
-
-### State Management
-
-- **Cart Hook**: `src/hooks/useCart.ts` keeps the active cart in sync with the CraveUp API
-- **Cart Store**: `src/store/cart-store.ts` (Zustand) persists the current cart ID and loading state
-- **Ordering Session Hook**: `src/hooks/use-ordering-session.ts` bootstraps sessions and cart IDs
-- **Theme Provider**: `RestaurantThemeProvider` manages theme switching and dark mode
-
-### Component Patterns
-
-- **Compound Components**: Menu items, cart components use compound patterns
-- **Error Boundaries**: Application-wide error handling
-- **Loading States**: Skeleton loaders and loading indicators throughout
-- **Responsive Design**: Mobile-first design with desktop enhancements
-
-### Important Configuration
-
-- **TypeScript**: Strict mode enabled, path aliases configured (`@/*` -> `src/*`)
-- **ESLint**: Next.js recommended config with TypeScript support
-- **Tailwind**: CSS variables integration for theme system
-- **Components.json**: Shadcn/ui configuration with New York style
+- `src/app/types.ts` – shared menu/cart interfaces used by UI components.
+- `src/types/menu-types.ts` / `src/types/common.ts` – menu modifier types and dialog props.
+- `src/lib/local-storage.ts` – helper for persisting cart IDs client-side.
+- `src/lib/format-api-error.ts` – normalises SDK errors for display.
 
 ### Environment Variables
 
-Required for full functionality:
-- `NEXT_PUBLIC_CRAVEUP_API_KEY` - Storefront API key exposed to the client
-- `CRAVEUP_API_BASE_URL` - Base URL for API calls (defaults to localhost:8000)
-- `NEXT_PUBLIC_LOCATION_ID` - Required location ID for restaurant operations
+Set the following for full functionality:
 
-### Testing Approach
+- `NEXT_PUBLIC_CRAVEUP_API_KEY` – required by `src/lib/storefront-client.ts`
+- `NEXT_PUBLIC_LOCATION_ID` – default location consumed by hooks
+- `CRAVEUP_API_BASE_URL` – used by `src/api/products/route.ts` when proxying server-side requests
+- Optional: `NEXT_PUBLIC_API_URL` / `NEXT_PUBLIC_CRAVEUP_STOREFRONT_BASE_URL` fallbacks (see `src/constants.ts`)
 
-- No dedicated automated tests are included; add React Testing Library suites as needed for your project
+### Testing
 
-### Critical Architecture Details
+- No automated tests ship with the template. Add React Testing Library suites as needed.
 
-#### Advanced State Management Patterns
-- **Hybrid Cart Strategy**: `useCart` pulls live data from the storefront API while `cart-store` keeps the active cart ID cached in Zustand/localStorage
-- **Session Bootstrapping**: `use-ordering-session` ensures a valid cart exists for the active location before menu interactions
-- **Cart Surface**: `CartSidebar` (used by the Navbar) consumes the live cart hook directly—no extra providers required
-- **Hydration Safety**: All cart hooks are client components with guarded localStorage access for SSR compatibility
+### Development Tips
 
-#### Theme Engine Implementation
-- **JSON-Driven Themes**: Load from `public/themes/` with runtime validation via `ThemeEngine.validateTheme()`
-- **CSS Custom Properties**: Dynamic generation with dark mode overrides and seasonal adjustments
-- **Provider Integration**: `RestaurantThemeProvider` with hooks for component-level theme access
-- **Multi-Hook Architecture**: `useRestaurantTheme`, `useThemeClasses`, `useThemeAnimations`, `useSeasonalTheme`
-- **Performance**: Theme caching, localStorage persistence, and automatic system preference detection
-
-#### API Architecture
-- **Dual Strategy**: Direct CraveUp API + Next.js API routes for CORS protection
-- **Security**: Server-side API key handling via `getServerApiKey()`, client calls through `/api/` routes
-- **Error Handling**: Custom `CraveUpAPIError` class with standardized response handling
-- **Endpoint Management**: Centralized in `src/lib/api/config.ts` with environment-based URL building
-- **Hybrid API Approach**: Some endpoints use direct API calls, others use Next.js API routes
-
-#### Component Development Guidelines
-- **Follow Existing Patterns**: Mirror production components in `src/app/components/` and `src/components/ui/`
-- **Compound Components**: Use for complex UI (cart, menu items)
-- **TypeScript**: Strict mode - always define proper interfaces in `src/types/`
-- **Styling**: Use theme engine variables, not hardcoded colors
-
-#### Key Files for Development
-- `src/lib/theme-engine.ts` - Theme system core with CSS custom properties generation
-- `src/lib/api/client.ts` - CraveUp API client with error handling
-- `src/lib/api/config.ts` - API configuration, endpoints, and security handling
-- `src/hooks/useCart.ts` - Cart data hook shared across screens and the cart sidebar
-- `src/components/crave-ui/cart-component/cart-sidebar.tsx` - Reusable cart surface driven by the storefront API
-- `src/app/hooks/use-restaurant-theme.tsx` - Theme management hooks and providers
-- `src/app/types.ts` - Core application type definitions
-- `public/themes/leclerc-theme.json` - Theme configuration with sushi-specific styling
-- `components.json` - Shadcn/ui configuration (New York style, CSS variables enabled)
+- Keep client components inside `src/app/components/` when they rely on hooks or browser APIs.
+- Use the existing SWR utilities (`useApiResource`, `useCart`, `useMenus`) for new API calls to stay consistent.
+- Reuse shadcn/ui primitives from `src/components/ui/` before adding new ones; remove unused exports when pruning.
+- When adding assets, place them under `public/images/` and reference with `/images/...`.
