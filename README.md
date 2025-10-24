@@ -17,6 +17,7 @@ Client-visible variables must be prefixed with `NEXT_PUBLIC_`.
 - `NEXT_PUBLIC_ORG_SLUG` — merchant slug that owns the location.
 - `NEXT_PUBLIC_DEFAULT_LOCATION_ID` — required for the single-location template; bypasses the organization landing page and renders the location directly.
 - `NEXT_PUBLIC_API_URL` — optional override for the Storefront API base URL.
+- `NEXT_PUBLIC_STOREFRONT_URL` — canonical storefront URL (optional, affects meta tags).
 - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` — enables delivery address autocomplete and map embeds.
 
 Project Structure
@@ -53,3 +54,4 @@ Extending
 - Update `src/lib/api/*` if you need to call different endpoints; the signatures are typed.
 - Replace `src/components` or add pages while keeping the existing shadcn primitives.
 - Follow `STYLEGUIDE.md` for naming, spacing, and composition guidelines.
+
