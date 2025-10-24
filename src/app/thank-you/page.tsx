@@ -28,7 +28,7 @@ const ThankYouContent = () => {
 
 
     removeCartCartId(locationId, DEFAULT_FULFILLMENT_METHOD);
-  }, []);
+  }, [locationId]);
 
   const handleRatingClick = (value: number) => {
     setRating(value);
@@ -185,6 +185,5 @@ const ThankYouPage = () => {
 };
 
 export default ThankYouPage;
-
 
 

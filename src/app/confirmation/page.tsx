@@ -6,9 +6,12 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function LeclercConfirmationPage() {
-  const orderNumber = `LB${Math.floor(Math.random() * 100000)}`;
-  const estimatedTime = "25-35 minutes";
+export default function TomodachiConfirmationPage() {
+  const orderNumber = `TS${Math.floor(Math.random() * 100000)
+    .toString()
+    .padStart(5, "0")}`;
+  const estimatedTime = "35-45 minutes";
+  const accentColor = "var(--backgroundprimary)";
 
   return (
     <div className="min-h-screen bg-background">
@@ -16,11 +19,8 @@ export default function LeclercConfirmationPage() {
       <header className="bg-background border-b border-border">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center h-16">
-            <h1
-              className="text-2xl font-bold"
-              style={{ color: "hsl(var(--brand-accent))" }}
-            >
-              LECLERC
+            <h1 className="text-2xl font-bold tracking-[0.6em] text-textdefault">
+              TOMODACHI SUSHI
             </h1>
           </div>
         </div>
@@ -29,14 +29,17 @@ export default function LeclercConfirmationPage() {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-2xl mx-auto">
           {/* Success Message */}
-          <div className="text-center mb-8">
-            <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
+          <div className="mb-8 text-center">
+            <CheckCircle
+              className="mx-auto mb-4 h-16 w-16"
+              style={{ color: accentColor }}
+            />
             <h1 className="text-3xl font-bold text-foreground mb-2">
               Order Confirmed!
             </h1>
             <p className="text-muted-foreground">
-              Thank you for your order. Your cookies are being prepared with
-              love.
+              Thank you for dining with Tomodachi Sushi. Our chefs are now
+              preparing your order with the freshest ingredients.
             </p>
           </div>
 
@@ -52,10 +55,7 @@ export default function LeclercConfirmationPage() {
                     {new Date().toLocaleString()}
                   </p>
                 </div>
-                <Package
-                  className="h-8 w-8"
-                  style={{ color: "hsl(var(--brand-accent))" }}
-                />
+                <Package className="h-8 w-8" style={{ color: accentColor }} />
               </div>
 
               <Separator className="mb-6" />
@@ -98,31 +98,29 @@ export default function LeclercConfirmationPage() {
                 </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm text-foreground">
-                    <span>2x Chocolate Chip Walnut</span>
-                    <span>$10.00</span>
+                    <span>2x Bluefin Toro Nigiri</span>
+                    <span>$24.00</span>
                   </div>
                   <div className="flex justify-between text-sm text-foreground">
-                    <span>1x Dark Chocolate Chocolate Chip</span>
-                    <span>$5.00</span>
+                    <span>1x Miso Black Cod</span>
+                    <span>$18.00</span>
                   </div>
                   <div className="flex justify-between text-sm text-foreground">
-                    <span>1x Pumpkin Spice (Warmed)</span>
-                    <span>$5.50</span>
+                    <span>1x Spicy Tuna Roll</span>
+                    <span>$14.00</span>
                   </div>
                   <Separator className="my-2" />
                   <div className="flex justify-between text-sm text-muted-foreground">
                     <span>Subtotal</span>
-                    <span>$20.50</span>
+                    <span>$56.00</span>
                   </div>
                   <div className="flex justify-between text-sm text-muted-foreground">
                     <span>Tax</span>
-                    <span>$1.82</span>
+                    <span>$4.76</span>
                   </div>
                   <div className="flex justify-between font-semibold text-foreground">
                     <span>Total</span>
-                    <span style={{ color: "hsl(var(--brand-accent))" }}>
-                      $22.32
-                    </span>
+                    <span style={{ color: accentColor }}>$60.76</span>
                   </div>
                 </div>
               </div>
@@ -139,11 +137,8 @@ export default function LeclercConfirmationPage() {
                 We&apos;ll send you updates via text message
               </p>
               <Button
-                className="text-white dark:text-white hover:opacity-90"
-                style={{
-                  backgroundColor: "hsl(var(--brand-accent))",
-                  borderColor: "hsl(var(--brand-accent))",
-                }}
+                className="text-textinverse hover:opacity-90"
+                style={{ backgroundColor: accentColor, borderColor: accentColor }}
               >
                 Track Order Status
               </Button>
@@ -152,22 +147,24 @@ export default function LeclercConfirmationPage() {
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/examples/leclerc-bakery">
+            <Link href="/menu">
               <Button variant="outline" className="w-full sm:w-auto">
-                Order More Cookies
+                Explore Menu
               </Button>
             </Link>
-            <Button className="w-full sm:w-auto">View Receipt</Button>
+            <Button
+              className="w-full sm:w-auto"
+              style={{ backgroundColor: accentColor, color: "var(--textinverse)" }}
+            >
+              View Receipt
+            </Button>
           </div>
 
           {/* Support */}
           <div className="text-center mt-12 text-sm text-muted-foreground">
             <p>Need help with your order?</p>
-            <p
-              className="font-medium"
-              style={{ color: "hsl(var(--brand-accent))" }}
-            >
-              Call us at (212) 874-6080 or email support@leclercbakery.com
+            <p className="font-medium" style={{ color: accentColor }}>
+              Call us at (212) 555-0112 or email reservations@tomodachisushi.com
             </p>
           </div>
         </div>

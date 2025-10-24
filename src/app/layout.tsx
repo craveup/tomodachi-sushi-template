@@ -2,9 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Forum, Yuji_Mai } from "next/font/google";
 
 import "./globals.css";
-import "./styles/leclerc-fonts.css";
-
-import { RestaurantThemeProvider } from "./hooks/use-restaurant-theme";
 import { ErrorBoundary } from "./components/error-boundary";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -56,10 +53,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${forum.variable} ${yujiMai.variable} ${wdxlLubrifont.variable} antialiased`}
       >
         <ErrorBoundary>
-          <RestaurantThemeProvider defaultThemePath="/themes/leclerc-theme.json">
-            {children}
-            <Toaster position="top-center" />
-          </RestaurantThemeProvider>
+          {children}
+          <Toaster position="top-center" />
         </ErrorBoundary>
       </body>
     </html>
