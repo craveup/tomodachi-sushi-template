@@ -30,8 +30,6 @@ export function useOrderingSession(
       return;
     }
 
-    let cancelled = false;
-
     async function init() {
       if (cartId) {
         setIsLoading(false);
@@ -40,12 +38,6 @@ export function useOrderingSession(
 
       const existingCartId =
         getCartId(locationId, DEFAULT_FULFILLMENT_METHOD) || undefined;
-
-      if (existingCartId) {
-        setCartIdState(existingCartId);
-        setIsLoading(false);
-        return;
-      }
 
       setIsLoading(true);
       setError("");
@@ -56,6 +48,7 @@ export function useOrderingSession(
 
       const payload: StartOrderingSessionRequest = {
         fulfillmentMethod: DEFAULT_FULFILLMENT_METHOD,
+        existingCartId: existingCartId,
       };
 
       if (returnUrl) {
@@ -68,32 +61,24 @@ export function useOrderingSession(
           payload,
         );
 
-        if (cancelled) return;
-
-        const nextCartId = newCartId ?? null;
-        if (nextCartId) {
-          setCartId(locationId, nextCartId, DEFAULT_FULFILLMENT_METHOD);
-          setCartIdState(nextCartId);
+        if (newCartId) {
+          setCartId(locationId, newCartId, DEFAULT_FULFILLMENT_METHOD);
+          setCartIdState(newCartId);
         }
 
         setOrderingError(errorMessage ?? "");
       } catch (e) {
-        if (cancelled) return;
         const { message } = formatApiError(e);
         setError(message);
       } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
+        setIsLoading(false);
       }
     }
 
     init();
 
-    return () => {
-      cancelled = true;
-    };
-  }, [cartId, locationId, setCartIdState, setIsLoading]);
+  
+  }, []);
 
   return { cartId, isLoading, error, orderingError };
 }
