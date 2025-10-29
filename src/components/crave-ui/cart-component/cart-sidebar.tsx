@@ -23,14 +23,16 @@ import {
 } from "@/components/ui/card";
 import { location_Id as DEFAULT_LOCATION_ID } from "@/constants";
 import { ResponsiveSheet } from "@/components/ResponsiveSheet";
+import type { StorefrontCart, CartModifierGroup } from "@/types/cart-types";
 
-interface CartItem {
+interface SidebarCartItem {
   id: string;
   name: string;
-  price: number;
   quantity: number;
   imageUrl: string | null;
-  modifiers?: string[];
+  unitPrice: number;
+  totalPrice: number;
+  modifiersLabel?: string;
   specialInstructions?: string;
 }
 
@@ -44,27 +46,66 @@ interface SuggestedItem {
 interface CartSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  cartItems?: CartItem[];
+  cartItems?: SidebarCartItem[];
   onCheckout?: (checkoutUrl?: string) => void | Promise<void>;
 }
 
 // --- API mappers ---
-function mapCartResponseToItems(apiCart: any): CartItem[] {
-  const items = Array.isArray(apiCart?.items) ? apiCart.items : [];
-  return items.map((line: any) => ({
-    id: String(line?.id ?? line?.cartItemId ?? line?.lineItemId ?? line?._id),
-    name: line?.product?.name ?? line?.name ?? "Item",
-    price: Number(line?.unit_price ?? line?.product?.price ?? line?.price ?? 0),
-    quantity: Number(line?.quantity ?? 1),
-    imageUrl: line?.product?.imageUrl ?? line?.imageUrl ?? null,
-    modifiers: Array.isArray(line?.modifiers)
-      ? line.modifiers.map((m: any) => m?.name ?? "").filter(Boolean)
-      : undefined,
-    specialInstructions:
-      (line?.specialInstructions ?? line?.notes ?? line?.special_instructions)
-        ?.toString()
-        .trim() || undefined,
-  }));
+function formatSelections(
+  groups: CartModifierGroup[] | undefined
+): string | undefined {
+  if (!Array.isArray(groups) || groups.length === 0) return undefined;
+
+  const parts: string[] = [];
+
+  const visit = (collection: CartModifierGroup[]) => {
+    collection.forEach((group) => {
+      const itemsLabel = group.items
+        .map((item) => {
+          const quantityPrefix = item.quantity > 1 ? `${item.quantity}× ` : "";
+          return `${quantityPrefix}${item.name}`;
+        })
+        .filter(Boolean)
+        .join(", ");
+
+      if (itemsLabel) {
+        parts.push(`${group.name}: ${itemsLabel}`);
+      }
+
+      group.items.forEach((item) => {
+        if (Array.isArray(item.children) && item.children.length > 0) {
+          visit(item.children);
+        }
+      });
+    });
+  };
+
+  visit(groups);
+  return parts.join(" | ");
+}
+
+function mapCartResponseToItems(
+  cart: StorefrontCart | null | undefined
+): SidebarCartItem[] {
+  if (!cart?.items?.length) return [];
+
+  return cart.items.map((line) => {
+    const unitPrice = Number.parseFloat(line.price ?? "0") || 0;
+    const totalPrice =
+      Number.parseFloat(line.total ?? "0") || unitPrice * line.quantity;
+    const imageUrl = line.imageUrl || null;
+
+    return {
+      id: line.id,
+      name: line.name,
+      quantity: line.quantity,
+      imageUrl,
+      unitPrice,
+      totalPrice,
+      modifiersLabel: formatSelections(line.selections),
+      specialInstructions: line.specialInstructions?.trim() || undefined,
+    };
+  });
 }
 
 type ApiProduct =
@@ -149,9 +190,9 @@ function CartSidebarContent({
   const onNext = () => emblaApi?.scrollNext();
 
   // Live cart items
-  const apiItems = useMemo<CartItem[]>(() => {
-    if (cartItems?.length) return cartItems;
+  const apiItems = useMemo<SidebarCartItem[]>(() => {
     if (cart) return mapCartResponseToItems(cart);
+    if (cartItems?.length) return cartItems;
     return [];
   }, [cart, cartItems]);
 
@@ -173,10 +214,12 @@ function CartSidebarContent({
   const showSuggestionsSection =
     (showRecSkeleton || liveSuggested.length > 0) && !!cartId;
 
-  const subtotal = useMemo(
-    () => apiItems.reduce((s, i) => s + i.price * i.quantity, 0),
-    [apiItems]
-  );
+  const subtotal = useMemo(() => {
+    if (cart?.subTotal) {
+      return Number.parseFloat(cart.subTotal) || 0;
+    }
+    return apiItems.reduce((sum, item) => sum + item.totalPrice, 0);
+  }, [apiItems, cart]);
 
   const placeholderImage =
     "https://kzmps94w6wprloamplrj.lite.vusercontent.net/placeholder.svg?height=200&width=300";
@@ -364,13 +407,11 @@ function CartSidebarContent({
             ) : (
               <div className="space-y-4">
                 {apiItems.map((item) => {
-                  const modifiersLabel = Array.isArray(item.modifiers)
-                    ? item.modifiers.filter(Boolean).join(", ")
-                    : "";
+                  const modifiersLabel = item.modifiersLabel ?? "";
                   const hasModifiers = Boolean(modifiersLabel);
-                  const specialInstructions = item.specialInstructions?.trim();
+                  const specialInstructions = item.specialInstructions;
                   const hasSpecialInstructions = Boolean(specialInstructions);
-                  const lineTotal = currency(item.price * item.quantity);
+                  const lineTotal = currency(item.totalPrice);
 
                   return (
                     <Card
@@ -508,7 +549,7 @@ function CartSidebarContent({
                           {showRecSkeleton ? (
                             // Skeleton card--ItemVertical layout
                             <Card className="gap-0 overflow-hidden p-0 animate-pulse">
-                              <div className="relative aspect-[4/3] w-full bg-muted" />
+                              <div className="relative aspect-4/3 w-full bg-muted" />
                               <CardHeader className="p-4">
                                 <div className="h-4 bg-muted rounded w-3/4 mb-2" />
                                 <div className="h-4 bg-muted rounded w-1/3" />
@@ -523,7 +564,7 @@ function CartSidebarContent({
                               }
                               role="button"
                             >
-                              <div className="relative aspect-[4/3] w-full">
+                              <div className="relative aspect-4/3 w-full">
                                 <Image
                                   src={item!.imageUrl || placeholderImage}
                                   alt={item!.name}

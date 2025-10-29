@@ -9,13 +9,14 @@ import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/hooks/useCart";
 import { postData } from "@/lib/handle-api";
 import { formatApiError } from "@/lib/format-api-error";
+import { useFormatters } from "@/lib/i18n/hooks";
 import { location_Id as LOCATION_ID } from "@/constants";
-import type { MenuItem } from "../types";
+import type { Product } from "@/types/menu-types";
 import { ItemUnavailableActions } from "@/types/common";
 
 interface MenuSectionProps {
   title: string;
-  items: MenuItem[];
+  items: Product[];
   sectionId?: string;
   onSectionMount?: (id: string, el: HTMLElement | null) => void;
   onItemClick?: (id: string) => void;
@@ -34,6 +35,7 @@ const TomodachiMenuSectionContent = ({
 }: MenuSectionProps) => {
   const locationId = propLocationId ?? LOCATION_ID;
   const { cartId, mutate } = useCart({ locationId });
+  const { currency } = useFormatters();
 
   const [busyId, setBusyId] = useState<string | null>(null);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
@@ -43,9 +45,17 @@ const TomodachiMenuSectionContent = ({
 
   const handleAddToCart = async (
     e: React.MouseEvent,
-    item: MenuItem
+    item: Product
   ): Promise<void> => {
     e.stopPropagation();
+
+    const hasModifiers =
+      (item.modifierIds?.length ?? item.modifiers?.length ?? 0) > 0;
+
+    if (hasModifiers) {
+      onItemClick?.(item.id);
+      return;
+    }
 
     if (!locationId || !cartId) {
       toast.error("Cart is not ready. Please try again in a moment.", {
@@ -83,8 +93,6 @@ const TomodachiMenuSectionContent = ({
     }
   };
 
-  const cartUnavailable = !cartId;
-
   return (
     <section
       ref={(el) => {
@@ -109,7 +117,14 @@ const TomodachiMenuSectionContent = ({
       <div className="flex flex-col gap-4 sm:gap-5">
         {items.map((item) => {
           const isBusy = busyId === item.id;
-          const itemImage = imageErrors[item.id] ? IMAGE_FALLBACK : item.image || IMAGE_FALLBACK;
+          const primaryImage = item.images?.[0] ?? null;
+          const hasModifiers =
+            (item.modifierIds?.length ?? item.modifiers?.length ?? 0) > 0;
+          const priceValue = Number.parseFloat(item.price ?? "0") || 0;
+          const priceLabel = item.displayPrice || currency(priceValue);
+          const itemImage = imageErrors[item.id]
+            ? IMAGE_FALLBACK
+            : primaryImage || IMAGE_FALLBACK;
 
           return (
             <article
@@ -118,7 +133,7 @@ const TomodachiMenuSectionContent = ({
               className="group relative flex flex-col rounded-2xl border border-borderdefault/60 bg-backgroundmuted/10 p-4 sm:p-5 transition hover:border-backgroundprimary/60 hover:bg-backgroundmuted/20"
             >
               <div className="flex items-start gap-4 sm:gap-5">
-                <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-backgroundmuted sm:h-24 sm:w-24">
+                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-backgroundmuted sm:h-24 sm:w-24">
                   <Image
                     src={itemImage}
                     alt={item.name}
@@ -135,24 +150,21 @@ const TomodachiMenuSectionContent = ({
                       <h3 className="truncate font-heading-h5 text-lg text-textdefault sm:text-xl">
                         {item.name}
                       </h3>
-                      {item?.subtitle && (
-                        <p className="truncate text-xs uppercase tracking-[0.25em] text-textmuted/70">
-                          {item.subtitle}
-                        </p>
-                      )}
                     </div>
 
-                    <div className="flex flex-shrink-0 items-center gap-2">
+                    <div className="flex shrink-0 items-center gap-2">
                       <span className="rounded-full bg-backgroundmuted px-3 py-1 text-sm font-semibold text-textdefault">
-                        ${item.price.toFixed(2)}
+                        {priceLabel}
                       </span>
                       <button
                         onClick={(e) => handleAddToCart(e, item)}
-                        disabled={isBusy || cartUnavailable}
+                        disabled={isBusy}
                         className="flex h-9 w-9 items-center justify-center rounded-full bg-backgroundprimary text-textinverse transition hover:bg-backgroundprimary/90 disabled:cursor-not-allowed disabled:opacity-50"
                         aria-label={
                           isBusy
                             ? `Adding ${item.name}`
+                            : hasModifiers
+                            ? `Customize ${item.name}`
                             : `Add ${item.name} to cart`
                         }
                         aria-busy={isBusy}
@@ -171,19 +183,6 @@ const TomodachiMenuSectionContent = ({
                       {item.description}
                     </p>
                   )}
-
-                  {Array.isArray(item.badges) && item.badges.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {item.badges.map((badge) => (
-                        <span
-                          key={badge}
-                          className="rounded-full border border-borderdefault px-2 py-0.5 text-xs uppercase tracking-wide text-textmuted"
-                        >
-                          {badge}
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
             </article>
@@ -201,7 +200,3 @@ export const TomodachiMenuSection = (props: MenuSectionProps) => {
     </Suspense>
   );
 };
-
-
-
-

@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useApiResource } from "./useApiResource";
-import { CartResponse } from "@/types/cart-types";
+import type { StorefrontCart } from "@/types/cart-types";
 import { location_Id as DEFAULT_LOCATION_ID, DEFAULT_FULFILLMENT_METHOD } from "@/constants";
 import { useCartStore } from "@/store/cart-store";
 import { getCartId } from "@/lib/local-storage";
@@ -56,7 +56,7 @@ export function useCart(options: UseCartOptions = {}) {
       : null;
 
   const { data, error, errorMessage, isLoading, isValidating, mutate } =
-    useApiResource<CartResponse>(endpoint, { shouldFetch });
+    useApiResource<StorefrontCart>(endpoint, { shouldFetch });
 
   return {
     cart: data,

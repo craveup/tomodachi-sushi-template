@@ -6,11 +6,11 @@ import { CircularLoader } from "@/components/ui/CircularLoader";
 import { useCart } from "@/hooks/useCart";
 import useMenus from "@/hooks/useMenus";
 import type { BundleCategory, BundleMenu } from "@/types/menus";
+import type { Product } from "@/types/menu-types";
 import { location_Id as LOCATION_ID } from "@/constants";
 import { MenuSwitcher } from "@/app/components/menu/menu-switcher";
 import ProductDescriptionDialog from "../components/product-description/ProductDescriptionDialog";
 import { TomodachiMenuSection } from "../components/tomodachi-menu-section";
-import {useCartStore} from "@/store/cart-store";
 
 export const dynamic = "force-dynamic";
 
@@ -57,24 +57,9 @@ const MenuPageClient = () => {
     [menu]
   );
 
-  const getProductsForCategory = (category: BundleCategory) => {
+  const getProductsForCategory = (category: BundleCategory): Product[] => {
     if (!category?.products?.length) return [];
-
-    return category.products.map((product) => ({
-      id: product.id,
-      name: product.name,
-      description: product.description ?? "",
-      price:
-        typeof product.price === "string"
-          ? parseFloat(product.price)
-          : product.price,
-      image: product.images?.[0] || null,
-      category: "signature" as const,
-      calories: 0,
-      isNew: false,
-      isPopular: false,
-      isGlutenFree: false,
-    }));
+    return category.products;
   };
 
   const [activeSection, setActiveSection] = useState<string>("");
@@ -167,13 +152,13 @@ const MenuPageClient = () => {
                   )}
 
                   {menuCategories.length > 0 && (
-                    <div className="sticky top-0 z-10 border-y border-borderdefault/40 bg-backgrounddefault/95 px-4 py-3 sm:px-6 lg:px-8 backdrop-blur-sm supports-[backdrop-filter]:bg-backgrounddefault/80">
+                    <div className="sticky top-0 z-10 border-y border-borderdefault/40 bg-backgrounddefault/95 px-4 py-3 sm:px-6 lg:px-8 backdrop-blur-sm supports-backdrop-filter:bg-backgrounddefault/80">
                       <div className="flex flex-wrap items-center justify-center gap-2">
                         {menuCategories.map((category) => (
                           <button
                             key={category.id}
                             onClick={() => scrollToSection(category.id)}
-                            className={`px-3 py-2 inline-flex items-center justify-center gap-2 rounded-lg border border-solid transition-colors cursor-pointer min-h-[40px] ${
+                            className={`px-3 py-2 inline-flex items-center justify-center gap-2 rounded-lg border border-solid transition-colors cursor-pointer min-h-10 ${
                               activeSection === category.id
                                 ? "border-backgroundprimary bg-backgroundprimary text-textinverse"
                                 : "border-borderdefault bg-backgroundmuted text-textdefault hover:bg-backgroundprimary/10"

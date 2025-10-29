@@ -1,33 +1,25 @@
-import type { Modifier } from "@/types/menu-types";
-
-export type BundleProduct = {
-  id: string;
-  name: string;
-  price: string | number;
-  description?: string;
-  availability?: any;
-  images: string[];
-  modifiers: Modifier[];
-};
+import type { Product } from "@/types/menu-types";
 
 export type BundleCategory = {
   id: string;
   name: string;
-  products: BundleProduct[];
+  products: Product[];
 };
 
 export type BundleMenu = {
   id: string;
   name: string;
   isActive: boolean;
-  time?: string;
-  // Some payloads include additional metadata such as description or time ranges
+  time: string;
   timeRange?: string;
+  image?: string;
   description?: string;
+  itemCount?: number;
+  imageUrl?: string;
   categories: BundleCategory[];
 };
+
 export type MenusResponse = {
   menus: BundleMenu[];
-  popularProducts: BundleProduct[];
+  popularProducts: Product[];
 };
-
