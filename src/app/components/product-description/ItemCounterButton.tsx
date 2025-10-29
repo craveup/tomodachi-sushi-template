@@ -8,12 +8,21 @@ const ItemCounterButton = ({
   onIncrease,
   onDecrease,
   small = false,
+  disabled = false,
+  minValue = 0,
+  maxValue,
 }: {
   value: number;
   small?: boolean;
-  onIncrease: (e: any) => void;
-  onDecrease: (e: any) => void;
+  disabled?: boolean;
+  minValue?: number;
+  maxValue?: number;
+  onIncrease: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onDecrease: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }) => {
+  const atMin = value <= minValue;
+  const atMax = typeof maxValue === "number" ? value >= maxValue : false;
+
   return (
     <div
       className={cn("flex items-center", small ? "space-x-1" : "space-x-2.5")}
@@ -22,7 +31,7 @@ const ItemCounterButton = ({
         variant='outline'
         size='icon'
         onClick={onDecrease}
-        disabled={value <= 0}
+        disabled={disabled || atMin}
         aria-label='Decrement'
         className={cn(small && "h-7 w-7")}
       >
@@ -39,7 +48,7 @@ const ItemCounterButton = ({
         variant='outline'
         size='icon'
         onClick={onIncrease}
-        disabled={value >= 50}
+        disabled={disabled || atMax}
         aria-label='Increment'
         className={cn(small && "h-7 w-7")}
       >

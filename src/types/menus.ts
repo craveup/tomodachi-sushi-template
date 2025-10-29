@@ -1,12 +1,4 @@
-type Modifier = {
-  id: string;
-  name: string;
-  description: string;
-  isFixed: boolean;
-  required: boolean;
-  quantity: number;
-  items: any[];
-};
+import type { Modifier } from "@/types/menu-types";
 
 export type BundleProduct = {
   id: string;

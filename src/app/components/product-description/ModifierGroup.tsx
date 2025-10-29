@@ -1,72 +1,48 @@
 import React from "react";
-import clsx from "clsx";
-import { Element } from "react-scroll";
 import { Modifier, SelectedModifierTypes } from "@/types/menu-types";
-import ModifierGroupItem from "./ModifierGroupItem";
+import ModifierGroupSection from "./ModifierGroupItem";
+
+interface ModifierGroupProps {
+  modifiers: Modifier[];
+  selections: SelectedModifierTypes[];
+  setSelections: React.Dispatch<React.SetStateAction<SelectedModifierTypes[]>>;
+  disabled?: boolean;
+  errorModifierGroupId?: string;
+  onGroupInteract?: (groupId?: string) => void;
+}
 
 const ModifierGroup = ({
   modifiers,
-  selectedModifiers,
-  handleModifierOptionSelection,
-  handleModifierOptionQuantityChange,
+  selections,
+  setSelections,
+  disabled,
   errorModifierGroupId,
-}: {
-  modifiers: Modifier[];
-  selectedModifiers: SelectedModifierTypes[];
-  handleModifierOptionSelection: (
-    isSelected: boolean,
-    groupId: string,
-    optionId: string,
-    isSingleSelect: boolean,
-  ) => void;
-  handleModifierOptionQuantityChange: (
-    groupId: string,
-    optionId: string,
-    newQuantity: number,
-  ) => void;
-  errorModifierGroupId: string;
-}) => {
+  onGroupInteract,
+}: ModifierGroupProps) => {
+  const updateGroupSelection = (groupId: string, next?: SelectedModifierTypes) => {
+    setSelections((prev) => {
+      const others = prev.filter((group) => group.groupId !== groupId);
+      if (!next || next.selectedOptions.length === 0) {
+        return others;
+      }
+      return [...others, next];
+    });
+  };
+
   return (
-    <div>
+    <div className="space-y-3">
       {modifiers.map((modifier) => {
-        const currentSelectedModifier = selectedModifiers.find(
-          (selectedModifier) => selectedModifier.groupId == modifier.id,
-        );
-
-        const isError = errorModifierGroupId === modifier.id;
-
+        const selection = selections.find((selected) => selected.groupId === modifier.id);
         return (
-          <Element name={modifier.id} key={modifier.id}>
-            <div
-              className='flex h-[40px] items-center justify-between p-3'
-              style={{ backgroundColor: "#F5F6F8" }}
-            >
-              <p
-                className={clsx(
-                  "text-xs leading-[15px] font-semibold",
-                  isError && "text-red-600",
-                )}
-              >
-                {modifier.name}
-              </p>
-              <p
-                className={clsx(
-                  "text-xs leading-[15.84px] font-medium",
-                  isError && "text-red-600",
-                )}
-              >{`${modifier.required ? "Required" : "Optional"} · Select ${modifier.quantity}`}</p>
-            </div>
-            <ModifierGroupItem
-              groupId={modifier.id}
-              items={modifier.items}
-              isMultipleSelection={modifier.quantity > 1}
-              currentSelectedModifier={currentSelectedModifier}
-              handleModifierOptionSelection={handleModifierOptionSelection}
-              handleModifierOptionQuantityChange={
-                handleModifierOptionQuantityChange
-              }
-            />
-          </Element>
+          <ModifierGroupSection
+            key={modifier.id}
+            modifier={modifier}
+            selection={selection}
+            onChange={(next) => updateGroupSelection(modifier.id, next)}
+            disabled={disabled}
+            errorGroupId={errorModifierGroupId}
+            onGroupInteract={onGroupInteract}
+          />
         );
       })}
     </div>

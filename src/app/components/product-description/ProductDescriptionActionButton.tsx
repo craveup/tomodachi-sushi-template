@@ -10,10 +10,11 @@ import { SelectedModifierTypes } from "@/types/menu-types";
 import ItemCounterButton from "./ItemCounterButton";
 import { LoadingButton } from "@/components/ui/LoadingButton";
 import { location_Id as LOCATION_ID } from "@/constants";
+import { ItemUnavailableActions } from "@/types/common";
 
 const ProductDescriptionActionButton = ({
   cartItem,
-  selectedModifiers,
+  selections,
   closeBottomSheet,
   setErrorModifierGroupId,
   specialInstructions,
@@ -21,11 +22,11 @@ const ProductDescriptionActionButton = ({
   cartId,
 }: {
   cartItem: any;
-  selectedModifiers: SelectedModifierTypes[];
+  selections: SelectedModifierTypes[];
   closeBottomSheet: any;
   setErrorModifierGroupId: (errorModifierGroupId: string) => void;
   specialInstructions: string;
-  itemUnavailableAction: string;
+  itemUnavailableAction: ItemUnavailableActions;
   cartId: string;
 }) => {
   const [quantity, setQuantity] = useState<number>(1);
@@ -34,18 +35,13 @@ const ProductDescriptionActionButton = ({
   const { mutate } = useCart({ locationId, cartId });
 
   const handleAddItemToCart = async () => {
+    setErrorModifierGroupId("");
     const addItemData = {
       productId: cartItem.id,
       quantity,
       specialInstructions,
       itemUnavailableAction,
-      selections: selectedModifiers.map((group) => ({
-        groupId: group.groupId,
-        selectedOptions: group.selectedOptions.map((option) => ({
-          optionId: option.id,
-          quantity: option.quantity,
-        })),
-      })),
+      selections,
     };
     const cart = await postData(
       `/api/v1/locations/${locationId}/carts/${cartId}/cart-item`,
@@ -69,7 +65,6 @@ const ProductDescriptionActionButton = ({
       const formattedError = formatApiError(error);
 
       toast.error(formattedError.message, { duration: 600 });
-      setIsLoading(false);
 
       // TODO -- remove any type
       if (!(formattedError as any).data) return;
@@ -86,6 +81,8 @@ const ProductDescriptionActionButton = ({
           offset: -90,
         });
       }
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -93,8 +90,16 @@ const ProductDescriptionActionButton = ({
       <div className="flex-1">
         <ItemCounterButton
           value={quantity}
-          onIncrease={() => setQuantity(quantity + 1)}
-          onDecrease={() => quantity > 1 && setQuantity(quantity - 1)}
+          onIncrease={(event) => {
+            event.preventDefault();
+            setQuantity((prev) => prev + 1);
+          }}
+          onDecrease={(event) => {
+            event.preventDefault();
+            setQuantity((prev) => Math.max(1, prev - 1));
+          }}
+          minValue={1}
+          disabled={isLoading}
         />
       </div>
       <LoadingButton

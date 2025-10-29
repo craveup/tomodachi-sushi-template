@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import { ArrowLeft, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,17 +14,13 @@ import ItemUnavailableAction from "./ItemUnavailableAction";
 import SpecialInstructions from "./SpecialInstructions";
 import ProductDescriptionActionButton from "./ProductDescriptionActionButton";
 import ShowMoreText from "../ShowMoreText";
+import { ItemUnavailableActions } from "@/types/common";
 
 interface AddToCartScreenProps {
   product: ProductDescriptionType;
   closeBottomSheet?: () => void;
   cartId: string;
   isAddToCartBlocked?: boolean;
-}
-
-export enum ItemUnavailableActions {
-  REMOVE_ITEM = "remove_item",
-  CANCEL_ENTIRE_ORDER = "cancel_entire_order",
 }
 
 const ProductDescription = ({
@@ -34,129 +30,22 @@ const ProductDescription = ({
   isAddToCartBlocked = false,
 }: AddToCartScreenProps) => {
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  const [selectedModifiers, setSelectedModifiers] = useState<
-    SelectedModifierTypes[]
-  >([]);
+  const [selections, setSelections] = useState<SelectedModifierTypes[]>([]);
   const [itemUnavailableAction, setItemUnavailableAction] = useState(
     ItemUnavailableActions.REMOVE_ITEM
   );
 
   const [errorModifierGroupId, setErrorModifierGroupId] = useState("");
   const [specialInstructions, setSpecialInstructions] = useState<string>("");
-  const { images, name, description, modifiers } = product;
+  const { images, name, description } = product;
   const imageURL = images[0];
-
-  function handleModifierOptionSelection(
-    isAlreadySelected: boolean,
-    groupId: string,
-    optionId: string,
-    isSingleSelection: boolean
-  ) {
-    setErrorModifierGroupId("");
-
-    if (isAlreadySelected) {
-      const updatedSelectedModifiers = selectedModifiers.reduce(
-        (
-          allSelectedModifiers: SelectedModifierTypes[],
-          currentSelectedModifier
-        ) => {
-          if (currentSelectedModifier.groupId === groupId) {
-            const updatedSelectedOptions =
-              currentSelectedModifier.selectedOptions.filter(
-                (selectedOption) => selectedOption.id !== optionId
-              );
-
-            if (updatedSelectedOptions.length > 0) {
-              allSelectedModifiers.push({
-                ...currentSelectedModifier,
-                selectedOptions: updatedSelectedOptions,
-              });
-            }
-          } else {
-            allSelectedModifiers.push(currentSelectedModifier);
-          }
-
-          return allSelectedModifiers;
-        },
-        []
-      );
-
-      setSelectedModifiers(updatedSelectedModifiers);
-      return;
+  const modifiers = useMemo(() => product?.modifiers ?? [], [product]);
+  const handleModifierGroupInteract = (groupId?: string) => {
+    if (!errorModifierGroupId) return;
+    if (!groupId || groupId === errorModifierGroupId) {
+      setErrorModifierGroupId("");
     }
-
-    const selectedModifierCopy = [...selectedModifiers];
-
-    const matchedItemIndex = selectedModifierCopy.findIndex((modifierGroup) => {
-      return modifierGroup.groupId === groupId;
-    });
-
-    if (matchedItemIndex == -1) {
-      const createdGroupEntry: SelectedModifierTypes = {
-        groupId,
-        selectedOptions: [{ id: optionId, quantity: 1 }],
-      };
-      selectedModifierCopy.push(createdGroupEntry);
-    } else {
-      const currentGroup = selectedModifierCopy[matchedItemIndex]!;
-      const updatedSelectedOptions = isSingleSelection
-        ? [
-            {
-              id: optionId,
-              quantity: 1,
-            },
-          ]
-        : [...currentGroup.selectedOptions, { id: optionId, quantity: 1 }];
-
-      selectedModifierCopy[matchedItemIndex] = {
-        ...currentGroup,
-        selectedOptions: updatedSelectedOptions,
-      };
-    }
-
-    setSelectedModifiers(selectedModifierCopy);
-  }
-
-  function handleModifierOptionQuantityChange(
-    groupId: string,
-    optionId: string,
-    newQuantity: number
-  ) {
-    setErrorModifierGroupId("");
-
-    if (newQuantity === 0) {
-      handleModifierOptionSelection(true, groupId, optionId, false);
-
-      return;
-    }
-
-    const selectedModifierCopy = [...selectedModifiers];
-
-    const matchedItemIndex = selectedModifierCopy.findIndex((modifierGroup) => {
-      return modifierGroup.groupId === groupId;
-    });
-
-    const currentGroup = selectedModifierCopy[matchedItemIndex]!;
-    const updatedSelectedOptions = currentGroup.selectedOptions.map(
-      (option) => {
-        if (option.id == optionId) {
-          return {
-            ...option,
-            quantity: newQuantity,
-          };
-        }
-
-        return option;
-      }
-    );
-
-    selectedModifierCopy[matchedItemIndex] = {
-      ...currentGroup,
-      selectedOptions: updatedSelectedOptions,
-    };
-
-    setSelectedModifiers(selectedModifierCopy);
-  }
+  };
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
@@ -201,12 +90,11 @@ const ProductDescription = ({
 
         <ModifierGroup
           modifiers={modifiers}
-          selectedModifiers={selectedModifiers}
-          handleModifierOptionSelection={handleModifierOptionSelection}
-          handleModifierOptionQuantityChange={
-            handleModifierOptionQuantityChange
-          }
+          selections={selections}
+          setSelections={setSelections}
+          disabled={isAddToCartBlocked}
           errorModifierGroupId={errorModifierGroupId}
+          onGroupInteract={handleModifierGroupInteract}
         />
 
         <ItemUnavailableAction
@@ -225,7 +113,7 @@ const ProductDescription = ({
         {isAddToCartBlocked ? (
           <div className="rounded-md bg-red-50 p-4">
             <div className="flex">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <Info aria-hidden="true" className="h-5 w-5 text-red-400" />
               </div>
               <div className="ml-3">
@@ -239,7 +127,7 @@ const ProductDescription = ({
           <ProductDescriptionActionButton
             cartItem={product}
             closeBottomSheet={closeBottomSheet}
-            selectedModifiers={selectedModifiers}
+            selections={selections}
             setErrorModifierGroupId={setErrorModifierGroupId}
             specialInstructions={specialInstructions}
             itemUnavailableAction={itemUnavailableAction}

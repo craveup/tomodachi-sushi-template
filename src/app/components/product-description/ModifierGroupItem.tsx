@@ -1,100 +1,299 @@
 import React from "react";
+import clsx from "clsx";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { ModifierItem, SelectedModifierTypes } from "@/types/menu-types";
 import ItemCounterButton from "./ItemCounterButton";
+import {
+  Modifier,
+  ModifierChildLink,
+  ModifierItem,
+  SelectedModifierOption,
+  SelectedModifierTypes,
+} from "@/types/menu-types";
 
-interface ModifierGroupItemProps {
-  items: ModifierItem[];
-  currentSelectedModifier?: SelectedModifierTypes;
-  isMultipleSelection: boolean;
-  handleModifierOptionSelection: (
-    isSelected: boolean,
-    groupId: string,
-    optionId: string,
-    isSingleSelection: boolean
-  ) => void;
-  handleModifierOptionQuantityChange: (
-    groupId: string,
-    optionId: string,
-    newQuantity: number
-  ) => void;
-  groupId: string;
+interface ModifierGroupSectionProps {
+  modifier: Modifier;
+  selection?: SelectedModifierTypes;
+  onChange: (selection?: SelectedModifierTypes) => void;
+  onGroupInteract?: (groupId?: string) => void;
+  disabled?: boolean;
+  depth?: number;
+  errorGroupId?: string;
 }
 
-const ModifierGroupItem = ({
-  items,
-  currentSelectedModifier,
-  handleModifierOptionSelection,
-  handleModifierOptionQuantityChange,
-  groupId,
-  isMultipleSelection,
-}: ModifierGroupItemProps) => {
+const formatRuleSummary = (rule: { min: number; max: number }) => {
+  const range =
+    rule.min === rule.max ? `${rule.max}` : `${rule.min}-${rule.max}`;
+  return `${rule.min > 0 ? "Required" : "Optional"} - Select ${range}`;
+};
+
+function getTotalSelected(options: SelectedModifierOption[] | undefined) {
+  return (options ?? []).reduce((acc, option) => acc + option.quantity, 0);
+}
+
+function mergeRuleOverrides(
+  group: Modifier,
+  overrides?: Partial<Modifier["rule"]>
+): Modifier {
+  if (!overrides) return group;
+  return {
+    ...group,
+    rule: {
+      min: typeof overrides.min === "number" ? overrides.min : group.rule.min,
+      max: typeof overrides.max === "number" ? overrides.max : group.rule.max,
+    },
+  };
+}
+
+const ModifierGroupSection = ({
+  modifier,
+  selection,
+  onChange,
+  onGroupInteract,
+  disabled,
+  depth = 0,
+  errorGroupId,
+}: ModifierGroupSectionProps) => {
+  const isSingleSelect = modifier.rule.max <= 1;
+  const selectedOptions = selection?.selectedOptions ?? [];
+  const totalSelected = getTotalSelected(selectedOptions);
+  const isErrored = errorGroupId === modifier.id;
+
+  const emitChange = (options: SelectedModifierOption[]) => {
+    if (options.length === 0) {
+      onChange(undefined);
+    } else {
+      onChange({ groupId: modifier.id, selectedOptions: options });
+    }
+  };
+
+  const handleToggleOption = (option: ModifierItem) => {
+    if (disabled) return;
+    onGroupInteract?.(modifier.id);
+
+    const existingIndex = selectedOptions.findIndex(
+      (item) => item.optionId === option.id
+    );
+    const existing =
+      existingIndex >= 0 ? selectedOptions[existingIndex] : undefined;
+
+    if (isSingleSelect) {
+      if (existing) {
+        emitChange([]);
+      } else {
+        emitChange([{ optionId: option.id, quantity: 1 }]);
+      }
+      return;
+    }
+
+    if (existing) {
+      const nextOptions = selectedOptions.filter(
+        (item) => item.optionId !== option.id
+      );
+      emitChange(nextOptions);
+      return;
+    }
+
+    if (totalSelected >= modifier.rule.max) {
+      return;
+    }
+
+    emitChange([...selectedOptions, { optionId: option.id, quantity: 1 }]);
+  };
+
+  const handleQuantityChange = (option: ModifierItem, delta: number) => {
+    if (disabled) return;
+    onGroupInteract?.(modifier.id);
+
+    const idx = selectedOptions.findIndex(
+      (item) => item.optionId === option.id
+    );
+    if (idx === -1) return;
+
+    const current = selectedOptions[idx];
+    if (!current) return;
+
+    const nextQuantity = Math.min(
+      Math.max(current.quantity + delta, 1),
+      option.maxQuantity
+    );
+
+    const totalWithoutCurrent = totalSelected - current.quantity;
+    if (totalWithoutCurrent + nextQuantity > modifier.rule.max) {
+      return;
+    }
+
+    const nextOptions = [...selectedOptions];
+    nextOptions[idx] = {
+      ...current,
+      quantity: nextQuantity,
+    };
+
+    emitChange(nextOptions);
+  };
+
+  const handleChildChange = (
+    parentOption: ModifierItem,
+    childLink: ModifierChildLink,
+    childSelection?: SelectedModifierTypes
+  ) => {
+    const idx = selectedOptions.findIndex(
+      (option) => option.optionId === parentOption.id
+    );
+    if (idx === -1) return;
+
+    const current = selectedOptions[idx];
+    if (!current) return;
+    const existingChildren = current.children ?? [];
+    const filtered = existingChildren.filter(
+      (child) => child.groupId !== childLink.groupId
+    );
+
+    const nextChildren =
+      childSelection && childSelection.selectedOptions.length > 0
+        ? [...filtered, childSelection]
+        : filtered;
+
+    const nextOptions = [...selectedOptions];
+    nextOptions[idx] = {
+      ...current,
+      children: nextChildren.length > 0 ? nextChildren : undefined,
+    };
+
+    emitChange(nextOptions);
+  };
+
+  const renderChildGroups = (
+    option: ModifierItem,
+    selectedOption: SelectedModifierOption | undefined
+  ) => {
+    if (!selectedOption) return null;
+    if (!Array.isArray(option.childGroups) || option.childGroups.length === 0)
+      return null;
+
+    return (
+      <div className="mt-3 space-y-3 border-l border-muted pl-3">
+        {option.childGroups.map((link) => {
+          if (!link.group) return null;
+          const overriddenGroup = mergeRuleOverrides(
+            link.group,
+            link.overrides
+          );
+          const childSelection = selectedOption.children?.find(
+            (child) => child.groupId === link.groupId
+          );
+
+          return (
+            <div key={`${option.id}-${link.groupId}`} className="space-y-2">
+              {link.applyPerParentQuantity && (
+                <p className="text-[11px] text-muted-foreground">
+                  Applies per quantity of {option.name}
+                </p>
+              )}
+              <ModifierGroupSection
+                modifier={overriddenGroup}
+                selection={childSelection}
+                onChange={(next) => handleChildChange(option, link, next)}
+                onGroupInteract={onGroupInteract}
+                disabled={disabled}
+                depth={depth + 1}
+                errorGroupId={errorGroupId}
+              />
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
-    <div>
-      {items.map((modifierItem) => {
-        const selectedItem = currentSelectedModifier?.selectedOptions.find(
-          (option) => option.id == modifierItem.id
-        );
+    <section
+      id={modifier.id}
+      className={clsx(
+        "scroll-mt-[120px] rounded-md border border-muted",
+        depth > 0 && "bg-muted/30"
+      )}
+    >
+      <div
+        className={clsx(
+          "flex h-10 items-center justify-between px-3",
+          depth > 0 ? "bg-muted/60" : "bg-muted"
+        )}
+      >
+        <p
+          className={clsx(
+            "text-xs font-semibold",
+            isErrored && "text-destructive"
+          )}
+        >
+          {modifier.name}
+        </p>
+        <p
+          className={clsx(
+            "text-xs font-medium text-muted-foreground",
+            isErrored && "text-destructive"
+          )}
+        >
+          {formatRuleSummary(modifier.rule)}
+        </p>
+      </div>
 
-        const isSelected = Boolean(selectedItem);
+      <div className="divide-y divide-muted">
+        {modifier.items.map((option) => {
+          const selectedOption = selectedOptions.find(
+            (item) => item.optionId === option.id
+          );
+          const isSelected = Boolean(selectedOption);
 
-        return (
-          <div className="cursor-pointer" key={modifierItem.id}>
-            <div
-              onClick={() =>
-                handleModifierOptionSelection(
-                  isSelected,
-                  groupId,
-                  modifierItem.id,
-                  !isMultipleSelection
-                )
-              }
-            >
-              <div className="flex min-h-[40px] flex-col items-end justify-center space-y-2 border-b px-3 py-2">
-                <div className="flex h-[23px] w-full items-center justify-between">
+          return (
+            <div key={option.id} className="px-3 py-2">
+              <div className="flex min-h-10 flex-col gap-2">
+                <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
-                    <Checkbox id={modifierItem.id} checked={isSelected} />
-                    <Label>{modifierItem.name}</Label>
+                    <Checkbox
+                      id={`${modifier.id}-${option.id}`}
+                      checked={isSelected}
+                      onCheckedChange={() => handleToggleOption(option)}
+                      disabled={disabled}
+                    />
+                    <Label htmlFor={`${modifier.id}-${option.id}`}>
+                      {option.name}
+                    </Label>
                   </div>
-                  <Label
-                    style={{ color: "#626262" }}
-                    className="text-xs text-[12px] font-medium"
-                  >
-                    + {modifierItem.price}
-                  </Label>
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {option.price && option.price !== "0"
+                      ? `+ ${option.price}`
+                      : "Included"}
+                  </span>
                 </div>
 
-                {isSelected && modifierItem.maxQuantity > 1 && (
-                  <ItemCounterButton
-                    small={true}
-                    value={selectedItem!.quantity}
-                    onIncrease={(e) => {
-                      e.stopPropagation();
-
-                      handleModifierOptionQuantityChange(
-                        groupId,
-                        modifierItem.id,
-                        selectedItem!.quantity + 1
-                      );
-                    }}
-                    onDecrease={(e) => {
-                      e.stopPropagation();
-                      handleModifierOptionQuantityChange(
-                        groupId,
-                        modifierItem.id,
-                        selectedItem!.quantity - 1
-                      );
-                    }}
-                  />
+                {isSelected && !isSingleSelect && option.maxQuantity > 1 && (
+                  <div onClick={(event) => event.stopPropagation()}>
+                    <ItemCounterButton
+                      small
+                      value={selectedOption!.quantity}
+                      onIncrease={(event) => {
+                        event.stopPropagation();
+                        handleQuantityChange(option, 1);
+                      }}
+                      onDecrease={(event) => {
+                        event.stopPropagation();
+                        handleQuantityChange(option, -1);
+                      }}
+                      disabled={disabled}
+                      maxValue={option.maxQuantity}
+                    />
+                  </div>
                 )}
+
+                {renderChildGroups(option, selectedOption)}
               </div>
             </div>
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
+    </section>
   );
 };
 
-export default ModifierGroupItem;
+export default ModifierGroupSection;
