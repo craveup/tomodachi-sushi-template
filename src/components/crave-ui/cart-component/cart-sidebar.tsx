@@ -449,7 +449,7 @@ function CartSidebarContent({
                           )}
 
                           {hasSpecialInstructions && (
-                            <p className="line-clamp-2 text-xs text-textmuted">
+                            <p className="text-xs leading-snug text-muted-foreground line-clamp-2 break-all">
                               Special instructions: {specialInstructions}
                             </p>
                           )}
