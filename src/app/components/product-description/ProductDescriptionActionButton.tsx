@@ -6,11 +6,92 @@ import { toast } from "sonner";
 import { formatApiError } from "@/lib/format-api-error";
 import { postData } from "@/lib/handle-api";
 import { useCart } from "@/hooks/useCart";
-import { SelectedModifierTypes } from "@/types/menu-types";
+import { Modifier, SelectedModifierTypes } from "@/types/menu-types";
 import ItemCounterButton from "./ItemCounterButton";
 import { LoadingButton } from "@/components/ui/LoadingButton";
 import { location_Id as LOCATION_ID } from "@/constants";
 import { ItemUnavailableActions } from "@/types/common";
+
+const mergeRuleOverrides = (
+  group: Modifier,
+  overrides?: Partial<Modifier["rule"]>
+): Modifier => {
+  if (!overrides) return group;
+  return {
+    ...group,
+    rule: {
+      min: typeof overrides.min === "number" ? overrides.min : group.rule.min,
+      max: typeof overrides.max === "number" ? overrides.max : group.rule.max,
+    },
+  };
+};
+
+const getSelectionTotal = (selection?: SelectedModifierTypes) =>
+  selection?.selectedOptions.reduce((total, option) => total + option.quantity, 0) ?? 0;
+
+const validateModifierSelection = (
+  group: Modifier,
+  selection?: SelectedModifierTypes
+):
+  | {
+      groupId: string;
+      message: string;
+    }
+  | null => {
+  const totalSelected = getSelectionTotal(selection);
+
+  if (group.rule.min > 0 && totalSelected < group.rule.min) {
+    const requiredCount = group.rule.min;
+    return {
+      groupId: group.id,
+      message:
+        requiredCount === 1
+          ? `Please select an option for ${group.name}.`
+          : `Please select at least ${requiredCount} options for ${group.name}.`,
+    };
+  }
+
+  if (!selection) {
+    return null;
+  }
+
+  for (const selectedOption of selection.selectedOptions) {
+    const option = group.items.find((item) => item.id === selectedOption.optionId);
+    if (!option || !option.childGroups || option.childGroups.length === 0) {
+      continue;
+    }
+
+    for (const childLink of option.childGroups) {
+      if (!childLink.group) continue;
+      const resolvedGroup = mergeRuleOverrides(childLink.group, childLink.overrides);
+      const childSelection = selectedOption.children?.find(
+        (child) => child.groupId === childLink.groupId
+      );
+      const childValidationResult = validateModifierSelection(resolvedGroup, childSelection);
+
+      if (childValidationResult) {
+        return childValidationResult;
+      }
+    }
+  }
+
+  return null;
+};
+
+const findModifierSelectionError = (
+  modifiers: Modifier[],
+  selections: SelectedModifierTypes[]
+) => {
+  for (const group of modifiers) {
+    const selection = selections.find((selected) => selected.groupId === group.id);
+    const validationResult = validateModifierSelection(group, selection);
+    if (validationResult) {
+      return validationResult;
+    }
+  }
+
+  return null;
+};
 
 const ProductDescriptionActionButton = ({
   cartItem,
@@ -53,6 +134,27 @@ const ProductDescriptionActionButton = ({
   };
 
   const handleCartItem = async () => {
+    const modifiers: Modifier[] = Array.isArray(cartItem?.modifiers)
+      ? (cartItem.modifiers as Modifier[])
+      : [];
+    const modifierError = findModifierSelectionError(modifiers, selections);
+
+    if (modifierError) {
+      setErrorModifierGroupId(modifierError.groupId);
+      toast.error(modifierError.message, {
+        duration: 1000,
+        position: "top-center",
+      });
+      scroller.scrollTo(modifierError.groupId, {
+        containerId: "product-description-section",
+        duration: 500,
+        delay: 100,
+        smooth: true,
+        offset: -90,
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
